@@ -97,7 +97,51 @@ void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+void fft(void) {
+  // Windowing
+  arm_mult_f32(fft_input, fft_window, fft_input, FFT_SAMPLES);
 
+  // Execute FFT
+  arm_rfft_fast_f32(&S, fft_input, fft_output, 0);
+
+  // Calculate magnitude
+  arm_cmplx_mag_f32(fft_output, fft_magnitude, FFT_SAMPLES / 2);
+
+  // Normalization (Unitary transformation) of magnitude
+  arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), fft_magnitude,
+      FFT_SAMPLES / 2);
+
+  // AC coupling
+  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
+    if (*(fft_frequency + i) < FFT_AC_COUPLING_HZ)
+      fft_magnitude[i] = 1.0f;
+    else
+      break;
+  }
+
+  float inv_dB_base_mag = 1.0f / 1.0f;
+  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++)
+    fft_db[i] = 10.0f * log10f(fft_magnitude[i] * inv_dB_base_mag);
+
+  // Calculate max magnitude
+  float mag_max, frq_max;
+  uint32_t maxIndex;
+  arm_max_f32(fft_magnitude, FFT_SAMPLES / 2, &mag_max, &maxIndex);
+  frq_max = *(fft_frequency + maxIndex);
+
+  // Output result to UART when user button is pressed
+  if (output_result) {
+    printf("\nMEMS mic: %s\n", mic_select);
+    printf("Frequency at max magnitude: %.1f, Max magnitude: %f\n", frq_max,
+        mag_max);
+    printf("Frequency(Hz),Magnitude,Magnitude(dB)\n");
+    for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
+      printf("%.1f,%f,%f\n", fft_frequency[i], fft_magnitude[i], fft_db[i]);
+    }
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+    output_result = false;
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -186,60 +230,17 @@ int main(void)
         fft_input[i] = (float) pcm_m1[i];
       }
       mic_select = M1;
-    } else if (!flag_m2) {
+      fft();
+      flag_m1 = true;
+    }
+    if (!flag_m2) {
       for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-        fft_input[i] = (float) pcm_m1[i];
+        fft_input[i] = (float) pcm_m2[i];
       }
       mic_select = M2;
+      fft();
+      flag_m2 = true;
     }
-
-    // Windowing
-    arm_mult_f32(fft_input, fft_window, fft_input, FFT_SAMPLES);
-
-    // Execute FFT
-    arm_rfft_fast_f32(&S, fft_input, fft_output, 0);
-
-    // Calculate magnitude
-    arm_cmplx_mag_f32(fft_output, fft_magnitude, FFT_SAMPLES / 2);
-
-    // Normalization (Unitary transformation) of magnitude
-    arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), fft_magnitude,
-        FFT_SAMPLES / 2);
-
-    // AC coupling
-    for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
-      if (*(fft_frequency + i) < FFT_AC_COUPLING_HZ)
-        fft_magnitude[i] = 1.0f;
-      else
-        break;
-    }
-
-    float inv_dB_base_mag = 1.0f / 1.0f;
-    for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++)
-      fft_db[i] = 10.0f * log10f(fft_magnitude[i] * inv_dB_base_mag);
-
-    // Calculate max magnitude
-    float mag_max, frq_max;
-    uint32_t maxIndex;
-    arm_max_f32(fft_magnitude, FFT_SAMPLES / 2, &mag_max, &maxIndex);
-    frq_max = *(fft_frequency + maxIndex);
-
-    // Output result to UART when user button is pressed
-    if (output_result) {
-      printf("\nMEMS mic: %s\n", mic_select);
-      printf("Frequency at max magnitude: %.1f, Max magnitude: %f\n", frq_max,
-          mag_max);
-      printf("Frequency(Hz),Magnitude,Magnitude(dB)\n");
-      for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
-        printf("%.1f,%f,%f\n", fft_frequency[i], fft_magnitude[i], fft_db[i]);
-      }
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-      output_result = false;
-    }
-
-    // Expect next PCM samples
-    if (!flag_m1) flag_m1 = true;
-    if (!flag_m2) flag_m2 = true;
 
   /* USER CODE END WHILE */
 
