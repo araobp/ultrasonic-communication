@@ -61,12 +61,6 @@ Jumper pin setting
 - [NUCLEO-L476RG schematic](http://www.st.com/resource/en/schematic_pack/nucleo_64pins_sch.zip)
 - [X-NUCLEO-CCA02M1 schematic](http://www.st.com/content/ccc/resource/technical/layouts_and_diagrams/schematic_pack/ae/8d/91/e9/14/bc/4f/0e/x-nucleo-cca02m1_schematic.pdf/files/x-nucleo-cca02m1_schematic.pdf/jcr:content/translations/en.x-nucleo-cca02m1_schematic.pdf)
 
-## Code (forked one)
-
-https://github.com/araobp/NUCLEO-L476RG_DFSDM_PDM-Mic
-
-Note: The project above has been converted from SW4STM32 into TrueSTUDIO project, and I have modified the pinout on CubeMX for the expansion board. I have also changed the operation to take a single-shot FFT result by pushing USER button on Nucleo board.
-
 ### UART
 
 |Parameter   |Value    |
