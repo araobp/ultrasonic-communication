@@ -219,12 +219,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) {
 
-    // Wait for next PCM samples from either M1 or M2
-    while (flag_m1 && flag_m2) {
-      HAL_Delay(1);
-    }
-
-    // Prepare FFT input
+    // Wait for next PCM samples from M1
     if (!flag_m1) {
       for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
         fft_input[i] = (float) pcm_m1[i];
@@ -233,6 +228,8 @@ int main(void)
       fft();
       flag_m1 = true;
     }
+
+    // Wait for next PCM samples from M1
     if (!flag_m2) {
       for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
         fft_input[i] = (float) pcm_m2[i];
@@ -241,7 +238,6 @@ int main(void)
       fft();
       flag_m2 = true;
     }
-
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
