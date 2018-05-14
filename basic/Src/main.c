@@ -66,7 +66,7 @@ char *mic_select;
 float sample_rate;
 float sample_period;
 
-// DMA mem2mem buffer
+// DMA peripheral to memory buffer
 int32_t buf_m1[FFT_SAMPLES * 2] = { 0 };
 int32_t buf_m2[FFT_SAMPLES * 2] = { 0 };
 
