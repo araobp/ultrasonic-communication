@@ -1,6 +1,6 @@
-# MEMS Microphones
+# MEMS Microphones with STM32
 
-## DFSDM microphone acquisition
+## STM32L4 DFSDM microphone acquisition
 
 ```
                     . . . . . . . . . . . . . . Arm Cortex-M4 . . . . . . . . . . . .
