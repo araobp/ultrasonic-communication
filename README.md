@@ -44,6 +44,8 @@ Solder bridges to be closed
 |SB16  |CN10     |28        |PA6, PB14      |MIC_PDM12(M1)   |
 |SB17  |CN10     |25        |PB10           |MIC_PDM34(M2)   |
 
+Note: SB9 should be closed instead of SB17 for acquiring both L/R sound on a single line.
+
 Jumper pin setting
 
 |Jumper|Position|Description           |
