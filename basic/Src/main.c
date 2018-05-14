@@ -229,7 +229,7 @@ int main(void)
       flag_m1 = true;
     }
 
-    // Wait for next PCM samples from M1
+    // Wait for next PCM samples from M2
     if (!flag_m2) {
       for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
         fft_input[i] = (float) pcm_m2[i];
