@@ -52,6 +52,8 @@ Jumper pin setting
 |J2    |1-2     |Use on-board MIC 1(M1)|
 |J3    |1-2     |Use on-board MIC 1(M1)|
 
+Note: M1's LR is pulled-down and M2's LR is pulled-up.
+
 ## STM32L476RG pinout configuration (CubeMX)
 
 ![Pinout](./Pinout.jpg)
