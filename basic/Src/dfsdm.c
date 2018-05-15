@@ -100,7 +100,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel1.Instance = DFSDM1_Channel1;
   hdfsdm1_channel1.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel1.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
-  hdfsdm1_channel1.Init.OutputClock.Divider = 25;
+  hdfsdm1_channel1.Init.OutputClock.Divider = 32;
   hdfsdm1_channel1.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel1.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel1.Init.Input.Pins = DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS;
@@ -109,7 +109,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel1.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
   hdfsdm1_channel1.Init.Awd.Oversampling = 10;
   hdfsdm1_channel1.Init.Offset = 0;
-  hdfsdm1_channel1.Init.RightBitShift = 0x00;
+  hdfsdm1_channel1.Init.RightBitShift = 0x02;
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel1) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -118,7 +118,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel2.Instance = DFSDM1_Channel2;
   hdfsdm1_channel2.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel2.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
-  hdfsdm1_channel2.Init.OutputClock.Divider = 25;
+  hdfsdm1_channel2.Init.OutputClock.Divider = 32;
   hdfsdm1_channel2.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel2.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel2.Init.Input.Pins = DFSDM_CHANNEL_SAME_CHANNEL_PINS;
@@ -127,7 +127,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel2.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
   hdfsdm1_channel2.Init.Awd.Oversampling = 10;
   hdfsdm1_channel2.Init.Offset = 0;
-  hdfsdm1_channel2.Init.RightBitShift = 0x00;
+  hdfsdm1_channel2.Init.RightBitShift = 0x02;
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -136,7 +136,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel7.Instance = DFSDM1_Channel7;
   hdfsdm1_channel7.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel7.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
-  hdfsdm1_channel7.Init.OutputClock.Divider = 25;
+  hdfsdm1_channel7.Init.OutputClock.Divider = 32;
   hdfsdm1_channel7.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel7.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel7.Init.Input.Pins = DFSDM_CHANNEL_SAME_CHANNEL_PINS;
@@ -145,7 +145,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel7.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
   hdfsdm1_channel7.Init.Awd.Oversampling = 10;
   hdfsdm1_channel7.Init.Offset = 0;
-  hdfsdm1_channel7.Init.RightBitShift = 0x00;
+  hdfsdm1_channel7.Init.RightBitShift = 0x02;
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel7) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);

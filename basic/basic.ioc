@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-DFSDM1.Divider=25
+DFSDM1.Divider=32
 DFSDM1.DmaMode_reg_FIL0=ENABLE
 DFSDM1.DmaMode_reg_FIL1=ENABLE
 DFSDM1.DmaMode_reg_FIL2=ENABLE
@@ -12,10 +12,13 @@ DFSDM1.Filter_regChannel_FIL2=DFSDM_CHANNEL_1
 DFSDM1.Fosr_FIL0=32
 DFSDM1.Fosr_FIL1=32
 DFSDM1.Fosr_FIL2=32
-DFSDM1.IPParameters=Filter_regChannel_FIL0,SincOrder_FIL0,Fosr_FIL0,FastMode_reg_FIL0,Divider,DmaMode_reg_FIL0,Oversampling_CH2,Oversampling_CH7,Filter_regChannel_FIL1,FastMode_reg_FIL1,DmaMode_reg_FIL1,SincOrder_FIL1,Fosr_FIL1,Type_spi_CH7,Type_spi_CH1,Oversampling_CH1,Filter_regChannel_FIL2,FastMode_reg_FIL2,DmaMode_reg_FIL2,SincOrder_FIL2,Fosr_FIL2
+DFSDM1.IPParameters=Filter_regChannel_FIL0,SincOrder_FIL0,Fosr_FIL0,FastMode_reg_FIL0,Divider,DmaMode_reg_FIL0,Oversampling_CH2,Oversampling_CH7,Filter_regChannel_FIL1,FastMode_reg_FIL1,DmaMode_reg_FIL1,SincOrder_FIL1,Fosr_FIL1,Type_spi_CH7,Type_spi_CH1,Oversampling_CH1,Filter_regChannel_FIL2,FastMode_reg_FIL2,DmaMode_reg_FIL2,SincOrder_FIL2,Fosr_FIL2,RightBitShift_CH1,RightBitShift_CH2,RightBitShift_CH7
 DFSDM1.Oversampling_CH1=10
 DFSDM1.Oversampling_CH2=10
 DFSDM1.Oversampling_CH7=10
+DFSDM1.RightBitShift_CH1=0x02
+DFSDM1.RightBitShift_CH2=0x02
+DFSDM1.RightBitShift_CH7=0x02
 DFSDM1.SincOrder_FIL0=DFSDM_FILTER_SINC3_ORDER
 DFSDM1.SincOrder_FIL1=DFSDM_FILTER_SINC3_ORDER
 DFSDM1.SincOrder_FIL2=DFSDM_FILTER_SINC3_ORDER

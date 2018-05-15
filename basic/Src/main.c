@@ -148,7 +148,7 @@ void fft(void) {
     printf("\n");
     // Raw PCM data
     for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-      printf("%ld,%ld\n", (long unsigned int)i, (long signed int)fft_input[i]);
+      printf("%ld,%f\n", (long unsigned int)i, fft_input[i]);
     }
     printf("EOF\n");
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
@@ -219,7 +219,7 @@ int main(void)
   printf("/// Audio Spectrum Analyzer ///\n\n");
   printf("Sampling rate: %4.1f(kHz)\n", (float) sample_rate / 1000.0f);
   sample_period = 1.0f / sample_rate * FFT_SAMPLES;
-  printf("Sampling period: %.1f(msec), Samples per period: %d\n\n",
+  printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
       sample_period * 1000.0f, FFT_SAMPLES);
   printf("Push USER button to output single-shot FFT\n");
 
