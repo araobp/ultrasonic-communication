@@ -56,19 +56,25 @@
 /* Private variables ---------------------------------------------------------*/
 
 // Flags to indicate ISR to copy data from buffer to PCM data store for FFT
-bool flag_m1 = true;  // MEMS mic M1
-bool flag_m2 = true;  // MEMS mic M2
-char M1[] = "M1";
-char M2[] = "M2";
+char M1[] = "M1";    // MEMS mic 1
+
+#ifdef M2_MULTIPREX
+  char M2[] = "M2A";  // MEMS mic 2 on the same PDM line as M1 uses.
+#else
+  char M2[] = "M2B";  // MEMS mic 2 on the other PDM line
+#endif
+
 char *mic_select;
+bool flag_m1 = true;
+bool flag_m2 = true;
 
 // Audio sample rate and period
 float sample_rate;
 float sample_period;
 
 // DMA peripheral to memory buffer
-int32_t buf_m1[FFT_SAMPLES * 2] = { 0 };
-int32_t buf_m2[FFT_SAMPLES * 2] = { 0 };
+int32_t buf_m1[FFT_SAMPLES] = { 0 };
+int32_t buf_m2[FFT_SAMPLES] = { 0 };
 
 // PCM data store for further processing (FFT)
 int32_t pcm_m1[FFT_SAMPLES] = { 0 };
@@ -135,9 +141,16 @@ void fft(void) {
     printf("Frequency at max magnitude: %.1f, Max magnitude: %f\n", frq_max,
         mag_max);
     printf("Frequency(Hz),Magnitude,Magnitude(dB)\n");
+    // FFT
     for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
       printf("%.1f,%f,%f\n", fft_frequency[i], fft_magnitude[i], fft_db[i]);
     }
+    printf("\n");
+    // Raw PCM data
+    for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+      printf("%ld,%ld\n", (long unsigned int)i, (long signed int)fft_input[i]);
+    }
+    printf("EOF\n");
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
     output_result = false;
   }
@@ -183,11 +196,19 @@ int main(void)
       != HAL_OK) {
     Error_Handler();
   }
+#ifdef M2_MULTIPREX
+  // DMA from DFSDM to buf_m2
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, FFT_SAMPLES)
+      != HAL_OK) {
+    Error_Handler();
+  }
+#else
   // DMA from DFSDM to buf_m2
   if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter1, buf_m2, FFT_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
+#endif
 
   // FFT sample rate
   sample_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
@@ -228,7 +249,6 @@ int main(void)
       fft();
       flag_m1 = true;
     }
-
     // Wait for next PCM samples from M2
     if (!flag_m2) {
       for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
@@ -325,9 +345,27 @@ void SystemClock_Config(void)
  */
 void HAL_DFSDM_FilterRegConvHalfCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
-  /*static int i = 0;
-   printf("%d\r\n", i);
-   i++;*/
+  uint32_t end = FFT_SAMPLES/2;
+  if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
+    for (uint32_t i = 0; i < end; i++) {
+      pcm_m1[i] = buf_m1[i];
+    }
+    flag_m1 = false;
+#ifdef M2_MULTIPREX
+  } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter2)) {
+    for (uint32_t i = 0; i < end; i++) {
+      pcm_m2[i] = buf_m2[i];
+    }
+    flag_m2 = false;
+  }
+#else
+  } else if  (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter1)) {
+    for (uint32_t i = 0; i < end; i++) {
+      pcm_m2[i] = buf_m2[i];
+    }
+    flag_m2 = false;
+  }
+#endif
 }
 
 /**
@@ -339,17 +377,27 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
  */
 void HAL_DFSDM_FilterRegConvCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
+  uint32_t start = FFT_SAMPLES/2;
   if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
       pcm_m1[i] = buf_m1[i];
     }
     flag_m1 = false;
-  } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter1)) {
-    for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+#ifdef M2_MULTIPREX
+  } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter2)) {
+    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
       pcm_m2[i] = buf_m2[i];
     }
     flag_m2 = false;
   }
+#else
+  } else if  (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter1)) {
+    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
+      pcm_m2[i] = buf_m2[i];
+    }
+    flag_m2 = false;
+  }
+#endif
 }
 
 /**

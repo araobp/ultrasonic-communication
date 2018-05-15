@@ -49,10 +49,13 @@
 
 DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 DFSDM_Filter_HandleTypeDef hdfsdm1_filter1;
+DFSDM_Filter_HandleTypeDef hdfsdm1_filter2;
+DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel2;
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel7;
 DMA_HandleTypeDef hdma_dfsdm1_flt0;
 DMA_HandleTypeDef hdma_dfsdm1_flt1;
+DMA_HandleTypeDef hdma_dfsdm1_flt2;
 
 /* DFSDM1 init function */
 void MX_DFSDM1_Init(void)
@@ -82,6 +85,36 @@ void MX_DFSDM1_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
+  hdfsdm1_filter2.Instance = DFSDM1_Filter2;
+  hdfsdm1_filter2.Init.RegularParam.Trigger = DFSDM_FILTER_SW_TRIGGER;
+  hdfsdm1_filter2.Init.RegularParam.FastMode = ENABLE;
+  hdfsdm1_filter2.Init.RegularParam.DmaMode = ENABLE;
+  hdfsdm1_filter2.Init.FilterParam.SincOrder = DFSDM_FILTER_SINC3_ORDER;
+  hdfsdm1_filter2.Init.FilterParam.Oversampling = 32;
+  hdfsdm1_filter2.Init.FilterParam.IntOversampling = 1;
+  if (HAL_DFSDM_FilterInit(&hdfsdm1_filter2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  hdfsdm1_channel1.Instance = DFSDM1_Channel1;
+  hdfsdm1_channel1.Init.OutputClock.Activation = ENABLE;
+  hdfsdm1_channel1.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
+  hdfsdm1_channel1.Init.OutputClock.Divider = 25;
+  hdfsdm1_channel1.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
+  hdfsdm1_channel1.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
+  hdfsdm1_channel1.Init.Input.Pins = DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS;
+  hdfsdm1_channel1.Init.SerialInterface.Type = DFSDM_CHANNEL_SPI_FALLING;
+  hdfsdm1_channel1.Init.SerialInterface.SpiClock = DFSDM_CHANNEL_SPI_CLOCK_INTERNAL;
+  hdfsdm1_channel1.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
+  hdfsdm1_channel1.Init.Awd.Oversampling = 10;
+  hdfsdm1_channel1.Init.Offset = 0;
+  hdfsdm1_channel1.Init.RightBitShift = 0x00;
+  if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
   hdfsdm1_channel2.Instance = DFSDM1_Channel2;
   hdfsdm1_channel2.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel2.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
@@ -94,7 +127,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel2.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
   hdfsdm1_channel2.Init.Awd.Oversampling = 10;
   hdfsdm1_channel2.Init.Offset = 0;
-  hdfsdm1_channel2.Init.RightBitShift = 0x02;
+  hdfsdm1_channel2.Init.RightBitShift = 0x00;
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -112,7 +145,7 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel7.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
   hdfsdm1_channel7.Init.Awd.Oversampling = 10;
   hdfsdm1_channel7.Init.Offset = 0;
-  hdfsdm1_channel7.Init.RightBitShift = 0x02;
+  hdfsdm1_channel7.Init.RightBitShift = 0x00;
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel7) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -124,6 +157,11 @@ void MX_DFSDM1_Init(void)
   }
 
   if (HAL_DFSDM_FilterConfigRegChannel(&hdfsdm1_filter1, DFSDM_CHANNEL_7, DFSDM_CONTINUOUS_CONV_ON) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  if (HAL_DFSDM_FilterConfigRegChannel(&hdfsdm1_filter2, DFSDM_CHANNEL_1, DFSDM_CONTINUOUS_CONV_ON) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -217,6 +255,28 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
      Be aware that there is only one channel to perform all the requested DMAs. */
     __HAL_LINKDMA(dfsdm_filterHandle,hdmaInj,hdma_dfsdm1_flt1);
     __HAL_LINKDMA(dfsdm_filterHandle,hdmaReg,hdma_dfsdm1_flt1);
+  }
+
+    /* DFSDM1_FLT2 Init */
+  if(dfsdm_filterHandle->Instance == DFSDM1_Filter2){
+    hdma_dfsdm1_flt2.Instance = DMA1_Channel6;
+    hdma_dfsdm1_flt2.Init.Request = DMA_REQUEST_0;
+    hdma_dfsdm1_flt2.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_dfsdm1_flt2.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_dfsdm1_flt2.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_dfsdm1_flt2.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_dfsdm1_flt2.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_dfsdm1_flt2.Init.Mode = DMA_CIRCULAR;
+    hdma_dfsdm1_flt2.Init.Priority = DMA_PRIORITY_MEDIUM;
+    if (HAL_DMA_Init(&hdma_dfsdm1_flt2) != HAL_OK)
+    {
+      _Error_Handler(__FILE__, __LINE__);
+    }
+
+    /* Several peripheral DMA handle pointers point to the same DMA handle.
+     Be aware that there is only one channel to perform all the requested DMAs. */
+    __HAL_LINKDMA(dfsdm_filterHandle,hdmaInj,hdma_dfsdm1_flt2);
+    __HAL_LINKDMA(dfsdm_filterHandle,hdmaReg,hdma_dfsdm1_flt2);
   }
 
 }

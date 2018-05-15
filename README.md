@@ -1,24 +1,6 @@
 # MEMS Microphones with STM32
 
-## STM32L4 DFSDM microphone acquisition
-
-```
-                    . . . . . . . . . . . . . . Arm Cortex-M4 . . . . . . . . . . . .
-                    .   +-------+                                FFT                .
-     +--+-- Clock ------|       |                              +------+   +------+  .
-     |  |           .   | DFSDM |                              | Core |-->|USART2|-- UART/USB --> PC
-     |  |           .   |       |                              | DSP  |   +------+  .
-     |  |           .   |       |                              +------+             .
-     |  |           .   |       |                                ^  ^               .
-     V  |           .   |       |          +-----+   +-----+     |  |               .
-[MEMS mic(M1)]-- PDM -->|       |-- PCM -->| DMA |-->| RAM |-----+  |               .
-        |           .   |       |          +-----+   |     |        |               .
-        v           .   |       |          +-----+   |     |        |               .
-[MEMS mic(M2)]-- PDM -->|       |-- PCM -->| DMA |-->|     |--------+               .
-                    .   +-------+          +-----+   +-----+                        .
-                    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-```
+![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=480&h=189)
 
 ## Expansion board
 
@@ -26,7 +8,7 @@ Use [X-NUCLEO-CCA02M1](http://www.st.com/en/ecosystems/x-nucleo-cca02m1.html) ex
 
 ![expansion](./MEMSMIC_expansion_board.jpg)
 
-As per the MEMC mic datasheet, input clock frequency Max value is 3.25MHz.
+As per the MEMS mic datasheet, input clock frequency Max value is 3.25MHz.
 
 Given the system clock rate at 80MHz, the clock divider should be larger than 25.
 
@@ -40,11 +22,12 @@ Solder bridges to be closed
 
 |Bridge|Connector|Pin number|STM32L476RG pin|Description     |
 |------|---------|----------|---------------|----------------|
+|SB9   |CN10     |28        |PA6, PB14      |MIC_PDM12(M1)   |
 |SB12  |CN7      |35        |PC2            |MIC_CLOCK_NUCLEO|
 |SB16  |CN10     |28        |PA6, PB14      |MIC_PDM12(M1)   |
 |SB17  |CN10     |25        |PB10           |MIC_PDM34(M2)   |
 
-Note: SB9 should be closed instead of SB17 for acquiring both L/R sound on a single line.
+Note: SB9 should be closed instead of SB17 for acquiring both L/R sound on a single PDM line.
 
 Jumper pin setting
 
