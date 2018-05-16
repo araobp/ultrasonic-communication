@@ -82,8 +82,9 @@ int32_t pcm_m2[FFT_SAMPLES] = { 0 };
 
 // FFT
 arm_rfft_fast_instance_f32 S;
-float fft_input[FFT_SAMPLES] = { 0.0f };
-float fft_output[FFT_SAMPLES] = { 0.0f };
+float32_t fft_input[FFT_SAMPLES] = { 0.0f };
+float32_t fft_hanning[FFT_SAMPLES] = { 0.0f };
+float32_t fft_output[FFT_SAMPLES] = { 0.0f };
 float fft_magnitude[FFT_SAMPLES / 2] = { 0.0f };
 float fft_db[FFT_SAMPLES / 2] = { 0.0f };
 float fft_frequency[FFT_SAMPLES / 2] = { 0.0f };
@@ -106,8 +107,12 @@ void SystemClock_Config(void);
 void fft(void) {
   // Windowing
   arm_mult_f32(fft_input, fft_window, fft_input, FFT_SAMPLES);
+  for(uint32_t i = 0; i < FFT_SAMPLES; i++) {
+    fft_hanning[i] = fft_input[i];
+  }
 
   // Execute FFT
+  // Note: this function modifies fft_input as well.
   arm_rfft_fast_f32(&S, fft_input, fft_output, 0);
 
   // Calculate magnitude
@@ -147,10 +152,23 @@ void fft(void) {
     }
     printf("\n");
     // Raw PCM data
-    for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-      printf("%ld,%f\n", (long unsigned int)i, fft_input[i]);
+    printf("Index,Amplitude\n");
+    if (mic_select == M1) {
+      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+        printf("%lu,%ld\n", i, pcm_m1[i]);
+      }
+    } else {
+      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+        printf("%lu,%ld\n", i, pcm_m2[i]);
+      }
     }
-    printf("EOF\n");
+    printf("EORAW\n");
+    // Filtered PCM data (e.g., Hanning Window)
+    printf("Index,Amplitude\n");
+    for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+      printf("%lu,%f\n", i, fft_hanning[i]);
+    }
+    printf("EOFLT\n");
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
     output_result = false;
   }
@@ -345,6 +363,7 @@ void SystemClock_Config(void)
  */
 void HAL_DFSDM_FilterRegConvHalfCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
+/*
   uint32_t end = FFT_SAMPLES/2;
   if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
     for (uint32_t i = 0; i < end; i++) {
@@ -366,6 +385,7 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
     flag_m2 = false;
   }
 #endif
+*/
 }
 
 /**
@@ -377,7 +397,8 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
  */
 void HAL_DFSDM_FilterRegConvCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
-  uint32_t start = FFT_SAMPLES/2;
+  // uint32_t start = FFT_SAMPLES / 2;
+  uint32_t start = 0;
   if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
     for (uint32_t i = start; i < FFT_SAMPLES; i++) {
       pcm_m1[i] = buf_m1[i];

@@ -4,6 +4,7 @@ import time
 ser = serial.Serial('COM15', 115200)
 
 HEADER = 'HEADER'
+FILTER = 'FILTER'
 CSV = 'CSV'
 RAW = 'RAW'
 mode = HEADER
@@ -13,14 +14,21 @@ sampling_rate = 0
 
 filename_fft = ''
 filename_raw = ''
+filename_filter = ''
 
 file_fft = None
 file_raw = None
+file_filter = None
 
 def param(line):
     return line.split(':')[1][1:].rstrip()
 
+def print_mode():
+    print('mode = {}'.format(mode))
+
 if __name__ == '__main__':
+
+    print_mode()
 
     while True:
 
@@ -38,25 +46,38 @@ if __name__ == '__main__':
 
             if (line.startswith('Frequency(Hz)')):
                 mode = CSV
-                filename_fft = '{}_{}_{}.fft'.format(
-                    str(int(time.time())), sampling_rate, mic
-                    )
+                print_mode()
+                filename ='{}_{}_{}'.format(str(int(time.time())),
+                                            sampling_rate, mic)
+                filename_fft = '{}.fft'.format(filename)
                 file_fft = open(filename_fft, 'w')
-                filename_raw = '{}_{}_{}.raw'.format(
-                    str(int(time.time())), sampling_rate, mic
-                    )
+                filename_raw = '{}.raw'.format(filename)
                 file_raw = open(filename_raw, 'w')
-                
-        if (mode == CSV):
+                filename_filter = '{}.flt'.format(filename)
+                file_filter = open(filename_filter, 'w')
+
+                file_fft.write(line)
+
+        elif (mode == CSV):
             if (line == '\n'):
                 mode = RAW
+                print_mode()
             else:
                 file_fft.write(line)
 
-        if (mode == RAW):
-            if (line == 'EOF\n'):
-                mode = HEADER
-                file_fft.close()
-                file_raw.close()
+        elif (mode == RAW):
+            if (line == 'EORAW\n'):
+                mode = FILTER
+                print_mode()
             else:
                 file_raw.write(line)
+            
+        elif (mode == FILTER):
+            if (line == 'EOFLT\n'):
+                mode = HEADER
+                print_mode()
+                file_fft.close()
+                file_raw.close()
+                file_filter.close()
+            else:
+                file_filter.write(line)
