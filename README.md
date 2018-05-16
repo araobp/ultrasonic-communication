@@ -68,23 +68,23 @@ It is also possible to use only one line for both L/R sound acquisition.
 
 I used [this on-line tone generator](http://www.szynalski.com/tone-generator/) to generate sine-wave tone at 18000Hz frequency.
 
-PCM data
+#### PCM data
 ![PCM](./doc/PCM_M1.jpg)
 
-Hanning window applied on the PCM data
+#### Hanning window applied on the PCM data
 ![Hanning](./doc/Hanning_M1.jpg)
 
-FFT result
+#### FFT result
 ![FFT](./doc/FFT_M1.jpg)
 
-FFT result (dB)
+#### FFT result (dB)
 ![FFT DB](./doc/FFT_DB_M1.jpg)
 
 ### Vacuum cleaner
 
 Vaccum cleaner seems to generate tone at around 5000Hz:
 
-FFT result
+#### FFT result
 ![FFT_Vaccum_Cleaner](./doc/FFT_Vaccum_Cleaner_M2A.jpg)
 
 ## References
