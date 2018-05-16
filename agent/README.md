@@ -12,4 +12,4 @@ This agent runs on PC to receive data via UART from NUCLEO-L476RG board to save 
 
 ## Visualization by Jupyter Notebook
 
-- [Vaccum Cleaner](./vaccum_cleaner/plot.ipyng)
+- [Vaccum Cleaner](./vaccum_cleaner/plot.ipynb)
