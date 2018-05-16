@@ -119,3 +119,8 @@ Vaccum cleaner seems to generate tone at around 5000Hz:
 ### Audio
 
 - [Using a PDM microphone](https://curiouser.cheshireeng.com/2014/11/04/using-a-pdm-microphone/)
+
+### Audio signal processing
+
+- [Book](http://floor13.sakura.ne.jp/book03/book03.html)
+- [Embarcadero C++ Compiler (Borland C++ Compiler)](https://www.embarcadero.com/jp/free-tools/ccompiler/free-download)
