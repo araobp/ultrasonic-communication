@@ -5,7 +5,7 @@ This agent runs on PC to receive data via UART from NUCLEO-L476RG board to save 
 ## File types
 
 ```
-*.csv ==> FFT
+*.fft ==> FFT
 *.raw ==> Raw PCM data
 *.flt ==> Hanning window applied on PCM data
 ```
