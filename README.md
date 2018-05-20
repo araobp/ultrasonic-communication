@@ -30,3 +30,30 @@ Although this is not ultrasonic, but I assign the following frequencies to each 
 |19800| D |
 |19900| E |
 |20000| F |
+
+## DFSDM setting
+
+|Parameter    |Value/setting|
+|-------------|-----|
+|System clock |80MHz|
+|Clock divider|25   |
+|Decimation   |32   |
+|Filter       |sinc3|
+
+The resulting sampling rate is 100kHz. If the length of FFT input data is 2048, the data length corresponds 10msec.
+
+```
+    [5/A][A][A][A][A][A/B][B][B]..
+
+```
+If the FFT peak is same in three times in a row (30msec), the receiver recognize it as a meaningful hex data.
+
+## Data frame
+
+```
+    [Start-of-frame][Identifier(4bit)][DLC(4bit)][D0(8bit)]...[Dn(8bit)][Enf-of-frame]
+       18300 Hz                                                           18400Hz
+       50msec                                                             50msec
+```
+
+
