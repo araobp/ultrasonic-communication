@@ -14,9 +14,9 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ## Ultrasonic communication experiment
 
-### Hex number in 8bit length
+### Hex number in 4bit length
 
-I assign the following frequencies to each hexa-decimal number of 8 bit data length. I am going to increase the frequencies to ultrasonic range later on.
+I assign the following frequencies to each hexa-decimal number of 4 bit data length. I am going to increase the frequencies to ultrasonic range later on.
 
 |Hz   |Hex|
 |-----|---|
@@ -148,3 +148,4 @@ Hex data: F
 
 - Develop tone generator on Win10.
 - Add a character LDC to the board.
+- 16bit-length data transmission by mixing different frequencies at tone generator.
