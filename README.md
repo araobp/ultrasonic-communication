@@ -62,7 +62,11 @@ This frame format is tentative: I am going to refer to CAN frame to support Stan
        100msec                                100msec
 ```
 
-### Test
+### Result of first ultrasonic communication test performed on May 20, 2018
+
+Although the MEMS mic is only 50 cm away from tone generator on my PC, this is my first experience in ultrasonic communications.
+
+The first of the first step.
 
 ```
 MEMS mic: M1
