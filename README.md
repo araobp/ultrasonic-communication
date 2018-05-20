@@ -42,13 +42,13 @@ Although this is not ultrasonic, but I assign the following frequencies to each 
 |Decimation   |32   |
 |Filter       |sinc3|
 
-The resulting sampling rate is 100kHz (Nyquist frequency is 50kHz). If the length of FFT input data is 2048, the data length corresponds 10msec.
+The resulting sampling rate is 100kHz (Nyquist frequency is 50kHz). If the length of FFT input data is 2048, the data length corresponds 20msec.
 
 ```
     [5/A][A][A][A][A][A/B][B][B]..
 
 ```
-If the FFT peak is same and its magnitude is larger than a specific value in three times in a row (30msec), the receiver recognize it as a meaningful hex data.
+If the FFT peak is same and its magnitude is larger than a specific value in three times in a row (60msec), the receiver recognize it as a meaningful hex data.
 
 ## Data frame
 
