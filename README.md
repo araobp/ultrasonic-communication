@@ -4,6 +4,8 @@
 
 ## Platform and test code
 
+This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
+
 ==> [Platform](PLATFORM.md)
 
 ==> [Test code](./basic)
@@ -40,7 +42,7 @@ Although this is not ultrasonic, but I assign the following frequencies to each 
 |Decimation   |32   |
 |Filter       |sinc3|
 
-The resulting sampling rate is 100kHz. If the length of FFT input data is 2048, the data length corresponds 10msec.
+The resulting sampling rate is 100kHz (Nyquist frequency is 50kHz). If the length of FFT input data is 2048, the data length corresponds 10msec.
 
 ```
     [5/A][A][A][A][A][A/B][B][B]..
