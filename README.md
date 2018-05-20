@@ -48,7 +48,7 @@ The resulting sampling rate is 100kHz (Nyquist frequency is 50kHz). If the lengt
     [5/A][A][A][A][A][A/B][B][B]..
 
 ```
-If the FFT peak is same in three times in a row (30msec), the receiver recognize it as a meaningful hex data.
+If the FFT peak is same and its magnitude is larger than a specific value in three times in a row (30msec), the receiver recognize it as a meaningful hex data.
 
 ## Data frame
 
