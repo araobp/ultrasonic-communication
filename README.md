@@ -12,7 +12,7 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ==> [Test code](./basic)
 
-## Ultrasonic communication
+## Ultrasonic communication experiment
 
 ### Hex number in 8bit length
 
