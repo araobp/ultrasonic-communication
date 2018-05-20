@@ -12,7 +12,7 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ## Hex number in 8bit length
 
-Although this is not ultrasonic, but I assign the following frequencies to each hexa-decimal number of 8 bit data length:
+I assign the following frequencies to each hexa-decimal number of 8 bit data length:
 
 |Hz   |Hex|
 |-----|---|
@@ -57,5 +57,9 @@ If the FFT peak is same and its magnitude is larger than a specific value in thr
        18600 Hz                                                           18800Hz
        100msec                                                            100msec
 ```
+
+## Tone generator
+
+I use [Audacity](https://www.audacityteam.org/) to generate tones.
 
 
