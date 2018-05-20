@@ -77,25 +77,25 @@
 #define FFT_AC_COUPLING_HZ  18000.0f
 
 // Ultrasonic communication
-#define START_OF_FRAME      18300
-#define END_OF_FRAME        18400
-#define HEX_0_FREQ          18500
-#define HEX_1_FREQ          18600
-#define HEX_2_FREQ          18700
-#define HEX_3_FREQ          18800
-#define HEX_4_FREQ          18900
-#define HEX_5_FREQ          19000
-#define HEX_6_FREQ          19100
-#define HEX_7_FREQ          19200
-#define HEX_8_FREQ          19300
-#define HEX_9_FREQ          19400
-#define HEX_A_FREQ          19500
-#define HEX_B_FREQ          19600
-#define HEX_C_FREQ          19700
-#define HEX_D_FREQ          19800
-#define HEX_E_FREQ          19900
+#define START_OF_FRAME      16600
+#define END_OF_FRAME        16800
+#define HEX_0_FREQ          17000
+#define HEX_1_FREQ          17200
+#define HEX_2_FREQ          17400
+#define HEX_3_FREQ          17600
+#define HEX_4_FREQ          17800
+#define HEX_5_FREQ          18000
+#define HEX_6_FREQ          18200
+#define HEX_7_FREQ          18400
+#define HEX_8_FREQ          18600
+#define HEX_9_FREQ          18800
+#define HEX_A_FREQ          19000
+#define HEX_B_FREQ          19200
+#define HEX_C_FREQ          19400
+#define HEX_D_FREQ          19600
+#define HEX_E_FREQ          19800
 #define HEX_F_FREQ          20000
-#define TOLERANCE           50    // Hz
+#define TOLERANCE           90      // Hz
 #define MAGNITUDE_THRESHOLD 10000
 
 /* USER CODE END Private defines */
