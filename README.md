@@ -55,7 +55,7 @@ If the FFT peak is same and its magnitude is larger than a specific value in thr
 ```
     [Start-of-frame][Identifier(4bit)][DLC(4bit)][D0(8bit)]...[Dn(8bit)][Enf-of-frame]
        18300 Hz                                                           18400Hz
-       50msec                                                             50msec
+       100msec                                                            100msec
 ```
 
 
