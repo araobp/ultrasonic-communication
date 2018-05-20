@@ -18,21 +18,21 @@ I assign the following frequencies to each hexa-decimal number of 8 bit data len
 
 |Hz   |Hex|
 |-----|---|
-|18000| 0 |
-|18200| 1 |
-|18400| 2 |
-|18600| 3 |
-|18800| 4 |
-|19000| 5 |
-|19200| 6 |
-|19400| 7 |
-|19600| 8 |
-|19800| 9 |
-|20000| A |
-|20200| B |
-|20400| C |
-|20600| D |
-|20800| E |
+|17000| 0 |
+|17200| 1 |
+|17400| 2 |
+|17600| 3 |
+|17800| 4 |
+|18000| 5 |
+|18200| 6 |
+|18400| 7 |
+|18600| 8 |
+|18800| 9 |
+|19000| A |
+|19200| B |
+|19400| C |
+|19600| D |
+|19800| E |
 |20000| F |
 
 ### DFSDM setting
@@ -142,3 +142,7 @@ Frequency at max magnitude: 19970.7, Max magnitude: 12264.990234
 Hex data: F
 ```
 
+## Next
+
+- Develop tone generator on Win10.
+- Add a character LDC to the board.
