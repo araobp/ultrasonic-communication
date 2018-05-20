@@ -2,9 +2,14 @@
 
 ![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=480&h=189)
 
-## Test
+## Platform and test code
 
-This is not ultrasonic, but I assign the following frequencies to each hexa-decimal number of 8 bit data length:
+==> [Platform](PLATFORM.md)
+==> [Test code](./basic)
+
+## Hex number in 8bit length
+
+Although this is not ultrasonic, but I assign the following frequencies to each hexa-decimal number of 8 bit data length:
 
 |Hz   |Hex|
 |-----|---|
