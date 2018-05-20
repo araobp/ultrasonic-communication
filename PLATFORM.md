@@ -10,7 +10,7 @@ As per the MEMS mic datasheet, input clock frequency Max value is 3.25MHz.
 
 Given the system clock rate at 80MHz, the clock divider should be larger than 25.
 
-In this project, to obtain 42kHz sampling rate, the clock divider is set to 60 and the decimation factor to 32: one 2048 samples corresponds to 50msec.
+In this project, to obtain 48kHz sampling rate, the clock divider is set to 52 and the decimation factor to 32: one 2048 samples corresponds to 42.6msec.
 
 ## Bridge/jumper setting for one microphone (M1) acquisition
 
