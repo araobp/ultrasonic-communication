@@ -16,21 +16,21 @@ Although this is not ultrasonic, but I assign the following frequencies to each 
 
 |Hz   |Hex|
 |-----|---|
-|18500| 0 |
-|18600| 1 |
-|18700| 2 |
-|18800| 3 |
-|18900| 4 |
-|19000| 5 |
-|19100| 6 |
-|19200| 7 |
-|19300| 8 |
-|19400| 9 |
-|19500| A |
-|19600| B |
-|19700| C |
-|19800| D |
-|19900| E |
+|17000| 0 |
+|17200| 1 |
+|17400| 2 |
+|17600| 3 |
+|17800| 4 |
+|18000| 5 |
+|18200| 6 |
+|18400| 7 |
+|18600| 8 |
+|18800| 9 |
+|19000| A |
+|19200| B |
+|19400| C |
+|19600| D |
+|19800| E |
 |20000| F |
 
 ## DFSDM setting
@@ -54,7 +54,7 @@ If the FFT peak is same and its magnitude is larger than a specific value in thr
 
 ```
     [Start-of-frame][Identifier(4bit)][DLC(4bit)][D0(8bit)]...[Dn(8bit)][Enf-of-frame]
-       18300 Hz                                                           18400Hz
+       16600 Hz                                                           16800Hz
        100msec                                                            100msec
 ```
 
