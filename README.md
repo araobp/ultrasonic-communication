@@ -6,6 +6,8 @@
 
 This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
+![platform](./doc/MEMSMIC_expansion_board.jpg)
+
 ==> [Platform](PLATFORM.md)
 
 ==> [Test code](./basic)
