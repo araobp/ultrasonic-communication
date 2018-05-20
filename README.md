@@ -5,6 +5,7 @@
 ## Platform and test code
 
 ==> [Platform](PLATFORM.md)
+
 ==> [Test code](./basic)
 
 ## Hex number in 8bit length
