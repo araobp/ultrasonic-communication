@@ -2,7 +2,7 @@
 
 ![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=480&h=189)
 
-## Platform and test code
+## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
 This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
@@ -10,7 +10,9 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ==> [Test code](./basic)
 
-## Hex number in 8bit length
+## Ultrasonic communication
+
+### Hex number in 8bit length
 
 I assign the following frequencies to each hexa-decimal number of 8 bit data length. I am going to increase the frequencies to ultrasonic range later on.
 
@@ -33,7 +35,7 @@ I assign the following frequencies to each hexa-decimal number of 8 bit data len
 |20800| E |
 |20000| F |
 
-## DFSDM setting
+### DFSDM setting
 
 |Parameter    |Value/setting|
 |-------------|-----|
@@ -50,7 +52,7 @@ The resulting sampling rate is 100kHz (Nyquist frequency is 50kHz). If the lengt
 ```
 If the FFT peak is same and its magnitude is larger than a specific value in three times in a row (60msec), the receiver recognize it as a meaningful hex data.
 
-## Data frame
+### Data frame
 
 This frame format is tentative: I am going to refer to CAN frame to support Standard Identifier, DLC and CRC.
 
@@ -60,7 +62,7 @@ This frame format is tentative: I am going to refer to CAN frame to support Stan
        100msec                                100msec
 ```
 
-## Test
+### Test
 
 ```
 MEMS mic: M1
