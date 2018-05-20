@@ -4,8 +4,8 @@
 
 ## Platform
 
-==> [PLATFORM][PLATFORM.md]
+==> [PLATFORM](PLATFORM.md)
 
 ## Application: ultrasonic communication
 
-In development.
+==> [APPLICATION](APPLICATION.md)
