@@ -57,13 +57,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 // Flags to indicate ISR to copy data from buffer to PCM data store for FFT
-char M1[] = "M1";    // MEMS mic 1
-
-#ifdef M2_MULTIPREX
-  char M2[] = "M2A";  // MEMS mic 2 on the same PDM line as M1 uses.
-#else
-  char M2[] = "M2B";  // MEMS mic 2 on the other PDM line
-#endif
+char M1[] = "M1";  // MEMS mic 1
+char M2[] = "M2";  // MEMS mic 2
 
 char *mic_select;
 bool flag_m1 = true;
@@ -83,20 +78,12 @@ int32_t pcm_m2[FFT_SAMPLES] = { 0 };
 
 // FFT
 arm_rfft_fast_instance_f32 S;
-float32_t fft_input[FFT_SAMPLES] = { 0.0f };
-float32_t fft_hanning[FFT_SAMPLES] = { 0.0f };
-float32_t fft_output[FFT_SAMPLES] = { 0.0f };
-float fft_magnitude[FFT_SAMPLES / 2] = { 0.0f };
-float fft_db[FFT_SAMPLES / 2] = { 0.0f };
-float fft_frequency[FFT_SAMPLES / 2] = { 0.0f };
-float fft_window[FFT_SAMPLES] = { 0.0f };
-const float WINDOW_SCALE = 2.0f * M_PI / (float) FFT_SAMPLES;
-
-// UART output flag
-bool output_result = false;
 
 // Ultrasonic communication
-uint8_t hex_data;
+typedef struct {
+  float max_mag;
+  float max_freq;
+} FFT_Result;
 
 /* USER CODE END PV */
 
@@ -123,8 +110,9 @@ bool check_freq(uint32_t freq_observed, uint32_t hex_freq) {
 /**
  * @brief  Convert observed frequency to hex data
  * @param  freq_max: frequency at max magnitude of FFT result
- * @retval hex data, 0xf0 if it's start-of-frame, 0xf1 if it's end-of-frame, or
- * 0xff if it's not within the frequency range of hex data.
+ * @retval hex data, START_OF_FRAME_CODE if it's start-of-frame,
+ * END_OF_FRAME_CODE if it's end-of-frame, or
+ * NOT_FOUND_CODE if it's not within the frequency range of hex data.
  */
 uint8_t freq2hex(float freq_max) {
   uint32_t freq_observed = (uint32_t)freq_max;
@@ -135,13 +123,13 @@ uint8_t freq2hex(float freq_max) {
   int right = 16;
   uint16_t mid;
   uint freq;
-  uint16_t hex_found = 0xff;  // not found
+  uint16_t hex_found = NOT_FOUND_CODE;  // not found
 
   if (check_freq(freq_observed, START_OF_FRAME)) {
-    hex_found = 0xf0;
+    hex_found = START_OF_FRAME_CODE;
   }
   else if (check_freq(freq_observed, END_OF_FRAME)) {
-    hex_found = 0xf1;
+    hex_found = END_OF_FRAME_CODE;
   }
   else {  // binary search
     while(left <= right) {
@@ -160,79 +148,99 @@ uint8_t freq2hex(float freq_max) {
   return hex_found;
 }
 
-void fft(void) {
-  // Windowing
-  arm_mult_f32(fft_input, fft_window, fft_input, FFT_SAMPLES);
-  for(uint32_t i = 0; i < FFT_SAMPLES; i++) {
-    fft_hanning[i] = fft_input[i];
-  }
+/**
+ * @brief  FFT to frequency at max magnitude
+ * @param
+ * @retval result including max frequency and max magnitude.
+ */
+void fft(float *input, float *output, float *window, float *magnitude, float *frequency, FFT_Result* result) {
 
-  // Execute FFT
-  // Note: this function modifies fft_input as well.
-  arm_rfft_fast_f32(&S, fft_input, fft_output, 0);
-
-  // Calculate magnitude
-  arm_cmplx_mag_f32(fft_output, fft_magnitude, FFT_SAMPLES / 2);
-
-  // Normalization (Unitary transformation) of magnitude
-  arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), fft_magnitude,
-      FFT_SAMPLES / 2);
-
-  // AC coupling
-  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
-    if (*(fft_frequency + i) < FFT_AC_COUPLING_HZ)
-      fft_magnitude[i] = 1.0f;
-    else
-      break;
-  }
-
-  float inv_dB_base_mag = 1.0f / 1.0f;
-  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++)
-    fft_db[i] = 10.0f * log10f(fft_magnitude[i] * inv_dB_base_mag);
-
-  // Calculate max magnitude
   float mag_max, freq_max;
   uint32_t maxIndex;
-  arm_max_f32(fft_magnitude, FFT_SAMPLES / 2, &mag_max, &maxIndex);
-  freq_max = *(fft_frequency + maxIndex);
+
+  // Windowing
+  arm_mult_f32(input, window, input, FFT_SAMPLES);
+
+  // Execute FFT
+  arm_rfft_fast_f32(&S, input, output, 0);
+
+  // Calculate magnitude
+  arm_cmplx_mag_f32(output, magnitude, FFT_SAMPLES / 2);
+
+  // Normalization (Unitary transformation) of magnitude
+  arm_scale_f32(magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), magnitude, FFT_SAMPLES / 2);
+
+  // Cut off lower frequency components
+  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
+    if (frequency[i] < FFT_CUT_OFF) {
+      magnitude[i] = 1.0f;
+    } else {
+      break;
+    }
+  }
+
+  // Calculate max magnitude
+  arm_max_f32(magnitude, FFT_SAMPLES / 2, &mag_max, &maxIndex);
+  freq_max = frequency[maxIndex];
+
+  // Return the result
+  result->max_mag = mag_max;
+  result->max_freq = freq_max;
+}
+
+/**
+ * @brief  Parse fft result to output received data in ASCII to USART and LCD
+ * @param  result
+ * @retval
+ */
+void parser(FFT_Result *result) {
+
+  bool output_result = false;
+  enum { IDLE, DATA_MSB, DATA_LSB } recv_state = IDLE;
+
+  uint8_t hex_data;
+  static uint8_t hex_data_3 = 0xff;
+  static uint8_t data_cnt = 0;
+  static uint8_t data_msb = 0;
 
   // Convert frequency to hex data
-  if (mag_max > MAGNITUDE_THRESHOLD) {
-    hex_data = freq2hex(freq_max);
+  if (result->max_mag > MAGNITUDE_THRESHOLD) {
+    hex_data = freq2hex(result->max_freq);
+    if (hex_data != hex_data_3) {
+      data_cnt = 0;
+      hex_data_3 = hex_data;
+    } else if (data_cnt == 3) {
+      // No operation
+    } else if (++data_cnt == 3) {
+      output_result = true;
+    }
   }
 
   // Output result to UART when user button is pressed
   if (output_result) {
     printf("\nMEMS mic: %s\n", mic_select);
-    printf("Frequency at max magnitude: %.1f, Max magnitude: %f\n", freq_max,
-        mag_max);
-    printf("Over threshold: %d, Hex data: %d\n", mag_max > MAGNITUDE_THRESHOLD, hex_data);
-    /*
-    printf("Frequency(Hz),Magnitude,Magnitude(dB)\n");
-    // FFT
-    for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
-      printf("%.1f,%f,%f\n", fft_frequency[i], fft_magnitude[i], fft_db[i]);
+    printf("Frequency at max magnitude: %.1f, Max magnitude: %f\n", result->max_freq,
+        result->max_mag);
+    switch(hex_data_3) {
+      case START_OF_FRAME_CODE:
+        printf("Hex data: START OF FRAME\n");
+        recv_state = DATA_MSB;
+        break;
+      case END_OF_FRAME_CODE:
+        printf("Hex data: END OF FRAME\n");
+        recv_state = IDLE;
+        break;
+      default:
+        if (recv_state == DATA_MSB) {
+          data_msb = hex_data_3 << 4;
+          recv_state = DATA_LSB;
+        } else if (recv_state == DATA_LSB) {
+          printf("Hex data: %c\n", data_msb + hex_data_3);
+          data_msb = 0;
+          recv_state = DATA_MSB;
+        }
+        break;
     }
-    printf("\n");
-    // Raw PCM data
-    printf("Index,Amplitude\n");
-    if (mic_select == M1) {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-        printf("%lu,%ld\n", i, pcm_m1[i]);
-      }
-    } else {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-        printf("%lu,%ld\n", i, pcm_m2[i]);
-      }
-    }
-    printf("EORAW\n");
-    // Filtered PCM data (e.g., Hanning Window)
-    printf("Index,Amplitude\n");
-    for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-      printf("%lu,%f\n", i, fft_hanning[i]);
-    }
-    printf("EOFLT\n");
-    */
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
     output_result = false;
   }
@@ -247,7 +255,14 @@ void fft(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+  float fft_input[FFT_SAMPLES] = { 0.0f };
+  float fft_output[FFT_SAMPLES] = { 0.0f };
+  float fft_frequency[FFT_SAMPLES / 2] = { 0.0f };
+  float fft_magnitude[FFT_SAMPLES / 2] = { 0.0f };
+  float fft_window[FFT_SAMPLES] = { 0.0f };
+  const float WINDOW_SCALE = 2.0f * M_PI / (float) FFT_SAMPLES;
 
+  FFT_Result fft_result;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -278,19 +293,11 @@ int main(void)
       != HAL_OK) {
     Error_Handler();
   }
-#ifdef M2_MULTIPREX
   // DMA from DFSDM to buf_m2
   if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, FFT_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
-#else
-  // DMA from DFSDM to buf_m2
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter1, buf_m2, FFT_SAMPLES)
-      != HAL_OK) {
-    Error_Handler();
-  }
-#endif
 
   // FFT sample rate
   sample_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
@@ -298,12 +305,11 @@ int main(void)
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
   // Output basic info
-  printf("/// Audio Spectrum Analyzer ///\n\n");
+  printf("/// Ultrasonic communication receiver ///\n\n");
   printf("Sampling rate: %4.1f(kHz)\n", (float) sample_rate / 1000.0f);
   sample_period = 1.0f / sample_rate * FFT_SAMPLES;
   printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
       sample_period * 1000.0f, FFT_SAMPLES);
-  printf("Push USER button to output single-shot FFT\n");
 
   // Hanning window
   for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
@@ -328,7 +334,8 @@ int main(void)
         fft_input[i] = (float) pcm_m1[i];
       }
       mic_select = M1;
-      fft();
+      fft(fft_input, fft_output, fft_window, fft_magnitude, fft_frequency, &fft_result);
+      parser(&fft_result);
       flag_m1 = true;
     }
     // Wait for next PCM samples from M2
@@ -337,7 +344,8 @@ int main(void)
         fft_input[i] = (float) pcm_m2[i];
       }
       mic_select = M2;
-      fft();
+      fft(fft_input, fft_output, fft_window, fft_magnitude, fft_frequency, &fft_result);
+      parser(&fft_result);
       flag_m2 = true;
     }
   /* USER CODE END WHILE */
@@ -427,29 +435,7 @@ void SystemClock_Config(void)
  */
 void HAL_DFSDM_FilterRegConvHalfCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
-/*
-  uint32_t end = FFT_SAMPLES/2;
-  if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    for (uint32_t i = 0; i < end; i++) {
-      pcm_m1[i] = buf_m1[i];
-    }
-    flag_m1 = false;
-#ifdef M2_MULTIPREX
-  } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter2)) {
-    for (uint32_t i = 0; i < end; i++) {
-      pcm_m2[i] = buf_m2[i];
-    }
-    flag_m2 = false;
-  }
-#else
-  } else if  (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter1)) {
-    for (uint32_t i = 0; i < end; i++) {
-      pcm_m2[i] = buf_m2[i];
-    }
-    flag_m2 = false;
-  }
-#endif
-*/
+  //
 }
 
 /**
@@ -468,21 +454,12 @@ void HAL_DFSDM_FilterRegConvCpltCallback(
       pcm_m1[i] = buf_m1[i];
     }
     flag_m1 = false;
-#ifdef M2_MULTIPREX
   } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter2)) {
     for (uint32_t i = start; i < FFT_SAMPLES; i++) {
       pcm_m2[i] = buf_m2[i];
     }
     flag_m2 = false;
   }
-#else
-  } else if  (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter1)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
-      pcm_m2[i] = buf_m2[i];
-    }
-    flag_m2 = false;
-  }
-#endif
 }
 
 /**
@@ -503,7 +480,6 @@ int _write(int file, char *ptr, int len) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == GPIO_PIN_13) {  // User button (blue tactile switch)
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-    output_result = true;
   }
 }
 /* USER CODE END 4 */

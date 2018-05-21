@@ -74,7 +74,7 @@
 
 /* USER CODE BEGIN Private defines */
 #define FFT_SAMPLES 2048UL
-#define FFT_AC_COUPLING_HZ  18000.0f
+#define FFT_CUT_OFF  16000.0f
 
 // Ultrasonic communication
 #define START_OF_FRAME      16600
@@ -97,6 +97,9 @@
 #define HEX_F_FREQ          20000
 #define TOLERANCE           90      // Hz
 #define MAGNITUDE_THRESHOLD 10000
+#define START_OF_FRAME_CODE 0xF0
+#define END_OF_FRAME_CODE   0xF1
+#define NOT_FOUND_CODE      0xFF
 
 /* USER CODE END Private defines */
 
