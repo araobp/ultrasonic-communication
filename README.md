@@ -14,7 +14,7 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ## Ultrasonic communication experiment
 
-==> [experiment](EXPERIMENT.md)
+==> [Experiment](EXPERIMENT.md)
 
 ## Next step
 
