@@ -20,22 +20,22 @@ I assign the following frequencies to each hexa-decimal number of 4 bit data len
 
 |Hz   |Hex|
 |-----|---|
-|17000| 0 |
-|17200| 1 |
-|17400| 2 |
-|17600| 3 |
-|17800| 4 |
-|18000| 5 |
-|18200| 6 |
-|18400| 7 |
-|18600| 8 |
-|18800| 9 |
-|19000| A |
-|19200| B |
-|19400| C |
-|19600| D |
-|19800| E |
-|20000| F |
+|17041| 0 |
+|17236| 1 |
+|17431| 2 |
+|17626| 3 |
+|17822| 4 |
+|18017| 5 |
+|18212| 6 |
+|18408| 7 |
+|18603| 8 |
+|18798| 9 |
+|18994| A |
+|19189| B |
+|19384| C |
+|19580| D |
+|19775| E |
+|19970| F |
 
 ### DFSDM setting
 
@@ -60,7 +60,7 @@ This frame format is tentative: I am going to refer to CAN frame to support Stan
 
 ```
     [Start-of-frame][D0(8bit)]...[Dn(8bit)][Enf-of-frame]
-       18600 Hz                               18800Hz
+       16650 Hz                               168450Hz
        100msec                                100msec
 ```
 
@@ -144,8 +144,37 @@ Frequency at max magnitude: 19970.7, Max magnitude: 12264.990234
 Hex data: F
 ```
 
+## Tone generator on Jupyter
+
+This generator can mix sine waves of multiple frequencies:
+
+==> [Tone Generator](./generator/ToneGenerator.ipynb)
+
+## Second test: "Hello World!" over ultrasonic on May 22, 2018
+
+```
+/// Ultrasonic communication receiver ///
+
+Sampling rate: 100.0(kHz)
+Sampling period: 20.5(msec), Samples per period: 2048
+
+START OF FRAME
+Data: H
+Data: e
+Data: l
+Data: l
+Data: o
+Data:
+Data: W
+Data: o
+Data: r
+Data: l
+Data: d
+Data: !
+END OF FRAME
+```
+
 ## Next
 
-- Develop tone generator on Win10.
 - Add a character LDC to the board.
 - 16bit-length data transmission by mixing different frequencies at tone generator.

@@ -74,28 +74,40 @@
 
 /* USER CODE BEGIN Private defines */
 #define FFT_SAMPLES 2048UL
-#define FFT_CUT_OFF  16000.0f
+#define FFT_CUT_OFF 16000.0f
 
-// Ultrasonic communication
-#define START_OF_FRAME      16600
-#define END_OF_FRAME        16800
-#define HEX_0_FREQ          17000
-#define HEX_1_FREQ          17200
-#define HEX_2_FREQ          17400
-#define HEX_3_FREQ          17600
-#define HEX_4_FREQ          17800
-#define HEX_5_FREQ          18000
-#define HEX_6_FREQ          18200
-#define HEX_7_FREQ          18400
-#define HEX_8_FREQ          18600
-#define HEX_9_FREQ          18800
-#define HEX_A_FREQ          19000
-#define HEX_B_FREQ          19200
-#define HEX_C_FREQ          19400
-#define HEX_D_FREQ          19600
-#define HEX_E_FREQ          19800
-#define HEX_F_FREQ          20000
-#define TOLERANCE           90      // Hz
+/*
+ * Symbols represented by ultrasonic frequencies
+ *
+ * index = freq * FRI_SAMPLES / sampling_rate - 1
+ */
+#define START_OF_FRAME  340U  // 16650 Hz
+#define END_OF_FRAME    344U  // 16845 Hz
+#define HEX_0           348U  // 17041 Hz
+#define HEX_1           352U  // 17236 Hz
+#define HEX_2           356U  // 17431 Hz
+#define HEX_3           360U  // 17626 Hz
+#define HEX_4           364U  // 17822 Hz
+#define HEX_5           368U  // 18017 Hz
+#define HEX_6           372U  // 18212 Hz
+#define HEX_7           376U  // 18408 Hz
+#define HEX_8           380U  // 18603 Hz
+#define HEX_9           384U  // 18798 Hz
+#define HEX_A           388U  // 18994 Hz
+#define HEX_B           392U  // 19189 Hz
+#define HEX_C           396U  // 19384 Hz
+#define HEX_D           400U  // 19580 Hz
+#define HEX_E           404U  // 19775 Hz
+#define HEX_F           408U  // 19970 Hz
+
+/*
+ * Frequency to symbol matching
+ *
+ * 0: exact match
+ * 1: taking Doppler effect into account
+ */
+#define TOLERANCE           0
+
 #define MAGNITUDE_THRESHOLD 10000
 #define START_OF_FRAME_CODE 0xF0
 #define END_OF_FRAME_CODE   0xF1
