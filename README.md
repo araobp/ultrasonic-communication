@@ -16,6 +16,8 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ==> [Experiment](EXPERIMENT.md)
 
+==> [Test code](./ultrasonic)
+
 ## Next step
 
 - Add a character LDC to the board.
