@@ -18,7 +18,8 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ==> [Test code](./ultracom)
 
+Conclusion: the method (sort of FSK modulation) did not work in a noisy environment (such as a meeting room). I have to come up with another approach, such as spread spectrum.
+
 ## Next step
 
-- Add a character LDC to the board.
-- 16bit-length data transmission by mixing different frequencies at tone generator.
+Come up with another approach such as spread spectrum.
