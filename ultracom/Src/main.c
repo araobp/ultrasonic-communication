@@ -41,6 +41,7 @@
 #include "stm32l4xx_hal.h"
 #include "dfsdm.h"
 #include "dma.h"
+#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -49,6 +50,7 @@
 #include "stdbool.h"
 #include "stdlib.h"
 #include "arm_math.h"
+#include "lcd.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -181,30 +183,33 @@ void parser(Result *result) {
   } recv_state = IDLE;
 
   uint8_t data;
-  static uint8_t hex_data_3 = NOT_FOUND_CODE;
+  static uint8_t hex_data_n = NOT_FOUND_CODE;
   static uint8_t data_cnt = 0;
   static uint8_t data_msb = 0;
+  uint8_t data_char[1] = { '\0' };
 
   data = result -> data;
   // Convert frequency to hex data
-  if (data != hex_data_3) {
+  if (data != hex_data_n) {
     data_cnt = 0;
-    hex_data_3 = data;
-  } else if (data_cnt == 3) {
+    hex_data_n = data;
+  } else if (data_cnt == TQ_N) {
     // No operation
-  } else if (++data_cnt == 3 && hex_data_3 != NOT_FOUND_CODE) {
+  } else if (++data_cnt == TQ_N && hex_data_n != NOT_FOUND_CODE) {
     output_result = true;
   }
 
   if (output_result) {
     /*
     printf("\nMEMS mic: %s\n", mic_select);
+    */
     printf("Frequency: %ld, Magnitude: %ld\n", (uint32_t)result->frequency,
         (uint32_t)result->magnitude);
-    */
-    switch (hex_data_3) {
+
+    switch (hex_data_n) {
     case START_OF_FRAME_CODE:
       printf("START OF FRAME\n");
+      lcd_clear();
       recv_state = DATA_MSB;
       break;
     case END_OF_FRAME_CODE:
@@ -213,17 +218,19 @@ void parser(Result *result) {
       break;
     default:
       if (recv_state == DATA_MSB) {
-        data_msb = hex_data_3 << 4;
+        data_msb = hex_data_n << 4;
         recv_state = DATA_LSB;
       } else if (recv_state == DATA_LSB) {
-        printf("Data: %c\n", data_msb + hex_data_3);
+        printf("Data: %c\n", data_msb + hex_data_n);
+        data_char[0] = data_msb + hex_data_n;
+        lcd_string(data_char, 1);
         data_msb = 0;
         recv_state = DATA_MSB;
       }
       break;
     }
-    //printf("[%d]\n", hex_data_3);
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+    //printf("[%d]\n", hex_data_n);
+    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
     output_result = false;
   }
 }
@@ -268,6 +275,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_DFSDM1_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
   // DMA from DFSDM to buf_m1
@@ -294,6 +302,8 @@ int main(void)
   sample_period = 1.0f / sample_rate * FFT_SAMPLES;
   printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
       sample_period * 1000.0f, FFT_SAMPLES);
+  lcd_init(&hi2c1);
+  lcd_string((uint8_t*)"Ultrasonic", 10);
 
   // Hanning window
   for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
@@ -390,8 +400,10 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_DFSDM1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_DFSDM1;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
@@ -470,7 +482,7 @@ int _write(int file, char *ptr, int len) {
  */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == GPIO_PIN_13) {  // User button (blue tactile switch)
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+    //
   }
 }
 /* USER CODE END 4 */

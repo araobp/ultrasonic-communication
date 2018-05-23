@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * File Name          : I2C.h
+  * Description        : This file provides code for the configuration
+  *                      of the I2C instances.
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -36,101 +36,46 @@
   *
   ******************************************************************************
   */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef __i2c_H
+#define __i2c_H
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32l4xx_hal.h"
+#include "main.h"
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
-/* Private define ------------------------------------------------------------*/
-
-#define B1_Pin GPIO_PIN_13
-#define B1_GPIO_Port GPIOC
-#define B1_EXTI_IRQn EXTI15_10_IRQn
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_3
-#define USART_RX_GPIO_Port GPIOA
-#define LD2_Pin GPIO_PIN_5
-#define LD2_GPIO_Port GPIOA
-#define TMS_Pin GPIO_PIN_13
-#define TMS_GPIO_Port GPIOA
-#define TCK_Pin GPIO_PIN_14
-#define TCK_GPIO_Port GPIOA
-#define SWO_Pin GPIO_PIN_3
-#define SWO_GPIO_Port GPIOB
-
-/* ########################## Assert Selection ############################## */
-/**
-  * @brief Uncomment the line below to expanse the "assert_param" macro in the 
-  *        HAL drivers code
-  */
-/* #define USE_FULL_ASSERT    1U */
+extern I2C_HandleTypeDef hi2c1;
 
 /* USER CODE BEGIN Private defines */
-#define FFT_SAMPLES 2048UL
-#define FFT_CUT_OFF 16000.0f
-
-/*
- * Symbols represented by ultrasonic frequencies
- *
- * index = freq * FRI_SAMPLES / sampling_rate - 1
- */
-#define START_OF_FRAME  340U  // 16650 Hz
-#define END_OF_FRAME    344U  // 16845 Hz
-#define HEX_0           348U  // 17041 Hz
-#define HEX_1           352U  // 17236 Hz
-#define HEX_2           356U  // 17431 Hz
-#define HEX_3           360U  // 17626 Hz
-#define HEX_4           364U  // 17822 Hz
-#define HEX_5           368U  // 18017 Hz
-#define HEX_6           372U  // 18212 Hz
-#define HEX_7           376U  // 18408 Hz
-#define HEX_8           380U  // 18603 Hz
-#define HEX_9           384U  // 18798 Hz
-#define HEX_A           388U  // 18994 Hz
-#define HEX_B           392U  // 19189 Hz
-#define HEX_C           396U  // 19384 Hz
-#define HEX_D           400U  // 19580 Hz
-#define HEX_E           404U  // 19775 Hz
-#define HEX_F           408U  // 19970 Hz
-
-/*
- * Frequency to symbol matching
- *
- * 0: exact match
- * 1: taking Doppler effect into account
- */
-#define TOLERANCE           0
-
-#define MAGNITUDE_THRESHOLD 5000
-#define START_OF_FRAME_CODE 0xF0
-#define END_OF_FRAME_CODE   0xF1
-#define NOT_FOUND_CODE      0xFF
-
-/*
- * TQ * N times matching
- * N >= 2
- */
-#define TQ_N  2
 
 /* USER CODE END Private defines */
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-void _Error_Handler(char *, int);
+extern void _Error_Handler(char *, int);
 
-#define Error_Handler() _Error_Handler(__FILE__, __LINE__)
+void MX_I2C1_Init(void);
+
+/* USER CODE BEGIN Prototypes */
+
+/* USER CODE END Prototypes */
+
 #ifdef __cplusplus
 }
 #endif
+#endif /*__ i2c_H */
 
-#endif /* __MAIN_H__ */
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
