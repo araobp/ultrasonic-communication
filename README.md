@@ -20,6 +20,10 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 Conclusion: the method (sort of FSK modulation) work very well in a silent room, but did not work in a noisy environment such as a meeting room. I have to come up with another approach, such as spread spectrum.
 
+## PDM mic
+
+I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro.
+
 ## Chirp modulation experiment
 
 ### Two kinds of noises
