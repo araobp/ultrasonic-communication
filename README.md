@@ -20,6 +20,44 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 Conclusion: the method (sort of FSK modulation) work very well in a silent room, but did not work in a noisy environment such as a meeting room. I have to come up with another approach, such as spread spectrum.
 
-## Next step
+## Chirp modulation experiment
 
-Come up with another approach such as spread spectrum.
+### Two kinds of noises
+
+- Constant noises at specific frequencies: noises from motors/inverters???
+- Bursty noises in a short period: cough, folding paper etc.
+
+I think Chirp modulation might be suitable for ultrasonic communications in a noisy environment.
+
+### Frame (tentative)
+
+```
+Segment length: TQ[msec] = 10msec
+
+Start of frame: 5TQ length
+Bit: 3TQ length
+End of frame: 5TQ length
+
+Frame (350msec)
+<- SOF       ->   <- Bit 0  ->   <- Bit 7  -><- EOF       ->
+[S][S][S][S][S][V][B0][B0][B0]...[B7][B7][B7][E][E][E][E][E]
+     50msec  10msec  30msec         30msec        50msec
+
+---------------   ------------               ---------------
+               ---            ...------------
+
+
+S or E
+1: Chirp
+
+Bit value
+0: No chirp
+1: Chirp
+
+Void
+0: No chirp
+```
+
+### Chirp detection
+
+Use FFT.
