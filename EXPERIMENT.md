@@ -28,7 +28,7 @@ I assign the following frequencies to each hexa-decimal number of 4 bit data len
 |Parameter    |Value/setting|
 |-------------|-----|
 |System clock |80MHz|
-|Clock divider|25   |
+|Clock divider|25 (3.2MHz over-sampling)|
 |Decimation   |32   |
 |Filter       |sinc3|
 
