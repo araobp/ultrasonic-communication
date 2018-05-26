@@ -83,12 +83,12 @@ Bit: 3TQ length
 End of frame: 5TQ length
 
 Frame (656msec)
-<- SOF    -><- Bit 0  ->   <- Bit 7  -><- EOF    ->
-[S][S][S][S][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
-    82msec     61.5msec       61.5msec     82msec
+<- SOF    ->      <- Bit 0  ->   <- Bit 7  -><- EOF    ->
+[S][S][S][S][Void][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
+    82msec          61.5msec       61.5msec     82msec
 
- ----------  ----------                 
-                            ----------  ----------
+ ----------        ----------                 
+             ----                 ----------  ----------
                             
 Start of Frame
 1: Chirp
