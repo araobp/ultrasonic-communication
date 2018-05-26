@@ -46,6 +46,8 @@ Since all the frequencies appear in one TQ(Time Quantum), I use SFFT to accumula
 
 ![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
+I don't need to worry about [Hersenberg's uncertainty principle](https://en.wikipedia.org/wiki/Uncertainty_principle).
+
 ### DFSDM setting
 
 |Parameter    |Value/setting|
