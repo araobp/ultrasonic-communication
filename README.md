@@ -37,6 +37,8 @@ I think Chirp modulation might be suitable for ultrasonic communications in a no
 
 ![Chirp](./doc/Chirp.jpg)
 
+![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
+
 ### Frame (tentative)
 
 ```
