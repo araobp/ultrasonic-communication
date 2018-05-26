@@ -1,4 +1,4 @@
-# Ultrasonic communication by STM32L4 and MEMS microphone
+# Ultrasonic communication by STM32L4's DSP and MEMS microphone
 
 ![HelloWorld](./doc/HelloWorld_Spectrogram.jpg)
 
