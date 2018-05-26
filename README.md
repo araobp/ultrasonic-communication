@@ -12,7 +12,7 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ==> [Test code](./basic)
 
-## Ultrasonic communications experiment
+## Ultrasonic communications experiment (FSK modulation)
 
 ==> [Experiment](EXPERIMENT.md)
 
