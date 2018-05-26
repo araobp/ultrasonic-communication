@@ -36,6 +36,8 @@ I observed two kinds of noises in a room:
 I _guess_ Chirp modulation might be suitable for ultrasonic communications in a noisy environment. No proof yet.
 ### Chirp modulation
 
+Spectrum is spread out, so power of each frequency is weak:
+
 ![Chirp](./doc/Chirp.jpg)
 
 ### Chirp de-modulation
