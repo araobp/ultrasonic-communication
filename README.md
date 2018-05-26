@@ -106,7 +106,7 @@ Void
 
 [Example] Ascii "S" character code (0x53)
 
-![S](./doc/Chirp_Sepctrogram_S.jpg)
+![S](./doc/Chirp_Spectrogram_S.jpg)
 
 ### Transmission speed
 
