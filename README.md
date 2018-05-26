@@ -33,6 +33,10 @@ I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Kno
 
 I think Chirp modulation might be suitable for ultrasonic communications in a noisy environment.
 
+### Chirp modulation
+
+![Chirp](./doc/Chirp.jpg)
+
 ### Frame (tentative)
 
 ```
