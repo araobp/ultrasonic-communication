@@ -34,16 +34,15 @@ I observed two kinds of noises in a room:
 - Bursty noises in a short period: cough, folding paper etc.
 
 I _guess_ Chirp modulation might be suitable for ultrasonic communications in a noisy environment. No proof yet.
-
 ### Chirp modulation
 
 ![Chirp](./doc/Chirp.jpg)
 
-![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
-
-### Chirp demodulation
+### Chirp de-modulation
 
 Since all the frequencies appear in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
+
+![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
 ### DFSDM setting
 
