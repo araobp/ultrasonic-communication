@@ -39,7 +39,13 @@ I think Chirp modulation might be suitable for ultrasonic communications in a no
 
 ![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
+### Chirp demodulation
+
+Since all the frequency appears in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
+
 ### Frame (tentative)
+
+"Start of frame" is to detect the beginning of transmission and also for frame synchronization with the transmitter.
 
 ```
 Segment length: TQ[msec] = 10msec
@@ -48,15 +54,14 @@ Start of frame: 5TQ length
 Bit: 3TQ length
 End of frame: 5TQ length
 
-Frame (350msec)
-<- SOF       ->   <- Bit 0  ->   <- Bit 7  -><- EOF       ->
-[S][S][S][S][S][V][B0][B0][B0]...[B7][B7][B7][E][E][E][E][E]
-     50msec  10msec  30msec         30msec        50msec
+Frame (290msec)
+<- SOF    -><- Bit 0  ->   <- Bit 7  -><- EOF    ->
+[S][S][S][S][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
+    40msec    30msec         30msec       40msec
 
----------------   ------------               ---------------
-               ---            ...------------
-
-
+ ----------  ----------                 ----------
+                            ----------
+                            
 S or E
 1: Chirp
 
@@ -68,6 +73,3 @@ Void
 0: No chirp
 ```
 
-### Chirp detection
-
-Use FFT.
