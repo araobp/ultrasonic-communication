@@ -12,7 +12,7 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ==> [Test code](./basic)
 
-## Ultrasonic communications experiment
+## Ultrasonic communications experiment (FSK modulation)
 
 ==> [Experiment](EXPERIMENT.md)
 
@@ -20,9 +20,11 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 Conclusion: the method (sort of FSK modulation) work very well in a silent room, but did not work in a noisy environment such as a meeting room. I have to come up with another approach, such as spread spectrum.
 
-## PDM mic
+## Knowles MEMS mic
 
-I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro.
+![Knowles](./doc/Knowles.jpg)
+
+I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
 
 ## Chirp modulation experiment
 
@@ -81,12 +83,12 @@ Bit: 3TQ length
 End of frame: 5TQ length
 
 Frame (656msec)
-<- SOF    -><- Bit 0  ->   <- Bit 7  -><- EOF    ->
-[S][S][S][S][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
-    82msec     61.5msec       61.5msec     82msec
+<- SOF    ->      <- Bit 0  ->   <- Bit 7  -><- EOF    ->
+[S][S][S][S][Void][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
+    82msec          61.5msec       61.5msec     82msec
 
- ----------  ----------                 
-                            ----------  ----------
+ ----------        ----------                 
+             ----                 ----------  ----------
                             
 Start of Frame
 1: Chirp
