@@ -117,3 +117,7 @@ Void
 It is quite slow! I will optimize each parameters to attain faster bit rate.
 
 8bits * 1000(msec) / 656(msec) = 12bps
+
+### Test code
+
+In development...
