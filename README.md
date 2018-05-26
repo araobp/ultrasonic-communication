@@ -24,7 +24,7 @@ Conclusion: the method (sort of FSK modulation) work very well in a silent room,
 
 ![Knowles](./doc/Knowles.jpg)
 
-I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro.
+I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
 
 ## Chirp modulation experiment
 
