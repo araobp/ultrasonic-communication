@@ -43,7 +43,7 @@ I _guess_ Chirp modulation might be suitable for ultrasonic communications in a 
 
 ### Chirp demodulation
 
-Since all the frequencies appears in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
+Since all the frequencies appear in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
 
 ### DFSDM setting
 
