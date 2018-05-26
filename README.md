@@ -43,27 +43,51 @@ I think Chirp modulation might be suitable for ultrasonic communications in a no
 
 Since all the frequency appears in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
 
+### DFSDM setting
+
+|Parameter    |Value/setting|
+|-------------|-----|
+|System clock |80MHz|
+|Clock divider|25 (3.2MHz over-sampling)|
+|Decimation   |32   |
+|Filter       |sinc3|
+|Sampling rate|100kHz|
+
+### FFT setting
+
+|Parameter    |Value/setting|
+|-------------|-----|
+|DMA interrupt|2048 samples/interrupt|
+|SFFT         | TBD |
+
+### Time Quantum (TQ)
+
+1/100kHz * 2048samples/interrupt = 20.5 msec
+
 ### Frame (tentative)
 
 "Start of frame" is to detect the beginning of transmission and also for frame synchronization with the transmitter.
 
 ```
-Segment length: TQ[msec] = 10msec
+Segment length: TQ[msec] = 20.5msec
 
 Start of frame: 5TQ length
 Bit: 3TQ length
 End of frame: 5TQ length
 
-Frame (290msec)
+Frame (656msec)
 <- SOF    -><- Bit 0  ->   <- Bit 7  -><- EOF    ->
 [S][S][S][S][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
-    40msec    30msec         30msec       40msec
+    82msec     61.5msec       61.5msec     82msec
 
- ----------  ----------                 ----------
-                            ----------
+ ----------  ----------                 
+                            ----------  ----------
                             
-S or E
+Start of Frame
 1: Chirp
+
+End of frame
+0: No chirp
 
 Bit value
 0: No chirp
@@ -73,3 +97,8 @@ Void
 0: No chirp
 ```
 
+### Transmission speed
+
+It is quite slow!
+
+8bits * 1000(msec) / 656(msec) = 12bps
