@@ -28,10 +28,12 @@ I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Kno
 
 ### Two kinds of noises
 
+I observed two kinds of noises in a room:
+
 - Constant noises at specific frequencies: noises from motors/inverters???
 - Bursty noises in a short period: cough, folding paper etc.
 
-I think Chirp modulation might be suitable for ultrasonic communications in a noisy environment.
+I _guess_ Chirp modulation might be suitable for ultrasonic communications in a noisy environment. No proof yet.
 
 ### Chirp modulation
 
