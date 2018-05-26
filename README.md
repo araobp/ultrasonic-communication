@@ -1,5 +1,7 @@
 # Ultrasonic communication by STM32L4 and MEMS microphone
 
+![HelloWorld](./doc/HelloWorld_Spectrogram.jpg)
+
 ![S](./doc/Chirp_Spectrogram_S.jpg)
 
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
