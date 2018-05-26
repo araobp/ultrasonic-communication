@@ -104,6 +104,10 @@ Void
 0: No chirp
 ```
 
+[Example] Ascii "S" character code (0x53)
+
+![S](./doc/Chirp_Spectrogram_S.jpg)
+
 ### Transmission speed
 
 It is quite slow! I will optimize each parameters to attain faster bit rate.
