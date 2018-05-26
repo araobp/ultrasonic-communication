@@ -28,31 +28,71 @@ I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Kno
 
 ### Two kinds of noises
 
+I observed two kinds of noises in a room:
+
 - Constant noises at specific frequencies: noises from motors/inverters???
 - Bursty noises in a short period: cough, folding paper etc.
 
-I think Chirp modulation might be suitable for ultrasonic communications in a noisy environment.
+I _guess_ Chirp modulation might be suitable for ultrasonic communications in a noisy environment. No proof yet.
+### Chirp modulation
+
+Spectrum is spread out like Mt. Fuji , so power of each frequency is weak:
+
+![Chirp](./doc/Chirp.jpg)
+
+### Chirp de-modulation
+
+Since all the frequencies appear in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
+
+![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
+
+I don't need to worry about [Hersenberg's uncertainty principle](https://en.wikipedia.org/wiki/Uncertainty_principle).
+
+### DFSDM setting
+
+|Parameter    |Value/setting|
+|-------------|-----|
+|System clock |80MHz|
+|Clock divider|25 (3.2MHz over-sampling)|
+|Decimation   |32   |
+|Filter       |sinc3|
+|Sampling rate|100kHz|
+
+### FFT setting
+
+|Parameter    |Value/setting|
+|-------------|-----|
+|DMA interrupt|2048 samples/interrupt|
+|SFFT         | TBD |
+
+### Time Quantum (TQ)
+
+1/100kHz * 2048samples/interrupt = 20.5 msec
 
 ### Frame (tentative)
 
+"Start of frame" is to detect the beginning of transmission and also for frame synchronization with the transmitter.
+
 ```
-Segment length: TQ[msec] = 10msec
+Segment length: TQ[msec] = 20.5msec
 
 Start of frame: 5TQ length
 Bit: 3TQ length
 End of frame: 5TQ length
 
-Frame (350msec)
-<- SOF       ->   <- Bit 0  ->   <- Bit 7  -><- EOF       ->
-[S][S][S][S][S][V][B0][B0][B0]...[B7][B7][B7][E][E][E][E][E]
-     50msec  10msec  30msec         30msec        50msec
+Frame (656msec)
+<- SOF    -><- Bit 0  ->   <- Bit 7  -><- EOF    ->
+[S][S][S][S][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
+    82msec     61.5msec       61.5msec     82msec
 
----------------   ------------               ---------------
-               ---            ...------------
-
-
-S or E
+ ----------  ----------                 
+                            ----------  ----------
+                            
+Start of Frame
 1: Chirp
+
+End of frame
+0: No chirp
 
 Bit value
 0: No chirp
@@ -62,6 +102,8 @@ Void
 0: No chirp
 ```
 
-### Chirp detection
+### Transmission speed
 
-Use FFT.
+It is quite slow! I will optimize each parameters to attain faster bit rate.
+
+8bits * 1000(msec) / 656(msec) = 12bps
