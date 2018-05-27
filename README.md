@@ -52,8 +52,6 @@ Since all the frequencies appear in one TQ(Time Quantum), I use SFFT to accumula
 
 ![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
-I don't need to worry about [Hersenberg's uncertainty principle](https://en.wikipedia.org/wiki/Uncertainty_principle).
-
 - [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression)
 - [Chirp A New Radar Technique](http://www.rfcafe.com/references/electronics-world/chirp-new-radar-technique-january-1965-electronics-world.htm)
 - [Radar Pulse Compression](https://www.ittc.ku.edu/workshops/Summer2004Lectures/Radar_Pulse_Compression.pdf)
