@@ -140,6 +140,6 @@ In development...
 This doppler sensor uses Radar to detect motion of people: https://github.com/araobp/motion-detector/blob/master/doc/adc_doppler.jpg.
 
 Other interesting links:
-- [ASR (NEC)](http://www.radartutorial.eu/19.kartei/03.atc/karte050.en.html)
-- [ASNARO-2 (NEC)](https://www.nec.com/en/global/solutions/space/satellite_systems/nextar.html)
 - [CSS modulation](https://home.zhaw.ch/~rumc/wcom2/unterlagen/wcom2chap3CSS.pdf)
+- [ASR (NEC)](https://www.nec.com/en/global/solutions/cns-atm/surveillance/asr.html)
+- [ASNARO-2 (NEC)](https://www.nec.com/en/global/solutions/space/satellite_systems/nextar.html)
