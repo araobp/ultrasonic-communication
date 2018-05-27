@@ -135,7 +135,7 @@ It is quite slow! I will optimize each parameters to attain faster bit rate.
 
 In development...
 
-### Devices I used in the past
+## Devices I used in the past
 
-This doppler sensor uses Radar to detect motion of people: [https://github.com/araobp/motion-detector/blob/master/doc/adc_doppler.jpg].
+This doppler sensor uses Radar to detect motion of people: https://github.com/araobp/motion-detector/blob/master/doc/adc_doppler.jpg.
 
