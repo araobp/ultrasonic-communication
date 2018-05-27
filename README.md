@@ -42,17 +42,27 @@ I observed two kinds of noises in a room:
 I _guess_ Chirp modulation might be suitable for ultrasonic communications in a noisy environment. No proof yet.
 ### Chirp modulation
 
-Spectrum is spread out like Mt. Fuji , so power of each frequency is weak:
+Spectrum is spread out like Mt. Fuji:
 
 ![Chirp](./doc/Chirp.jpg)
 
 ### Chirp de-modulation
 
-Since all the frequencies appear in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
+All the frequencies appear in one TQ(Time Quantum). I used [Audacity](https://www.audacityteam.org/) to capture the spectrogram:
 
 ![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
-- [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression)
+Chirp is converted into sinc wave by the following formula:
+
+Reference: [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression)
+
+```
+If a chirp sequence is a(n) and that for the compression filter is b(n), then the compressed pulse sequence c(n) is given by
+
+c1(n)=IFFT[FFT{a(n)}*FFT{b(n)}]
+```
+
+Other references:
 - [Chirp A New Radar Technique](http://www.rfcafe.com/references/electronics-world/chirp-new-radar-technique-january-1965-electronics-world.htm)
 - [Radar Pulse Compression](https://www.ittc.ku.edu/workshops/Summer2004Lectures/Radar_Pulse_Compression.pdf)
 
