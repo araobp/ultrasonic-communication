@@ -44,7 +44,7 @@ If the FFT peak is same and its magnitude is larger than a specific value in thr
 
 ### Data frame
 
-This frame format is tentative: I am going to refer to CAN frame to support Standard Identifier, DLC and CRC.
+This frame format is tentative.
 
 ```
     [Start-of-frame][D0(8bit)]...[Dn(8bit)][Enf-of-frame]
@@ -139,6 +139,8 @@ This generator can mix sine waves of multiple frequencies:
 ==> [Tone Generator](./generator/ToneGenerator.ipynb)
 
 ## Second test: "Hello World!" over ultrasonic on May 22, 2018
+
+![Hello World](./doc/HelloWorld_Spectrogram.jpg)
 
 ```
 /// Ultrasonic communication receiver ///

@@ -1,12 +1,16 @@
-# Ultrasonic communication by STM32L4 and MEMS microphone
+# Ultrasonic communication by STM32L4's DSP and MEMS microphone
 
-![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=2268&h=567)
+![HelloWorld](./doc/HelloWorld_Spectrogram.jpg)
+
+![S](./doc/Chirp_Spectrogram_S.jpg)
 
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
 This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 
 ![platform](./doc/MEMSMIC_expansion_board.jpg)
+
+![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=2268&h=567)
 
 ==> [Platform](PLATFORM.md)
 
@@ -36,19 +40,32 @@ I observed two kinds of noises in a room:
 - Bursty noises in a short period: cough, folding paper etc.
 
 I _guess_ Chirp modulation might be suitable for ultrasonic communications in a noisy environment. No proof yet.
+
 ### Chirp modulation
 
-Spectrum is spread out like Mt. Fuji , so power of each frequency is weak:
+Spectrum is spread out like Mt. Fuji:
 
 ![Chirp](./doc/Chirp.jpg)
 
 ### Chirp de-modulation
 
-Since all the frequencies appear in one TQ(Time Quantum), I use SFFT to accumulate power of each frequency.
+All the frequencies appear in one TQ(Time Quantum). I used [Audacity](https://www.audacityteam.org/) to capture the spectrogram:
 
 ![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
-I don't need to worry about [Hersenberg's uncertainty principle](https://en.wikipedia.org/wiki/Uncertainty_principle).
+Chirp is converted into sinc wave by the following formula:
+
+(Reference: [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression))
+
+```
+If a chirp sequence is a(n) and that for the compression filter is b(n), then the compressed pulse sequence c(n) is given by
+
+c1(n)=IFFT[FFT{a(n)}*FFT{b(n)}]
+```
+
+Other references:
+- [Chirp A New Radar Technique](http://www.rfcafe.com/references/electronics-world/chirp-new-radar-technique-january-1965-electronics-world.htm)
+- [Radar Pulse Compression](https://www.ittc.ku.edu/workshops/Summer2004Lectures/Radar_Pulse_Compression.pdf)
 
 ### DFSDM setting
 
@@ -113,3 +130,16 @@ Void
 It is quite slow! I will optimize each parameters to attain faster bit rate.
 
 8bits * 1000(msec) / 656(msec) = 12bps
+
+### Test code
+
+In development...
+
+## Devices I used in the past
+
+This doppler sensor uses Radar to detect motion of people: https://github.com/araobp/motion-detector/blob/master/doc/adc_doppler.jpg.
+
+Other interesting links:
+- [CSS modulation](https://home.zhaw.ch/~rumc/wcom2/unterlagen/wcom2chap3CSS.pdf)
+- [ASR (NEC)](https://www.nec.com/en/global/solutions/cns-atm/surveillance/asr.html)
+- [ASNARO-2 (NEC)](https://www.nec.com/en/global/solutions/space/satellite_systems/nextar.html)
