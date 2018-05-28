@@ -131,7 +131,7 @@ It is quite slow! I will optimize each parameters to attain faster bit rate.
 
 ### FFT output from STM32L4 DSP with MEMS mic
 
-I used a very cheap mic and Jupyter Notebook to see the output: https://github.com/araobp/ultrasonic-communication/agent/chirp_experiment/chirp.ipynb
+I used a very cheap mic and [Jupyter Notebook to see the output](./agent/chirp_experiment/chirp.ipynb).
 
 Sweep range: 16000Hz - 16000Hz
 
