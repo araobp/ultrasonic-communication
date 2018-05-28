@@ -85,10 +85,6 @@ Vaccum cleaner seems to generate tone at around 5000Hz:
 #### FFT result
 ![FFT_Vaccum_Cleaner](./doc/FFT_Vaccum_Cleaner_M2A.jpg)
 
-## Application: ultrasonic communication
-
-In development.
-
 ## References
 
 ### Basis
