@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-DFSDM1.Divider=25
+DFSDM1.Divider=52
 DFSDM1.DmaMode_reg_FIL0=ENABLE
 DFSDM1.DmaMode_reg_FIL1=ENABLE
 DFSDM1.DmaMode_reg_FIL2=ENABLE
@@ -56,7 +56,7 @@ Dma.Request1=DFSDM1_FLT1
 Dma.Request2=DFSDM1_FLT2
 Dma.RequestsNb=3
 File.Version=6
-KeepUserPlacement=true
+KeepUserPlacement=false
 Mcu.Family=STM32L4
 Mcu.IP0=DFSDM1
 Mcu.IP1=DMA
