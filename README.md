@@ -53,9 +53,7 @@ All the frequencies appear in one TQ(Time Quantum). I used [Audacity](https://ww
 
 ![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
-Chirp is converted into sinc wave by the following formula:
-
-(Reference: [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression))
+Reference: [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression)
 
 ```
 If a chirp sequence is a(n) and that for the compression filter is b(n), then the compressed pulse sequence c(n) is given by
