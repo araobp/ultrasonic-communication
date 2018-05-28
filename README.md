@@ -53,9 +53,7 @@ All the frequencies appear in one TQ(Time Quantum). I used [Audacity](https://ww
 
 ![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
 
-Chirp is converted into sinc wave by the following formula:
-
-(Reference: [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression))
+Reference: [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression)
 
 ```
 If a chirp sequence is a(n) and that for the compression filter is b(n), then the compressed pulse sequence c(n) is given by
@@ -130,6 +128,22 @@ Void
 It is quite slow! I will optimize each parameters to attain faster bit rate.
 
 8bits * 1000(msec) / 656(msec) = 12bps
+
+### FFT output from STM32L4 DSP with MEMS mic
+
+I used a very cheap mic and Jupyter Notebook to see the output: https://github.com/araobp/ultrasonic-communication/agent/chirp_experiment/chirp.ipynb
+
+Sweep range: 16000Hz - 16000Hz
+
+![16000](./doc/FFT_Chirp_16000.jpg)
+
+Sweep range: 16000Hz - 17000Hz
+
+![16000_17000](./doc/FFT_Chirp_16000_17000.jpg)
+
+Sweep range: 16000Hz - 18000Hz
+
+![16000_18000](./doc/FFT_Chirp_16000_18000.jpg)
 
 ### Test code
 
