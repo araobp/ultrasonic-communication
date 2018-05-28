@@ -135,15 +135,15 @@ I used a very cheap mic and Jupyter Notebook to see the output: https://github.c
 
 Sweep range: 16000Hz - 16000Hz
 
-![16000](./agent/chirp_experiment/FFT_Chirp_16000.jpg)
+![16000](./doc/FFT_Chirp_16000.jpg)
 
 Sweep range: 16000Hz - 17000Hz
 
-![16000_17000](./agent/chirp_experiment/FFT_Chirp_16000_17000.jpg)
+![16000_17000](./doc/FFT_Chirp_16000_17000.jpg)
 
 Sweep range: 16000Hz - 18000Hz
 
-![16000_18000](./agent/chirp_experiment/FFT_Chirp_16000_18000.jpg)
+![16000_18000](./doc/FFT_Chirp_16000_18000.jpg)
 
 ### Test code
 
