@@ -93,17 +93,17 @@ Other references:
 ```
 Segment length: TQ[msec] = 20.5msec
 
-Start of frame: 5TQ length
+Start of frame: 3TQ length
 Bit: 3TQ length
-End of frame: 5TQ length
+End of frame: 3TQ length
 
-Frame (656msec)
-<- SOF    ->      <- Bit 0  ->   <- Bit 7  -><- EOF    ->
-[S][S][S][S][Void][B0][B0][B0]...[B7][B7][B7][E][E][E][E]
-    82msec          61.5msec       61.5msec     82msec
+Frame (615msec)
+<- SOF -><- Bit 0  ->   <- Bit 7  -><- EOF ->
+[S][S][S][B0][B0][B0]...[B7][B7][B7][E][E][E]
+61.5msec 61.5msec                   61.5msec
 
- ----------        ----------                 
-             ----                 ----------  ----------
+ -------                 ----------                 
+         ------------               ---------
                             
 Start of Frame
 1: Chirp
@@ -114,9 +114,6 @@ End of frame
 Bit value
 0: No chirp
 1: Chirp
-
-Void
-0: No chirp
 ```
 
 [Example] Ascii "S" character code (0x53)
@@ -127,7 +124,7 @@ Void
 
 It is quite slow! I will optimize each parameters to attain faster bit rate.
 
-8bits * 1000(msec) / 656(msec) = 12bps
+8bits * 1000(msec) / 615(msec) = 13bps
 
 ### FFT output from STM32L4 DSP with MEMS mic
 
@@ -147,6 +144,8 @@ Sweep range: 16000Hz - 18000Hz
 
 ### Chirp expriment on May 29, 2018
 
-Sweep range 16000Hz - 18000Hz seemed to show the best result.
+Regarding S/N ratio and reachability, it achieved a great improvemnt, thanks to chirp modulation.
+
+And sweep range 16000Hz - 18000Hz seemed to show the best result.
 
 ==> [Test code](./chirp)
