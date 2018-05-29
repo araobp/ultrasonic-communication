@@ -150,12 +150,3 @@ Sweep range: 16000Hz - 18000Hz
 Sweep range 16000Hz - 18000Hz seemed to show the best result.
 
 ==> [Test code](./chirp)
-
-## Devices I used in the past
-
-This doppler sensor uses Radar to detect motion of people: https://github.com/araobp/motion-detector/blob/master/doc/adc_doppler.jpg.
-
-Other interesting links:
-- [CSS modulation](https://home.zhaw.ch/~rumc/wcom2/unterlagen/wcom2chap3CSS.pdf)
-- [ASR (NEC)](https://www.nec.com/en/global/solutions/cns-atm/surveillance/asr.html)
-- [ASNARO-2 (NEC)](https://www.nec.com/en/global/solutions/space/satellite_systems/nextar.html)
