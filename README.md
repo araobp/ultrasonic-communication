@@ -145,9 +145,11 @@ Sweep range: 16000Hz - 18000Hz
 
 ![16000_18000](./doc/FFT_Chirp_16000_18000.jpg)
 
-### Test code
+### Chirp expriment on May 29, 2018
 
-In development...
+Sweep range 16000Hz - 18000Hz seemed to show the best result.
+
+==> [Test code](./chirp)
 
 ## Devices I used in the past
 
