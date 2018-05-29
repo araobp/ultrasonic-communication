@@ -75,9 +75,16 @@
 /* USER CODE BEGIN Private defines */
 #define FFT_SAMPLES 2048UL
 
-// Chirp sweep range
+// Expected chirp sweep range
 #define CHIRP_F1  16000.0  // Hz
-#define CHIRP_F2  20000.0  // Hz
+#define CHIRP_F2  18000.0  // Hz
+
+// Chirp FFT magnitude threshold
+#define CHIRP_MAGNITUDE_THRESHOLD   3000u
+
+// Chirp signal threshold (rate)
+#define CHIRP_SIGNAL_THRESHOLD_HIGH   0.1f
+#define CHIRP_SIGNAL_THRESHOLD_LOW    0.03f
 
 /* USER CODE END Private defines */
 

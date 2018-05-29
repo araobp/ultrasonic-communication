@@ -91,8 +91,16 @@ float fft_frequency[FFT_SAMPLES / 2] = { 0.0f };
 float fft_window[FFT_SAMPLES] = { 0.0f };
 const float WINDOW_SCALE = 2.0f * M_PI / (float) FFT_SAMPLES;
 
-// Chirp compression
-float chirp_compressor[FFT_SAMPLES] = { 0.0f };
+// Chirp sweep range
+uint32_t chirp_f1 = 0ul;
+uint32_t chirp_f2 = 0ul;
+
+// Chirp strength
+uint16_t chirp_strength = 0u;
+
+// Chirp signal
+uint16_t chirp_signal_threshold_high = 0u;
+uint16_t chirp_signal_threshold_low = 0u;
 
 // UART output flag
 bool output_result = false;
@@ -118,20 +126,13 @@ void fft(void) {
   // Note: this function modifies fft_input as well.
   arm_rfft_fast_f32(&S, fft_input, fft_output, 0);
 
-  // Chirp compressor (Note: fft_output is complex numbers)
-  arm_mult_f32(fft_output, chirp_compressor, fft_output, FFT_SAMPLES);
-
-  // Execute IFFT
-  arm_rfft_fast_f32(&S, fft_output, fft_output, 1);
-
-  /*
   // Calculate magnitude
   arm_cmplx_mag_f32(fft_output, fft_magnitude, FFT_SAMPLES / 2);
 
   // Normalization (Unitary transformation) of magnitude
   arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), fft_magnitude,
       FFT_SAMPLES / 2);
-
+  /*
   // AC coupling
   for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
     if (*(fft_frequency + i) < FFT_AC_COUPLING_HZ)
@@ -151,8 +152,15 @@ void fft(void) {
   frq_max = *(fft_frequency + maxIndex);
   */
 
+  chirp_strength = 0;
+  for (uint32_t i = chirp_f1; i <= chirp_f2 ; i++) {
+    if (fft_magnitude[i] > CHIRP_MAGNITUDE_THRESHOLD) {
+      chirp_strength += 1;
+    }
+  }
+
   // Output result to UART when user button is pressed
-  if (output_result) {
+  //if (output_result) {
     // printf("\nMEMS mic: %s\n", mic_select);
 
     // Raw PCM data
@@ -172,16 +180,32 @@ void fft(void) {
     */
 
     // Chirp compression
-    // printf("Chirp compression\n");
+    /*
     printf("Index,Amplitude\n");
     for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
       printf("%ld\n", (int32_t)fft_output[i]);
     }
     printf("\n");
+    */
+    printf("\n///// C H I R P   S I G N A L /////\n");
+    printf("Chirp f1: %lu Hz at index %lu\n", (uint32_t)fft_frequency[chirp_f1], chirp_f1);
+    printf("Chirp f2: %lu Hz at index %lu\n", (uint32_t)fft_frequency[chirp_f2], chirp_f2);
+    printf("Chirp strength: %d\n", chirp_strength);
+    if (chirp_strength >= chirp_signal_threshold_high) {
+      printf("==> Signal HIGH\n");
+    } else if (chirp_strength <= chirp_signal_threshold_low) {
+      printf("==> Signal LOW\n");
+    } else {
+      printf("==> Signal UNKNOWN\n");
+    }
+
+    printf("\n");
 
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
     output_result = false;
-  }
+
+    HAL_Delay(1000);
+  //}
 }
 /* USER CODE END 0 */
 
@@ -258,14 +282,18 @@ int main(void)
     fft_window[i] = 0.5f - 0.5f * arm_cos_f32((float)i * WINDOW_SCALE);
   }
 
+  // Chirp sweep range f1 and f2
   for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
     fft_frequency[i] = (float)i * (float)sample_rate / (float)FFT_SAMPLES;
-    if (fft_frequency[i] >= CHIRP_F1 && fft_frequency[i] <= CHIRP_F2) {
-      chirp_compressor[i * 2] = 1.0;
-      chirp_compressor[i * 2 + 1] = 1.0;
-      // printf("index: %lu, freq: %f, filter on\n", i, fft_frequency[i]);
+    if ((chirp_f1 == 0) && (fft_frequency[i] >= CHIRP_F1)) {
+      chirp_f1 = i;
+    }
+    if ((chirp_f2 == 0) && (fft_frequency[i] >= CHIRP_F2)) {
+      chirp_f2 = i;
     }
   }
+  chirp_signal_threshold_high = (chirp_f2 - chirp_f1 + 1) * CHIRP_SIGNAL_THRESHOLD_HIGH;
+  chirp_signal_threshold_low = (chirp_f2 - chirp_f1 + 1) * CHIRP_SIGNAL_THRESHOLD_LOW;
 
   // FFT initialization
   arm_rfft_fast_init_f32(&S, FFT_SAMPLES);

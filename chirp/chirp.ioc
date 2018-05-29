@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-DFSDM1.Divider=25
+DFSDM1.Divider=52
 DFSDM1.DmaMode_reg_FIL0=ENABLE
 DFSDM1.DmaMode_reg_FIL1=ENABLE
 DFSDM1.DmaMode_reg_FIL2=ENABLE
