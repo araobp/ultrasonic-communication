@@ -62,8 +62,8 @@ Reference:
 |-------------|-----|
 |System clock |80MHz|
 |Clock divider|25 (3.2MHz over-sampling)|
-|Decimation   |32   |
 |Filter       |sinc3|
+|Decimation   |32   |
 |Sampling rate|100kHz|
 
 ### FFT setting
