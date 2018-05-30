@@ -1,8 +1,6 @@
 # Ultrasonic communication by STM32L4's DSP and MEMS microphone
 
-![HelloWorld](./doc/HelloWorld_Spectrogram.jpg)
-
-![S](./doc/Chirp_Spectrogram_S.jpg)
+![S](./doc/ChirpFrameS.jpg)
 
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
@@ -86,39 +84,13 @@ Other references:
 
 1/100kHz * 2048samples/interrupt = 20.5 msec
 
-### Frame (tentative)
+### Frame synchronization technique (tentative)
 
-"Start of frame" is to detect the beginning of transmission and also for frame synchronization with the transmitter.
-
-```
-Segment length: TQ[msec] = 20.5msec
-
-Start of frame: 3TQ length
-Bit: 3TQ length
-End of frame: 3TQ length
-
-Frame (615msec)
-<- SOF -><- Bit 0  ->   <- Bit 7  -><- EOF ->
-[S][S][S][B0][B0][B0]...[B7][B7][B7][E][E][E]
-61.5msec 61.5msec                   61.5msec
-
- -------                 ----------                 
-         ------------               ---------
-                            
-Start of Frame
-1: Chirp
-
-End of frame
-0: No chirp
-
-Bit value
-0: No chirp
-1: Chirp
-```
+![sync](https://docs.google.com/drawings/d/e/2PACX-1vT0xMhbKVX62nasynSLvbgHrd40IWsxlZk-ngVtTI8NFT8TRtOmFlF54dge_VsReuIUTKtRM1zNQkBn/pub?w=960&h=720)
 
 [Example] Ascii "S" character code (0x53)
 
-![S](./doc/Chirp_Spectrogram_S.jpg)
+![S](./doc/ChirpFrameS.jpg)
 
 ### Transmission speed
 
