@@ -86,13 +86,11 @@ Reference:
 
 ### Transmission speed
 
-It is quite slow! I will optimize each parameters to attain faster bit rate.
-
-8bits * 1000(msec) / 615(msec) = 13bps
+8bits * 1000 / (20.5(msec) * 19) = 20.5bps
 
 ### FFT output from STM32L4 DSP with MEMS mic
 
-I used a very cheap mic and [Jupyter Notebook to see the output](./agent/chirp_experiment/chirp.ipynb).
+I used a very cheap speaker and [Jupyter Notebook to see the output](./agent/chirp_experiment/chirp.ipynb).
 
 Sweep range: 16000Hz - 16000Hz
 
@@ -108,7 +106,7 @@ Sweep range: 16000Hz - 18000Hz
 
 ### Chirp expriment on May 29, 2018
 
-Regarding S/N ratio and reachability, it achieved a great improvemnt, thanks to chirp modulation.
+Regarding S/N ratio and reachability, it achieved a great improvement, thanks to chirp modulation.
 
 And sweep range 16000Hz - 18000Hz seemed to show the best result.
 
