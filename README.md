@@ -78,7 +78,7 @@ Reference:
 
 ### Frame synchronization technique (tentative)
 
-![sync](https://docs.google.com/drawings/d/e/2PACX-1vT0xMhbKVX62nasynSLvbgHrd40IWsxlZk-ngVtTI8NFT8TRtOmFlF54dge_VsReuIUTKtRM1zNQkBn/pub?w=480&h=360)
+![sync](https://docs.google.com/drawings/d/e/2PACX-1vT0xMhbKVX62nasynSLvbgHrd40IWsxlZk-ngVtTI8NFT8TRtOmFlF54dge_VsReuIUTKtRM1zNQkBn/pub?w=960&h=720)
 
 #### Example: Ascii "S" character code (0x53)
 
