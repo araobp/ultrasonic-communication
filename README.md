@@ -80,9 +80,11 @@ Reference:
 
 ![sync](https://docs.google.com/drawings/d/e/2PACX-1vT0xMhbKVX62nasynSLvbgHrd40IWsxlZk-ngVtTI8NFT8TRtOmFlF54dge_VsReuIUTKtRM1zNQkBn/pub?w=960&h=720)
 
-[Example] Ascii "S" character code (0x53)
+#### Example: Ascii "S" character code (0x53)
 
-![S](./doc/ChirpFrameS.jpg)
+!["S"](./doc/ChirpFrameS.jpg)
+
+[WAV file of "S"](./generator/ChirpFrameS.wav)
 
 ### Transmission speed
 
