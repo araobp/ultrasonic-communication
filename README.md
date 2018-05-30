@@ -4,9 +4,11 @@
 
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
-This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
+This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone:
 
 ![platform](./doc/MEMSMIC_expansion_board.jpg)
+
+The architecture is as follows:
 
 ![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=2268&h=567)
 
@@ -21,12 +23,6 @@ This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone.
 ==> [Test code](./ultracom)
 
 Conclusion: the method (sort of FSK modulation) work very well in a silent room, but did not work in a noisy environment such as a meeting room. I have to come up with another approach, such as spread spectrum.
-
-## Knowles MEMS mic
-
-![Knowles](./doc/Knowles.jpg)
-
-I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
 
 ## Chirp modulation experiment
 
@@ -115,3 +111,17 @@ Regarding S/N ratio and reachability, it achieved a great improvement, thanks to
 And sweep range 16000Hz - 18000Hz seemed to show the best result.
 
 ==> [Test code](./chirp)
+
+## My original MEMS mic shield
+
+I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
+
+![Knowles](./doc/Knowles.jpg)
+
+I am going to make my original shield with Knowles MEMS mic:
+
+- Knowles MEMS mic
+- LCDs
+- LEDs
+- Tactile switches
+- CAN tranceiver
