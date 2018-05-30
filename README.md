@@ -94,6 +94,8 @@ Reference:
 
 I used a very cheap speaker (100yen: $1) with my laptop PC to playback the "S" wav file.
 
+![speaker](./doc/speaker.jpg)
+
 Sweep range: 16000Hz - 16000Hz
 
 ![16000](./doc/FFT_Chirp_16000.jpg)
