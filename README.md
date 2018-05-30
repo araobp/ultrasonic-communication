@@ -68,6 +68,7 @@ DFSDM parameters
 |Decimation   |32   |
 |Sampling rate|100kHz|
 
+
 FFT parameters
 
 |Parameter    |Value/setting|
@@ -77,6 +78,7 @@ FFT parameters
 #### Time Quantum (TQ) and transmission speed
 
 Time Quantum: 1/100kHz * 2048samples/interrupt = 20.5 msec
+
 Transmission speed: 8bits * 1000 / (20.5(msec) * 19) = 20.5bps
 
 ### Example frame: Ascii "S" character code (0x53)
