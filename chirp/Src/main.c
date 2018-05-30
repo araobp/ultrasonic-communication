@@ -102,6 +102,27 @@ uint16_t chirp_strength = 0u;
 uint16_t chirp_signal_threshold_high = 0u;
 uint16_t chirp_signal_threshold_low = 0u;
 
+/*
+ * Frame position
+ * 0: start of frame
+ * 1: B0
+ * 2: B1
+ * 3: B2
+ * 4: B3
+ * 5: B4
+ * 6: B5
+ * 7: B6
+ * 8: B7
+ * 9: end of frame
+ */
+uint16_t frame_position = 0u;
+const uint16_t frame_field_length[11] = {START_OF_FRAME, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT, END_OF_FRAME};
+
+uint8_t bits = 0x00;
+
+bool debug_printed = false;
+uint32_t debug_count = 0;
+
 // UART output flag
 bool output_result = false;
 /* USER CODE END PV */
@@ -115,6 +136,50 @@ void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+
+/*                <-field_len->
+ * frame_position [     0      |     1      | ...   ]
+ * bit_position   [7 |6 |5 |4 |3 |2 |1 |0 ]
+ */
+void decode(int16_t level) {
+  static uint16_t count = 1;
+  static uint16_t bit_position = 8;
+
+  switch(level) {
+  case CHIRP_HIGH:
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+  case CHIRP_UNKNOWN:  // TODO: reconsider unknown case
+    if (++count >= frame_field_length[frame_position]) {
+      if (frame_position > 0) {
+        bits = bits || (0x01 << --bit_position);
+      }
+      ++frame_position;
+      count = 1;
+    }
+    break;
+  case CHIRP_LOW:
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+    if ((frame_position > 0) && (++count >= frame_field_length[frame_position])) {
+      ++frame_position;
+      count = 1;
+    }
+    break;
+  }
+  if (!debug_printed) {
+    printf("level: %d, count: %d, frame_position: %d, bit_position: %d\n", level, count, frame_position, bit_position);
+    if (++debug_count >= 36) {
+      debug_printed = true;
+      printf("---\n");
+    }
+  }
+  if (bit_position == 0 && frame_position == 10) {
+    printf("==> Hex: %x, Char: %c\n", bits, bits);
+    frame_position = 0;
+    bit_position = 8;
+    bits = 0x00;
+  }
+}
+
 void fft(void) {
   // Windowing
   arm_mult_f32(fft_input, fft_window, fft_input, FFT_SAMPLES);
@@ -187,24 +252,27 @@ void fft(void) {
     }
     printf("\n");
     */
-    printf("\n///// C H I R P   S I G N A L /////\n");
-    printf("Chirp f1: %lu Hz at index %lu\n", (uint32_t)fft_frequency[chirp_f1], chirp_f1);
-    printf("Chirp f2: %lu Hz at index %lu\n", (uint32_t)fft_frequency[chirp_f2], chirp_f2);
-    printf("Chirp strength: %d\n", chirp_strength);
+    //printf("\n///// C H I R P   S I G N A L /////\n");
+    //printf("Chirp f1: %lu Hz at index %lu\n", (uint32_t)fft_frequency[chirp_f1], chirp_f1);
+    //printf("Chirp f2: %lu Hz at index %lu\n", (uint32_t)fft_frequency[chirp_f2], chirp_f2);
+    //printf("Chirp strength: %d\n", chirp_strength);
     if (chirp_strength >= chirp_signal_threshold_high) {
-      printf("==> Signal HIGH\n");
+      //printf("-> Signal HIGH\n");
+      decode(CHIRP_HIGH);
     } else if (chirp_strength <= chirp_signal_threshold_low) {
-      printf("==> Signal LOW\n");
+      //printf("-> Signal LOW\n");
+      decode(CHIRP_LOW);
     } else {
-      printf("==> Signal UNKNOWN\n");
+      //printf("-> Signal UNKNOWN\n");
+      decode(CHIRP_UNKNOWN);
     }
 
-    printf("\n");
+    //printf("\n");
 
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+    //HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
     output_result = false;
 
-    HAL_Delay(1000);
+    //HAL_Delay(1000);
   //}
 }
 /* USER CODE END 0 */
@@ -483,8 +551,8 @@ int _write(int file, char *ptr, int len) {
  */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == GPIO_PIN_13) {  // User button (blue tactile switch)
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-    output_result = true;
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+    // output_result = true;
   }
 }
 /* USER CODE END 4 */
