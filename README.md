@@ -107,7 +107,7 @@ Sweep range: 16000Hz - 18000Hz
 
 ### Chirp expriment on June 1, 2018
 
-It can transmit a character code "S" to the receiver. It showed better reachability. However, I observed the following problems:
+It could transmit a character code "S" to the receiver. It showed better reachability. However, I observed the following problems:
 
 - Out of sync.
 - Windows media player attenuates the amplitude when the transmission (play back) is ongoing.
