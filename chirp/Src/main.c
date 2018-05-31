@@ -102,27 +102,6 @@ uint16_t chirp_strength = 0u;
 uint16_t chirp_signal_threshold_high = 0u;
 uint16_t chirp_signal_threshold_low = 0u;
 
-/*
- * Frame position
- * 0: start of frame
- * 1: B0
- * 2: B1
- * 3: B2
- * 4: B3
- * 5: B4
- * 6: B5
- * 7: B6
- * 8: B7
- * 9: end of frame
- */
-uint16_t frame_position = 0u;
-const uint16_t frame_field_length[11] = {START_OF_FRAME, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT, END_OF_FRAME};
-
-uint8_t bits = 0x00;
-
-bool debug_printed = false;
-uint32_t debug_count = 0;
-
 // UART output flag
 bool output_result = false;
 /* USER CODE END PV */
@@ -137,45 +116,76 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN 0 */
 
-/*                <-field_len->
- * frame_position [     0      |     1      | ...   ]
- * bit_position   [7 |6 |5 |4 |3 |2 |1 |0 ]
- */
 void decode(int16_t level) {
-  static uint16_t count = 1;
-  static uint16_t bit_position = 8;
+  static uint16_t count = 0;
+  static uint8_t bits = 0;
+  char b;
+  static uint16_t n = 0;
+  const uint16_t offset = FRAME_START + FRAME_SAMPLING_OFFSET;
+  const uint16_t max_length = offset + FRAME_BIT * 8;
+  static uint16_t high_count = 0;
+  bool sampling_point;
+
+  static char print_buf[30][256];
+  static int idx = 0;
+
+  sampling_point = (count == offset + FRAME_BIT * n) ? true : false;
 
   switch(level) {
   case CHIRP_HIGH:
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-  case CHIRP_UNKNOWN:  // TODO: reconsider unknown case
-    if (++count >= frame_field_length[frame_position]) {
-      if (frame_position > 0) {
-        bits = bits || (0x01 << --bit_position);
-      }
-      ++frame_position;
-      count = 1;
+    if (count < offset) {  // Synchronization phase
+      high_count++;
+    } else if (sampling_point) {  // Data receiving phase
+      bits = bits | (0b10000000 >> n);
+      n++;
     }
+    count++;
+    break;
+  case CHIRP_UNKNOWN:
+    if (sampling_point) {
+      sprintf(&print_buf[idx++][0], "Unknown!");
+      n++;
+    }
+    count++;
     break;
   case CHIRP_LOW:
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-    if ((frame_position > 0) && (++count >= frame_field_length[frame_position])) {
-      ++frame_position;
-      count = 1;
+    if (count > 0) {
+        count++;
+      if (sampling_point) {  // Data receiving phase
+        n++;
+      }
     }
     break;
   }
-  if (!debug_printed) {
-    printf("level: %d, count: %d, frame_position: %d, bit_position: %d\n", level, count, frame_position, bit_position);
-    if (++debug_count >= 36) {
-      debug_printed = true;
-      printf("---\n");
+  // Debug info
+  if (count > 0) {
+    // printf("%d\n", level);
+    if (sampling_point) {
+      b = (level > 0) ? '1': '0';
+    } else {
+      b = ' ';
     }
+    sprintf(&print_buf[idx++][0], "[l]: %2d, c: %02d, h: %1d, n: %02d, [s]: %1d, [b]: %1c, bits: 0x%02x, t: %lu", level, count - 1, high_count, n, sampling_point, b, bits, HAL_GetTick());
   }
-  if (bit_position == 0 && frame_position == 10) {
-    printf("==> Hex: %x, Char: %c\n", bits, bits);
-    frame_position = 0;
-    bit_position = 8;
+  // Synchronization error
+  if ((count >= FRAME_START) && (high_count < FRAME_SYNC_THRESHOLD)) {
+    count = 0;
+    high_count = 0;
+    sprintf(&print_buf[idx++][0], "Sync error!");
+  }
+  // Frame receiving completed
+  if (count >= max_length) {
+    count = 0;
+    n = 0;
+    high_count = 0;
+    for (int i = 0; i < idx; i++) {
+      printf("%s\n", &print_buf[i][0]);
+      print_buf[i][0] = '\0';
+    }
+    idx = 0;
+    printf("==> bits: 0x%02x, char: %c\n", bits, bits);
     bits = 0x00;
   }
 }
@@ -385,9 +395,11 @@ int main(void)
       for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
         fft_input[i] = (float) pcm_m2[i];
       }
+      /*
       mic_select = M2;
       fft();
       flag_m2 = true;
+      */
     }
   /* USER CODE END WHILE */
 

@@ -80,7 +80,7 @@
 #define CHIRP_F2  18000.0  // Hz
 
 // Chirp FFT magnitude threshold
-#define CHIRP_MAGNITUDE_THRESHOLD   2000u
+#define CHIRP_MAGNITUDE_THRESHOLD   2500u
 
 // Chirp signal threshold (rate)
 #define CHIRP_SIGNAL_THRESHOLD_HIGH   0.1f
@@ -88,13 +88,14 @@
 
 // Chirp signal level
 #define CHIRP_HIGH      1
-#define CHIRP_LOW       0
-#define CHIRP_UNKNOWN   -1
+#define CHIRP_LOW       -1
+#define CHIRP_UNKNOWN   0
 
 // Frame
-#define START_OF_FRAME 3u
-#define BIT 3u
-#define END_OF_FRAME 3u
+#define FRAME_START  3u
+#define FRAME_BIT 2u
+#define FRAME_SYNC_THRESHOLD  2u
+#define FRAME_SAMPLING_OFFSET 1u
 
 /* USER CODE END Private defines */
 
