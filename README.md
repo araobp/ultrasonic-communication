@@ -105,11 +105,37 @@ Sweep range: 16000Hz - 18000Hz
 
 ![16000_18000](./doc/FFT_Chirp_16000_18000.jpg)
 
-### Chirp expriment on May 29, 2018
+### Chirp expriment on June 1, 2018
 
-Regarding S/N ratio and reachability, it achieved a great improvement, thanks to chirp modulation.
+It could transmit a character code "S" to the receiver. It showed better reachability. However, I observed the following problems:
 
-And sweep range 16000Hz - 18000Hz seemed to show the best result.
+- Out of sync.
+- Windows media player attenuates the amplitude when the transmission (play back) is ongoing.
+- Noises still disturb the communication.
+
+```
+[l]:  1, c: 00, h: 1, n: 00, [s]: 0, [b]:  , bits: 0x00, t: 34942
+[l]:  1, c: 01, h: 2, n: 00, [s]: 0, [b]:  , bits: 0x00, t: 34962
+[l]:  1, c: 02, h: 3, n: 00, [s]: 0, [b]:  , bits: 0x00, t: 34983
+[l]: -1, c: 03, h: 3, n: 00, [s]: 0, [b]:  , bits: 0x00, t: 35003
+[l]: -1, c: 04, h: 3, n: 01, [s]: 1, [b]: 0, bits: 0x00, t: 35024
+[l]:  1, c: 05, h: 3, n: 01, [s]: 0, [b]:  , bits: 0x00, t: 35044
+[l]:  1, c: 06, h: 3, n: 02, [s]: 1, [b]: 1, bits: 0x40, t: 35065
+[l]: -1, c: 07, h: 3, n: 02, [s]: 0, [b]:  , bits: 0x40, t: 35085
+[l]: -1, c: 08, h: 3, n: 03, [s]: 1, [b]: 0, bits: 0x40, t: 35106
+[l]:  1, c: 09, h: 3, n: 03, [s]: 0, [b]:  , bits: 0x40, t: 35126
+[l]:  1, c: 10, h: 3, n: 04, [s]: 1, [b]: 1, bits: 0x50, t: 35147
+[l]: -1, c: 11, h: 3, n: 04, [s]: 0, [b]:  , bits: 0x50, t: 35167
+[l]: -1, c: 12, h: 3, n: 05, [s]: 1, [b]: 0, bits: 0x50, t: 35187
+[l]: -1, c: 13, h: 3, n: 05, [s]: 0, [b]:  , bits: 0x50, t: 35208
+[l]: -1, c: 14, h: 3, n: 06, [s]: 1, [b]: 0, bits: 0x50, t: 35228
+[l]:  1, c: 15, h: 3, n: 06, [s]: 0, [b]:  , bits: 0x50, t: 35249
+[l]:  1, c: 16, h: 3, n: 07, [s]: 1, [b]: 1, bits: 0x52, t: 35269
+[l]:  1, c: 17, h: 3, n: 07, [s]: 0, [b]:  , bits: 0x52, t: 35290
+[l]:  1, c: 18, h: 3, n: 08, [s]: 1, [b]: 1, bits: 0x53, t: 35310
+[l]: -1, c: 19, h: 3, n: 08, [s]: 0, [b]:  , bits: 0x53, t: 35331
+==> bits: 0x53, char: S
+```
 
 ==> [Test code](./chirp)
 
