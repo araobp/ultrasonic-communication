@@ -105,6 +105,10 @@ Sweep range: 16000Hz - 18000Hz
 
 ![16000_18000](./doc/FFT_Chirp_16000_18000.jpg)
 
+Paper rubbing
+
+![Paper rubbing](./doc/FFT_Paper_Rubbing.jpg)
+
 ### Chirp expriment on June 1, 2018
 
 It could transmit a character code "S" to the receiver. It showed better reachability. However, I observed the following problems:
