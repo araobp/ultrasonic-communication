@@ -116,6 +116,7 @@ Paper rubbing
 ![Paper rubbing](./doc/FFT_Paper_Rubbing.jpg)
 
 #### The best chrip signal
+
 |Parameter    |Value   |
 |-------------|--------|
 |TQ           |20.5msec|
