@@ -80,7 +80,7 @@
 #define CHIRP_F2  18000.0  // Hz
 
 // Chirp FFT magnitude threshold
-#define CHIRP_MAGNITUDE_THRESHOLD   5000u
+#define CHIRP_MAGNITUDE_THRESHOLD   3000u
 
 // Chirp signal threshold (rate)
 #define CHIRP_SIGNAL_THRESHOLD_HIGH   0.4f

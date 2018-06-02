@@ -116,7 +116,7 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN 0 */
 
-void decode(int16_t level) {
+void decode(int16_t level, uint16_t chirp_strength) {
   static uint16_t count = 0;
   static uint8_t bits = 0;
   char b;
@@ -167,7 +167,7 @@ void decode(int16_t level) {
     } else {
       b = ' ';
     }
-    sprintf(&print_buf[idx++][0], "[l]: %2d, c: %02d, h: %1d, n: %02d, [s]: %1d, [b]: %1c, bits: 0x%02x, t: %lu", level, count - 1, high_count, n, sampling_point, b, bits, HAL_GetTick());
+    sprintf(&print_buf[idx++][0], "[l]: %2d, [s]: %3d%%, c: %02d, h: %1d, n: %02d, [s]: %1d, [b]: %1c, bits: 0x%02x, t: %lu", level, (int)((float)chirp_strength/(float)(chirp_f2 - chirp_f1 + 1) * 100.0), count - 1, high_count, n, sampling_point, b, bits, HAL_GetTick());
   }
   // Synchronization error
   if ((count >= FRAME_START) && (high_count < FRAME_SYNC_THRESHOLD)) {
@@ -268,13 +268,13 @@ void fft(void) {
     //printf("Chirp strength: %d\n", chirp_strength);
     if (chirp_strength >= chirp_signal_threshold_high) {
       //printf("-> Signal HIGH\n");
-      decode(CHIRP_HIGH);
+      decode(CHIRP_HIGH, chirp_strength);
     } else if (chirp_strength <= chirp_signal_threshold_low) {
       //printf("-> Signal LOW\n");
-      decode(CHIRP_LOW);
+      decode(CHIRP_LOW, chirp_strength);
     } else {
       //printf("-> Signal UNKNOWN\n");
-      decode(CHIRP_UNKNOWN);
+      decode(CHIRP_UNKNOWN, chirp_strength);
     }
 
     //printf("\n");
@@ -345,7 +345,7 @@ int main(void)
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
-  // Output basic info
+  printf("/// Ultrasonic signal receiver ///\n\n");
   /*
   printf("/// Audio Spectrum Analyzer ///\n\n");
   printf("Sampling rate: %4.1f(kHz)\n", (float) sample_rate / 1000.0f);
@@ -370,7 +370,9 @@ int main(void)
       chirp_f2 = i;
     }
   }
+  // The number of received HIGHs
   chirp_signal_threshold_high = (chirp_f2 - chirp_f1 + 1) * CHIRP_SIGNAL_THRESHOLD_HIGH;
+  // The number of received LOWs
   chirp_signal_threshold_low = (chirp_f2 - chirp_f1 + 1) * CHIRP_SIGNAL_THRESHOLD_LOW;
 
   // FFT initialization
