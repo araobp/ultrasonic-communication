@@ -116,7 +116,8 @@ Paper rubbing
 ![Paper rubbing](./doc/FFT_Paper_Rubbing.jpg)
 
 #### The best chrip signal
-
+|Parameter    |Value   |
+|-------------|--------|
 |TQ           |20.5msec|
 |Sampling rage|100kHz to reduce white noise around the sweep range|
 |Sweep range  |17000 - 18000 Hz x 2 times within TQ|
