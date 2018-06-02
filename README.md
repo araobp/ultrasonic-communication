@@ -117,9 +117,9 @@ Paper rubbing
 
 #### The best chrip signal
 
-TQ: 20.5msec
-Sampling rage: 100kHz to reduce white noise around the sweep range
-Sweep range: 17000 - 18000 Hz x 2 times within TQ
+|TQ           |20.5msec|
+|Sampling rage|100kHz to reduce white noise around the sweep range|
+|Sweep range  |17000 - 18000 Hz x 2 times within TQ|
 
 ### Chirp expriment on June 1, 2018
 
