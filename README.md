@@ -105,6 +105,12 @@ Sweep range: 16000Hz - 18000Hz
 
 ![16000_18000](./doc/FFT_Chirp_16000_18000.jpg)
 
+Sweep range: 17000Hz - 18000Hz (2 times in 20.5msec)
+
+![17000_18000_2x](./doc/FFT_Chirp_17000_18000_2xdb.jpg)
+
+![17000_18000_2x](./doc/FFT_Chirp_17000_18000_2x.jpg)
+
 Paper rubbing
 
 ![Paper rubbing](./doc/FFT_Paper_Rubbing.jpg)
