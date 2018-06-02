@@ -125,6 +125,8 @@ void decode(int16_t level, uint16_t chirp_strength) {
   const uint16_t max_length = offset + FRAME_BIT * 8;
   static uint16_t high_count = 0;
   bool sampling_point;
+  int rate;
+  char level_char = 'U';
 
   static char print_buf[30][256];
   static int idx = 0;
@@ -134,6 +136,7 @@ void decode(int16_t level, uint16_t chirp_strength) {
   switch(level) {
   case CHIRP_HIGH:
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+    level_char = 'H';
     if (count < offset) {  // Synchronization phase
       high_count++;
     } else if (sampling_point) {  // Data receiving phase
@@ -143,6 +146,7 @@ void decode(int16_t level, uint16_t chirp_strength) {
     count++;
     break;
   case CHIRP_UNKNOWN:
+    level_char = 'U';
     if (sampling_point) {
       sprintf(&print_buf[idx++][0], "Unknown!");
       n++;
@@ -150,6 +154,7 @@ void decode(int16_t level, uint16_t chirp_strength) {
     count++;
     break;
   case CHIRP_LOW:
+    level_char = 'L';
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
     if (count > 0) {
         count++;
@@ -167,12 +172,14 @@ void decode(int16_t level, uint16_t chirp_strength) {
     } else {
       b = ' ';
     }
-    sprintf(&print_buf[idx++][0], "[l]: %2d, [s]: %3d%%, c: %02d, h: %1d, n: %02d, [s]: %1d, [b]: %1c, bits: 0x%02x, t: %lu", level, (int)((float)chirp_strength/(float)(chirp_f2 - chirp_f1 + 1) * 100.0), count - 1, high_count, n, sampling_point, b, bits, HAL_GetTick());
+    rate = (int)((float)chirp_strength/(float)(chirp_f2 - chirp_f1 + 1) * 100.0);
+    sprintf(&print_buf[idx++][0], "[l]: %c, [s]: %3d%%, c: %02d, h: %1d, n: %02d, [s]: %1d, [b]: %1c, bits: 0x%02x, t: %lu", level_char, rate, count - 1, high_count, n, sampling_point, b, bits, HAL_GetTick());
   }
   // Synchronization error
   if ((count >= FRAME_START) && (high_count < FRAME_SYNC_THRESHOLD)) {
     count = 0;
     high_count = 0;
+    idx = 0;
     sprintf(&print_buf[idx++][0], "Sync error!");
   }
   // Frame receiving completed

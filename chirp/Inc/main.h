@@ -83,7 +83,7 @@
 #define CHIRP_MAGNITUDE_THRESHOLD   3000u
 
 // Chirp signal threshold (rate)
-#define CHIRP_SIGNAL_THRESHOLD_HIGH   0.4f
+#define CHIRP_SIGNAL_THRESHOLD_HIGH   0.1f
 #define CHIRP_SIGNAL_THRESHOLD_LOW    0.05f
 
 // Chirp signal level
