@@ -411,6 +411,20 @@ It could transmit a message "Hello World!" to the receiver. This time, the sweep
 ```
 ==> [Test code](./chirp)
 
+### Next step: fight with noise
+
+The implimentation so far have not employed the chirp compression technique.
+
+Try the following math to distinguish between chirp signal and noise:
+
+```
+f1 is a received wave form.
+
+f1[n] * f2[n] = f1[n] + f2[n]
+```
+
+Reference: http://whiteboard.ping.se/SDR/IQ
+
 ## My original MEMS mic shield
 
 I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
