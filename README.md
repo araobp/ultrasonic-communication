@@ -415,10 +415,11 @@ It could transmit a message "Hello World!" to the receiver. This time, the sweep
 
 The implimentation so far have not employed the chirp compression technique.
 
-Try the following math to distinguish between chirp signal and noise:
+Try the following math to distinguish between chirp signal and noise, either in the time domain or the frequency domain.
 
 ```
-f1 is a received wave form.
+f1: received chirp wave form with noise
+f2: reference reversed chirp wave form
 
 f1[n] * f2[n] = f1[n] + f2[n]
 ```
