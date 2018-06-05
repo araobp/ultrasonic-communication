@@ -413,16 +413,7 @@ It could transmit a message "Hello World!" to the receiver. This time, the sweep
 
 ### Next step: fight with noise
 
-The implimentation so far have not employed the chirp compression technique.
-
-Try the following math to distinguish between chirp signal and noise, either in the time domain or the frequency domain.
-
-```
-f1: received chirp wave form with noise
-f2: reference reversed chirp wave form
-
-f1[n] * f2[n] = f1[n] + f2[n]
-```
+I have made Chirp Compression simulation by Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpFrameGenerator.ipynb
 
 Reference: http://whiteboard.ping.se/SDR/IQ
 
