@@ -302,6 +302,8 @@ void fft(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+  float freq1;
+  float freq2;
 
   /* USER CODE END 1 */
 
@@ -367,13 +369,15 @@ int main(void)
     fft_window[i] = 0.5f - 0.5f * arm_cos_f32((float)i * WINDOW_SCALE);
   }
 
+  freq1 = CHIRP_F1;
+  freq2 = CHIRP_F1 + 2.0 * (CHIRP_F2 - CHIRP_F1);
   // Chirp sweep range f1 and f2
   for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
     fft_frequency[i] = (float)i * (float)sample_rate / (float)FFT_SAMPLES;
-    if ((chirp_f1 == 0) && (fft_frequency[i] >= CHIRP_F1)) {
+    if ((chirp_f1 == 0) && (fft_frequency[i] >= freq1)) {
       chirp_f1 = i;
     }
-    if ((chirp_f2 == 0) && (fft_frequency[i] >= CHIRP_F2)) {
+    if ((chirp_f2 == 0) && (fft_frequency[i] >= freq2)) {
       chirp_f2 = i;
     }
   }

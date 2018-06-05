@@ -76,7 +76,7 @@
 #define FFT_SAMPLES 2048UL
 
 // Expected chirp sweep range
-#define CHIRP_F1  16000.0  // Hz
+#define CHIRP_F1  17000.0  // Hz
 #define CHIRP_F2  18000.0  // Hz
 
 // Chirp FFT magnitude threshold
