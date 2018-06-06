@@ -424,7 +424,7 @@ Chirp is identifiable at around 0 Hz:
 
 ![upchirp_upchirp_conjugate](./doc/Simulation_upchirp_upchirp_conjugate.jpg)
 
-Chirp is identifiable at around 17500 Hz:
+Chirp is identifiable at around 35000 Hz:
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
