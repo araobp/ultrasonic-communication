@@ -416,11 +416,11 @@ It could transmit a message "Hello World!" to the receiver. This time, the sweep
 
 I have made Chirp Compression simulation by Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpFrameGenerator.ipynb
 
-![upchirp_with_noise](./doc/simulation_upchirp_with_noise.jpg)
+![upchirp_with_noise](./doc/Simulation_upchirp_with_noise.jpg)
 
-![upchirp_upchirp_conjugate](./doc/simulation_upchirp_upchirp_conjugate.jpg)
+![upchirp_upchirp_conjugate](./doc/Simulation_upchirp_upchirp_conjugate.jpg)
 
-![upchirp_downchirp](./doc/simulation_upchirp_downchirp.jpg)
+![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
 Reference:
 - http://whiteboard.ping.se/SDR/IQ
