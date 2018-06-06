@@ -416,9 +416,15 @@ It could transmit a message "Hello World!" to the receiver. This time, the sweep
 
 I have made Chirp Compression simulation by Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpFrameGenerator.ipynb
 
+Chirp signal is under noise level:
+
 ![upchirp_with_noise](./doc/Simulation_upchirp_with_noise.jpg)
 
+Chirp is identifiable at around 0 Hz:
+
 ![upchirp_upchirp_conjugate](./doc/Simulation_upchirp_upchirp_conjugate.jpg)
+
+Chirp is identifiable at around 17500 Hz:
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
