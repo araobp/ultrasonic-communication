@@ -28,7 +28,7 @@ Conclusion: the method (sort of FSK modulation) work very well in a silent room,
 
 I tested Chirp modulation as one of spread spectrum techniques. It worked!
 
-==> [Experiment2](EXPERIMENT.md)
+==> [Experiment2](EXPERIMENT2.md)
 
 ### Next step: fight with noise
 
