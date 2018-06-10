@@ -1,19 +1,19 @@
-### Two kinds of noises
+# Ultrasonic communications experiment (Chirp modulation)
+
+## Two kinds of noises
 
 I observed two kinds of noises in a room:
 
 - Constant noises at specific frequencies: noises from motors/inverters???
 - Bursty noises in a short period: cough, folding paper etc.
 
-I _guess_ Chirp modulation might be suitable for ultrasonic communications in a noisy environment. No proof yet.
-
-### Chirp modulation
+## Chirp modulation
 
 Spectrum is spread out like Mt. Fuji:
 
 ![Chirp](./doc/Chirp.jpg)
 
-### Chirp de-modulation
+## Chirp de-modulation
 
 All the frequencies appear in one TQ(Time Quantum). I used [Audacity](https://www.audacityteam.org/) to capture the spectrogram:
 
@@ -24,11 +24,11 @@ Reference:
 - [Chirp A New Radar Technique](http://www.rfcafe.com/references/electronics-world/chirp-new-radar-technique-january-1965-electronics-world.htm)
 - [Radar Pulse Compression](https://www.ittc.ku.edu/workshops/Summer2004Lectures/Radar_Pulse_Compression.pdf)
 
-### Frame synchronization (tentative)
+## Frame synchronization (tentative)
 
 ![sync](https://docs.google.com/drawings/d/e/2PACX-1vT0xMhbKVX62nasynSLvbgHrd40IWsxlZk-ngVtTI8NFT8TRtOmFlF54dge_VsReuIUTKtRM1zNQkBn/pub?w=960&h=720)
 
-### System setting
+## System setting
 
 DFSDM parameters
 
@@ -47,13 +47,13 @@ FFT parameters
 |-------------|-----|
 |DMA interrupt|2048 samples/interrupt|
 
-#### Time Quantum (TQ) and transmission speed
+### Time Quantum (TQ) and transmission speed
 
 Time Quantum: 1/100kHz * 2048samples/interrupt = 20.5 msec
 
 Transmission speed: 8bits * 1000 / (20.5(msec) * 19) = 20.5bps
 
-### FFT output from STM32L4 DSP with MEMS mic
+## FFT output from STM32L4 DSP with MEMS mic
 
 I used a very cheap speaker (100yen: $1) with my laptop PC to playback the "S" wav file.
 
@@ -81,7 +81,7 @@ Paper rubbing
 
 ![Paper rubbing](./doc/FFT_Paper_Rubbing.jpg)
 
-#### The best chrip signal
+### The best chrip signal
 
 |Parameter    |Value   |
 |-------------|--------|
@@ -89,7 +89,7 @@ Paper rubbing
 |Sampling rage|100kHz to reduce white noise around the sweep range|
 |Sweep range  |17000 - 18000 Hz x 2 times within TQ|
 
-### Chirp expriment on June 1, 2018
+## Chirp expriment on June 1, 2018
 
 It could transmit a character code "S" to the receiver. It showed better reachability. However, I observed the following problems:
 
@@ -121,7 +121,7 @@ It could transmit a character code "S" to the receiver. It showed better reachab
 ==> bits: 0x53, char: S
 ```
 
-### Chirp expriment on June 3, 2018
+## Chirp expriment on June 3, 2018
 
 ![HelloWorld](./doc/ChirpFrameHelloWorld.jpg)
 
