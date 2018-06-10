@@ -18,6 +18,8 @@ The system architecture is as follows:
 
 ## Ultrasonic communications experiment (FSK modulation)
 
+![](./doc/18symbols.jpg)
+
 ==> [Experiment](EXPERIMENT.md)
 
 ==> [Test code](./ultracom)
