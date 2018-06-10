@@ -69,27 +69,27 @@ bool flag_m1 = true;
 bool flag_m2 = true;
 
 // Audio sample rate and period
-float sample_rate;
-float sample_period;
+float sampling_rate;
+float sampling_period;
 
 // DMA peripheral to memory buffer
-int32_t buf_m1[FFT_SAMPLES] = { 0 };
-int32_t buf_m2[FFT_SAMPLES] = { 0 };
+int32_t buf[PCM_SAMPLES] = { 0 };
+int32_t buf_m2[PCM_SAMPLES] = { 0 };
 
 // PCM data store for further processing (FFT)
-int32_t pcm_m1[FFT_SAMPLES] = { 0 };
-int32_t pcm_m2[FFT_SAMPLES] = { 0 };
+int32_t pcm[PCM_SAMPLES] = { 0 };
+int32_t pcm_m2[PCM_SAMPLES] = { 0 };
 
 // FFT
 arm_rfft_fast_instance_f32 S;
-float32_t fft_input[FFT_SAMPLES] = { 0.0f };
-float32_t fft_hanning[FFT_SAMPLES] = { 0.0f };
-float32_t fft_output[FFT_SAMPLES] = { 0.0f };
-float fft_magnitude[FFT_SAMPLES / 2] = { 0.0f };
-float fft_db[FFT_SAMPLES / 2] = { 0.0f };
-float fft_frequency[FFT_SAMPLES / 2] = { 0.0f };
-float fft_window[FFT_SAMPLES] = { 0.0f };
-const float WINDOW_SCALE = 2.0f * M_PI / (float) FFT_SAMPLES;
+float32_t fft_input[PCM_SAMPLES] = { 0.0f };
+float32_t fft_hanning[PCM_SAMPLES] = { 0.0f };
+float32_t fft_output[PCM_SAMPLES] = { 0.0f };
+float fft_magnitude[PCM_SAMPLES / 2] = { 0.0f };
+float fft_db[PCM_SAMPLES / 2] = { 0.0f };
+float fft_frequency[PCM_SAMPLES / 2] = { 0.0f };
+float fft_window[PCM_SAMPLES] = { 0.0f };
+const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
 
 // UART output flag
 bool output_result = false;
@@ -106,8 +106,8 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 void fft(void) {
   // Windowing
-  arm_mult_f32(fft_input, fft_window, fft_input, FFT_SAMPLES);
-  for(uint32_t i = 0; i < FFT_SAMPLES; i++) {
+  arm_mult_f32(fft_input, fft_window, fft_input, PCM_SAMPLES);
+  for(uint32_t i = 0; i < PCM_SAMPLES; i++) {
     fft_hanning[i] = fft_input[i];
   }
 
@@ -116,14 +116,14 @@ void fft(void) {
   arm_rfft_fast_f32(&S, fft_input, fft_output, 0);
 
   // Calculate magnitude
-  arm_cmplx_mag_f32(fft_output, fft_magnitude, FFT_SAMPLES / 2);
+  arm_cmplx_mag_f32(fft_output, fft_magnitude, PCM_SAMPLES / 2);
 
   // Normalization (Unitary transformation) of magnitude
-  arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), fft_magnitude,
-      FFT_SAMPLES / 2);
+  arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) PCM_SAMPLES), fft_magnitude,
+      PCM_SAMPLES / 2);
 
   // AC coupling
-  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
+  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
     if (*(fft_frequency + i) < FFT_AC_COUPLING_HZ)
       fft_magnitude[i] = 1.0f;
     else
@@ -131,13 +131,13 @@ void fft(void) {
   }
 
   float inv_dB_base_mag = 1.0f / 1.0f;
-  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++)
+  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++)
     fft_db[i] = 10.0f * log10f(fft_magnitude[i] * inv_dB_base_mag);
 
   // Calculate max magnitude
   float mag_max, frq_max;
   uint32_t maxIndex;
-  arm_max_f32(fft_magnitude, FFT_SAMPLES / 2, &mag_max, &maxIndex);
+  arm_max_f32(fft_magnitude, PCM_SAMPLES / 2, &mag_max, &maxIndex);
   frq_max = *(fft_frequency + maxIndex);
 
   // Output result to UART when user button is pressed
@@ -147,25 +147,25 @@ void fft(void) {
         mag_max);
     printf("Frequency(Hz),Magnitude,Magnitude(dB)\n");
     // FFT
-    for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
+    for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
       printf("%.1f,%f,%f\n", fft_frequency[i], fft_magnitude[i], fft_db[i]);
     }
     printf("\n");
     // Raw PCM data
     printf("Index,Amplitude\n");
     if (mic_select == M1) {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-        printf("%lu,%ld\n", i, pcm_m1[i]);
+      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
+        printf("%lu,%ld\n", i, pcm[i]);
       }
     } else {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
         printf("%lu,%ld\n", i, pcm_m2[i]);
       }
     }
     printf("EORAW\n");
     // Filtered PCM data (e.g., Hanning Window)
     printf("Index,Amplitude\n");
-    for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+    for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
       printf("%lu,%f\n", i, fft_hanning[i]);
     }
     printf("EOFLT\n");
@@ -210,48 +210,48 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // DMA from DFSDM to buf_m1
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf_m1, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 #ifdef M2_MULTIPREX
   // DMA from DFSDM to buf_m2
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 #else
   // DMA from DFSDM to buf_m2
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter1, buf_m2, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter1, buf_m2, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 #endif
 
   // FFT sample rate
-  sample_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
+  sampling_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
   // Output basic info
   printf("/// Audio Spectrum Analyzer ///\n\n");
-  printf("Sampling rate: %4.1f(kHz)\n", (float) sample_rate / 1000.0f);
-  sample_period = 1.0f / sample_rate * FFT_SAMPLES;
+  printf("Sampling rate: %4.1f(kHz)\n", (float) sampling_rate / 1000.0f);
+  sampling_period = 1.0f / sampling_rate * PCM_SAMPLES;
   printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
-      sample_period * 1000.0f, FFT_SAMPLES);
+      sampling_period * 1000.0f, PCM_SAMPLES);
   printf("Push USER button to output single-shot FFT\n");
 
   // Hanning window
-  for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+  for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     fft_window[i] = 0.5f - 0.5f * arm_cos_f32((float)i * WINDOW_SCALE);
   }
 
-  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
-    fft_frequency[i] = (float)i * (float)sample_rate / (float)FFT_SAMPLES;
+  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+    fft_frequency[i] = (float)i * (float)sampling_rate / (float)PCM_SAMPLES;
   }
 
   // FFT initialization
-  arm_rfft_fast_init_f32(&S, FFT_SAMPLES);
+  arm_rfft_fast_init_f32(&S, PCM_SAMPLES);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -260,8 +260,8 @@ int main(void)
 
     // Wait for next PCM samples from M1
     if (!flag_m1) {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-        fft_input[i] = (float) pcm_m1[i];
+      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
+        fft_input[i] = (float) pcm[i];
       }
       mic_select = M1;
       fft();
@@ -269,7 +269,7 @@ int main(void)
     }
     // Wait for next PCM samples from M2
     if (!flag_m2) {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
         fft_input[i] = (float) pcm_m2[i];
       }
       mic_select = M2;
@@ -400,20 +400,20 @@ void HAL_DFSDM_FilterRegConvCpltCallback(
   // uint32_t start = FFT_SAMPLES / 2;
   uint32_t start = 0;
   if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
-      pcm_m1[i] = buf_m1[i];
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
+      pcm[i] = buf[i];
     }
     flag_m1 = false;
 #ifdef M2_MULTIPREX
   } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter2)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
       pcm_m2[i] = buf_m2[i];
     }
     flag_m2 = false;
   }
 #else
   } else if  (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter1)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
       pcm_m2[i] = buf_m2[i];
     }
     flag_m2 = false;

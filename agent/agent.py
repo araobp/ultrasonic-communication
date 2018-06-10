@@ -33,7 +33,6 @@ if __name__ == '__main__':
     while True:
 
         line = ser.readline().decode('ascii')
-        #print(line, end='')
 
         if (mode == HEADER):
             if (line.startswith('MEMS mic')):
@@ -53,9 +52,6 @@ if __name__ == '__main__':
                 file_fft = open(filename_fft, 'w')
                 filename_raw = '{}.raw'.format(filename)
                 file_raw = open(filename_raw, 'w')
-                filename_filter = '{}.flt'.format(filename)
-                file_filter = open(filename_filter, 'w')
-
                 file_fft.write(line)
 
         elif (mode == CSV):
@@ -67,17 +63,9 @@ if __name__ == '__main__':
 
         elif (mode == RAW):
             if (line == 'EORAW\n'):
-                mode = FILTER
-                print_mode()
-            else:
-                file_raw.write(line)
-            
-        elif (mode == FILTER):
-            if (line == 'EOFLT\n'):
                 mode = HEADER
                 print_mode()
                 file_fft.close()
                 file_raw.close()
-                file_filter.close()
             else:
-                file_filter.write(line)
+                file_raw.write(line)

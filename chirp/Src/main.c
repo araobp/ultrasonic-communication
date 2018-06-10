@@ -69,27 +69,27 @@ bool flag_m1 = true;
 bool flag_m2 = true;
 
 // Audio sample rate and period
-float sample_rate;
-float sample_period;
+float sampling_rate;
+float sampling_period;
 
 // DMA peripheral to memory buffer
-int32_t buf_m1[FFT_SAMPLES] = { 0 };
-int32_t buf_m2[FFT_SAMPLES] = { 0 };
+int32_t buf[PCM_SAMPLES] = { 0 };
+int32_t buf_m2[PCM_SAMPLES] = { 0 };
 
 // PCM data store for further processing (FFT)
-int32_t pcm_m1[FFT_SAMPLES] = { 0 };
-int32_t pcm_m2[FFT_SAMPLES] = { 0 };
+int32_t pcm[PCM_SAMPLES] = { 0 };
+int32_t pcm_m2[PCM_SAMPLES] = { 0 };
 
 // FFT
 arm_rfft_fast_instance_f32 S;
-float32_t fft_input[FFT_SAMPLES] = { 0.0f };
-float32_t fft_hanning[FFT_SAMPLES] = { 0.0f };
-float32_t fft_output[FFT_SAMPLES] = { 0.0f };
-float fft_magnitude[FFT_SAMPLES / 2] = { 0.0f };
-float fft_db[FFT_SAMPLES / 2] = { 0.0f };
-float fft_frequency[FFT_SAMPLES / 2] = { 0.0f };
-float fft_window[FFT_SAMPLES] = { 0.0f };
-const float WINDOW_SCALE = 2.0f * M_PI / (float) FFT_SAMPLES;
+float32_t fft_input[PCM_SAMPLES] = { 0.0f };
+float32_t fft_hanning[PCM_SAMPLES] = { 0.0f };
+float32_t fft_output[PCM_SAMPLES] = { 0.0f };
+float fft_magnitude[PCM_SAMPLES / 2] = { 0.0f };
+float fft_db[PCM_SAMPLES / 2] = { 0.0f };
+float fft_frequency[PCM_SAMPLES / 2] = { 0.0f };
+float fft_window[PCM_SAMPLES] = { 0.0f };
+const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
 
 // Chirp sweep range
 uint32_t chirp_f1 = 0ul;
@@ -199,8 +199,8 @@ void decode(int16_t level, uint16_t chirp_strength) {
 
 void fft(void) {
   // Windowing
-  arm_mult_f32(fft_input, fft_window, fft_input, FFT_SAMPLES);
-  for(uint32_t i = 0; i < FFT_SAMPLES; i++) {
+  arm_mult_f32(fft_input, fft_window, fft_input, PCM_SAMPLES);
+  for(uint32_t i = 0; i < PCM_SAMPLES; i++) {
     fft_hanning[i] = fft_input[i];
   }
 
@@ -209,11 +209,11 @@ void fft(void) {
   arm_rfft_fast_f32(&S, fft_input, fft_output, 0);
 
   // Calculate magnitude
-  arm_cmplx_mag_f32(fft_output, fft_magnitude, FFT_SAMPLES / 2);
+  arm_cmplx_mag_f32(fft_output, fft_magnitude, PCM_SAMPLES / 2);
 
   // Normalization (Unitary transformation) of magnitude
-  arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), fft_magnitude,
-      FFT_SAMPLES / 2);
+  arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) PCM_SAMPLES), fft_magnitude,
+      PCM_SAMPLES / 2);
   /*
   // AC coupling
   for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
@@ -331,26 +331,26 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // DMA from DFSDM to buf_m1
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf_m1, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 #ifdef M2_MULTIPREX
   // DMA from DFSDM to buf_m2
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 #else
   // DMA from DFSDM to buf_m2
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter1, buf_m2, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter1, buf_m2, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 #endif
 
   // FFT sample rate
-  sample_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
+  sampling_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
@@ -365,15 +365,15 @@ int main(void)
   */
 
   // Hanning window
-  for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+  for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     fft_window[i] = 0.5f - 0.5f * arm_cos_f32((float)i * WINDOW_SCALE);
   }
 
   freq1 = CHIRP_F1;
   freq2 = CHIRP_F1 + 2.0 * (CHIRP_F2 - CHIRP_F1);
   // Chirp sweep range f1 and f2
-  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
-    fft_frequency[i] = (float)i * (float)sample_rate / (float)FFT_SAMPLES;
+  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+    fft_frequency[i] = (float)i * (float)sampling_rate / (float)PCM_SAMPLES;
     if ((chirp_f1 == 0) && (fft_frequency[i] >= freq1)) {
       chirp_f1 = i;
     }
@@ -387,7 +387,7 @@ int main(void)
   chirp_signal_threshold_low = (chirp_f2 - chirp_f1 + 1) * CHIRP_SIGNAL_THRESHOLD_LOW;
 
   // FFT initialization
-  arm_rfft_fast_init_f32(&S, FFT_SAMPLES);
+  arm_rfft_fast_init_f32(&S, PCM_SAMPLES);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -396,8 +396,8 @@ int main(void)
 
     // Wait for next PCM samples from M1
     if (!flag_m1) {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-        fft_input[i] = (float) pcm_m1[i];
+      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
+        fft_input[i] = (float) pcm[i];
       }
       mic_select = M1;
       fft();
@@ -405,7 +405,7 @@ int main(void)
     }
     // Wait for next PCM samples from M2
     if (!flag_m2) {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
         fft_input[i] = (float) pcm_m2[i];
       }
       /*
@@ -538,20 +538,20 @@ void HAL_DFSDM_FilterRegConvCpltCallback(
   // uint32_t start = FFT_SAMPLES / 2;
   uint32_t start = 0;
   if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
-      pcm_m1[i] = buf_m1[i];
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
+      pcm[i] = buf[i];
     }
     flag_m1 = false;
 #ifdef M2_MULTIPREX
   } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter2)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
       pcm_m2[i] = buf_m2[i];
     }
     flag_m2 = false;
   }
 #else
   } else if  (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter1)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
       pcm_m2[i] = buf_m2[i];
     }
     flag_m2 = false;

@@ -67,16 +67,16 @@ bool flag_m1 = true;
 bool flag_m2 = true;
 
 // Audio sample rate and period
-float sample_rate;
-float sample_period;
+float sampling_rate;
+float sampling_period;
 
 // DMA peripheral to memory buffer
-int32_t buf_m1[FFT_SAMPLES] = { 0 };
-int32_t buf_m2[FFT_SAMPLES] = { 0 };
+int32_t buf[PCM_SAMPLES] = { 0 };
+int32_t buf_m2[PCM_SAMPLES] = { 0 };
 
 // PCM data store for further processing (FFT)
-int32_t pcm_m1[FFT_SAMPLES] = { 0 };
-int32_t pcm_m2[FFT_SAMPLES] = { 0 };
+int32_t pcm[PCM_SAMPLES] = { 0 };
+int32_t pcm_m2[PCM_SAMPLES] = { 0 };
 
 // FFT
 arm_rfft_fast_instance_f32 S;
@@ -113,17 +113,17 @@ void fft(float *input, float *output, float *window, float *magnitude,
     float *frequency, Result *result) {
 
   // Windowing
-  arm_mult_f32(input, window, input, FFT_SAMPLES);
+  arm_mult_f32(input, window, input, PCM_SAMPLES);
 
   // Execute FFT
   arm_rfft_fast_f32(&S, input, output, 0);
 
   // Calculate magnitude
-  arm_cmplx_mag_f32(output, magnitude, FFT_SAMPLES / 2);
+  arm_cmplx_mag_f32(output, magnitude, PCM_SAMPLES / 2);
 
   // Normalization (Unitary transformation) of magnitude
-  arm_scale_f32(magnitude, 1.0f / sqrtf((float) FFT_SAMPLES), magnitude,
-  FFT_SAMPLES / 2);
+  arm_scale_f32(magnitude, 1.0f / sqrtf((float) PCM_SAMPLES), magnitude,
+  PCM_SAMPLES / 2);
 
   // Calculate max magnitude
   //arm_max_f32(magnitude, FFT_SAMPLES / 2, &mag_max, &maxIndex);
@@ -244,12 +244,12 @@ void parser(Result *result) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  float fft_input[FFT_SAMPLES] = { 0.0f };
-  float fft_output[FFT_SAMPLES] = { 0.0f };
-  float fft_frequency[FFT_SAMPLES / 2] = { 0.0f };
-  float fft_magnitude[FFT_SAMPLES / 2] = { 0.0f };
-  float fft_window[FFT_SAMPLES] = { 0.0f };
-  const float WINDOW_SCALE = 2.0f * M_PI / (float) FFT_SAMPLES;
+  float fft_input[PCM_SAMPLES] = { 0.0f };
+  float fft_output[PCM_SAMPLES] = { 0.0f };
+  float fft_frequency[PCM_SAMPLES / 2] = { 0.0f };
+  float fft_magnitude[PCM_SAMPLES / 2] = { 0.0f };
+  float fft_window[PCM_SAMPLES] = { 0.0f };
+  const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
 
   Result result;
   /* USER CODE END 1 */
@@ -279,43 +279,43 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // DMA from DFSDM to buf_m1
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf_m1, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 
   // DMA from DFSDM to buf_m2
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, FFT_SAMPLES)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter2, buf_m2, PCM_SAMPLES)
       != HAL_OK) {
     Error_Handler();
   }
 
 
   // FFT sample rate
-  sample_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
+  sampling_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
   // Output basic info
   printf("/// Ultrasonic communication receiver ///\n\n");
-  printf("Sampling rate: %4.1f(kHz)\n", (float) sample_rate / 1000.0f);
-  sample_period = 1.0f / sample_rate * FFT_SAMPLES;
+  printf("Sampling rate: %4.1f(kHz)\n", (float) sampling_rate / 1000.0f);
+  sampling_period = 1.0f / sampling_rate * PCM_SAMPLES;
   printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
-      sample_period * 1000.0f, FFT_SAMPLES);
+      sampling_period * 1000.0f, PCM_SAMPLES);
   lcd_init(&hi2c1);
   lcd_string((uint8_t*)"Ultrasonic", 10);
 
   // Hanning window
-  for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
+  for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     fft_window[i] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
   }
 
-  for (uint32_t i = 0; i < FFT_SAMPLES / 2; i++) {
-    fft_frequency[i] = (float) i * (float) sample_rate / (float) FFT_SAMPLES;
+  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+    fft_frequency[i] = (float) i * (float) sampling_rate / (float) PCM_SAMPLES;
   }
 
   // FFT initialization
-  arm_rfft_fast_init_f32(&S, FFT_SAMPLES);
+  arm_rfft_fast_init_f32(&S, PCM_SAMPLES);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -324,8 +324,8 @@ int main(void)
 
     // Wait for next PCM samples from M1
     if (!flag_m1) {
-      for (uint32_t i = 0; i < FFT_SAMPLES; i++) {
-        fft_input[i] = (float) pcm_m1[i];
+      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
+        fft_input[i] = (float) pcm[i];
       }
       mic_select = M1;
       fft(fft_input, fft_output, fft_window, fft_magnitude, fft_frequency,
@@ -453,12 +453,12 @@ void HAL_DFSDM_FilterRegConvCpltCallback(
   // uint32_t start = FFT_SAMPLES / 2;
   uint32_t start = 0;
   if (flag_m1 && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
-      pcm_m1[i] = buf_m1[i];
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
+      pcm[i] = buf[i];
     }
     flag_m1 = false;
   } else if (flag_m2 && (hdfsdm_filter == &hdfsdm1_filter2)) {
-    for (uint32_t i = start; i < FFT_SAMPLES; i++) {
+    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
       pcm_m2[i] = buf_m2[i];
     }
     flag_m2 = false;

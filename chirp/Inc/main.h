@@ -73,7 +73,7 @@
 /* #define USE_FULL_ASSERT    1U */
 
 /* USER CODE BEGIN Private defines */
-#define FFT_SAMPLES 2048UL
+#define PCM_SAMPLES 2048UL
 
 // Expected chirp sweep range
 #define CHIRP_F1  17000.0  // Hz

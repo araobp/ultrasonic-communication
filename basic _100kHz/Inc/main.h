@@ -73,7 +73,7 @@
 /* #define USE_FULL_ASSERT    1U */
 
 /* USER CODE BEGIN Private defines */
-#define FFT_SAMPLES 2048UL
+#define PCM_SAMPLES 2048UL
 #define FFT_AC_COUPLING_HZ  1000.0f
 /* USER CODE END Private defines */
 
