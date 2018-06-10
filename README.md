@@ -29,11 +29,15 @@ My first idea was FSK modulation of 18 frequencies (18 symboles) to send data on
 
 ## Ultrasonic communications experiment (Chirp modulation)
 
-I tested Chirp modulation as one of spread spectrum techniques. It worked! But the noise problem still remained. I had to come up with a noise suppression technique such as Chirp compression.
+I tested Chirp modulation as one of spread spectrum techniques. It worked! But the noise problem still remained, and the result was useless in a noisy room. I had to come up with a noise suppression technique such as Chirp compression.
 
 ==> [Experiment2](EXPERIMENT2.md)
 
+==> [Test code](./chirp)
+
 ## Ultrasonic communications experiment (Chirp modulation with compression)
+
+This time, I employ some compression technique, and chirp appears one time within Time Quantum (TQ), unlike the previous experiment.
 
 ### Simulation on Jupyter Notebook
 
@@ -53,11 +57,13 @@ Chirp is identifiable at around 35000 Hz:
 
 ### The first experiment of up x down (June 10, 2018)
 
+It worked!
+
 ![upchirp_downchirp](./doc/FFT_upXdown.jpg)
 
 ### Next step
 
-I have to come up with some synchronization technique.
+I have to come up with some synchronization technique: synchronization of TQ between the transmitter and the receiver.
 
 ## My original MEMS mic shield
 
