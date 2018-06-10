@@ -31,7 +31,7 @@ My first idea was FSK modulation of 18 frequencies (18 symboles) to send data on
 
 I tested Chirp modulation as one of spread spectrum techniques. It worked! But the noise problem still remained, and the result was useless in a noisy room. I had to come up with a noise suppression technique such as Chirp compression.
 
-![](./doc/chirp.jpg)
+![](./doc/Chirp.jpg)
 
 ==> [Experiment2](EXPERIMENT2.md)
 
