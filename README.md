@@ -413,8 +413,7 @@ It could transmit a message "Hello World!" to the receiver. This time, the sweep
 
 ### Next step: fight with noise
 
-
-I have made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpFrameGenerator.ipynb
+I have made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpSimulation.ipynb
 
 Chirp signal is under noise level:
 
@@ -427,6 +426,10 @@ Chirp is identifiable at around 0 Hz:
 Chirp is identifiable at around 35000 Hz:
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
+
+And the first experiment on STM32L4 with MEMS mic:
+
+![upchirp_downchirp](./doc/FFT_upXdonw.jpg)
 
 ## My original MEMS mic shield
 
