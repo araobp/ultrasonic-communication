@@ -4,7 +4,7 @@
 
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
-This project uses STM32L476RG as MCU and MP34ST01-M as MEMS microphone:
+This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
 
 ![platform](./doc/MEMSMIC_expansion_board.jpg)
 
