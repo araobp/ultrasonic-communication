@@ -57,7 +57,7 @@ Chirp is identifiable at around 35000 Hz:
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
-### The first experiment of up x down (June 10, 2018)
+### The first experiment of up x down on STM32L4 DSP (June 10, 2018)
 
 It worked!
 
