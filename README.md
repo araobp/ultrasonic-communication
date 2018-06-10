@@ -45,7 +45,7 @@ This time, I employ some compression technique, and chirp appears one time withi
 
 I have made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpSimulation.ipynb
 
-Chirp signal is under noise level:
+The two peaks below are constant noises and chirp signal is under noise level of white noise:
 
 ![upchirp_with_noise](./doc/Simulation_upchirp_with_noise.jpg)
 
