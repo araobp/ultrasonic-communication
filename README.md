@@ -43,7 +43,7 @@ This time, I employ some compression technique, and chirp appears one time withi
 
 ### Simulation on Jupyter Notebook
 
-I have made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpSimulation.ipynb
+I made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpSimulation.ipynb
 
 The two peaks below are constant noises and chirp signal is under noise level of white noise:
 
@@ -59,7 +59,7 @@ Chirp is identifiable at around 35000 Hz:
 
 ### The first experiment of up x down on STM32L4 DSP (June 10, 2018)
 
-It worked!
+I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within TQ.
 
 ![upchirp_downchirp](./doc/FFT_upXdown.jpg)
 
