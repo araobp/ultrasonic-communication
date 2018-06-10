@@ -1,6 +1,6 @@
-## Experiment
+# Ultrasonic communications experiment (FSK modulation)
 
-### Hex number in 4bit length
+## Hex number in 4bit length
 
 ![18symbols](./doc/18symbols.jpg)
 
@@ -25,7 +25,7 @@ I assign the following frequencies to each hexa-decimal number of 4 bit data len
 |19775| E |
 |19970| F |
 
-### DFSDM setting
+## DFSDM setting
 
 |Parameter    |Value/setting|
 |-------------|-----|
@@ -42,7 +42,7 @@ The resulting sampling rate is 100kHz (Nyquist frequency is 50kHz). If the lengt
 ```
 If the FFT peak is same and its magnitude is larger than a specific value in three times in a row (60msec), the receiver recognize it as a meaningful hex data.
 
-### Data frame
+## Data frame
 
 This frame format is tentative.
 
@@ -52,7 +52,7 @@ This frame format is tentative.
        100msec                                100msec
 ```
 
-### Result of first ultrasonic communication test performed on May 20, 2018
+## Result of first ultrasonic communication test performed on May 20, 2018
 
 Although the MEMS mic is only 50 cm away from tone generator on my PC, this is my first experience in ultrasonic communications.
 
