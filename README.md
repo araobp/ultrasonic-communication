@@ -1,4 +1,4 @@
-# Ultrasonic communications by STM32L4's DSP and MEMS mic
+# Ultrasonic communications (STM32L4 DSP w/ MEMS mic)
 
 ![ChirpFrame](./doc/ChirpFrame.jpg)
 
