@@ -427,9 +427,9 @@ Chirp is identifiable at around 35000 Hz:
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
-And the first experiment on STM32L4 with MEMS mic:
+### The first experiment of up x down (June 10, 2018)
 
-![upchirp_downchirp](./doc/FFT_upXdonw.jpg)
+![upchirp_downchirp](./doc/FFT_upXdown.jpg)
 
 ## My original MEMS mic shield
 
