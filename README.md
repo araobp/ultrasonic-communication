@@ -18,21 +18,22 @@ The system architecture is as follows:
 
 ## Ultrasonic communications experiment (FSK modulation)
 
+My first idea was FSK modulation of 18 frequencies (18 symboles) to send data on ultrasonic wave. The method worked very well in a silent room, but did not work in a noisy environment such as a meeting room. I had to come up with another approach, such as spread spectrum.
+
 ![](./doc/18symbols.jpg)
 
 ==> [Experiment](EXPERIMENT.md)
 
 ==> [Test code](./ultracom)
 
-Conclusion: the method (sort of FSK modulation) work very well in a silent room, but did not work in a noisy environment such as a meeting room. I have to come up with another approach, such as spread spectrum.
 
-## Chirp modulation experiment
+## Ultrasonic communications experiment (Chirp modulation)
 
-I tested Chirp modulation as one of spread spectrum techniques. It worked!
+I tested Chirp modulation as one of spread spectrum techniques. It worked! But the noise problem still remained. I had to come up with a noise suppression technique such as Chirp compression.
 
 ==> [Experiment2](EXPERIMENT2.md)
 
-### Next step: fight with noise
+## Ultrasonic communications experiment (Chirp modulation with compression)
 
 I have made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpSimulation.ipynb
 
@@ -51,6 +52,10 @@ Chirp is identifiable at around 35000 Hz:
 ### The first experiment of up x down (June 10, 2018)
 
 ![upchirp_downchirp](./doc/FFT_upXdown.jpg)
+
+### Next step
+
+I have to come up with some synchronization technique.
 
 ## My original MEMS mic shield
 
