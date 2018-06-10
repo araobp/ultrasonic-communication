@@ -35,6 +35,8 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 
 ## Ultrasonic communications experiment (Chirp modulation with compression)
 
+### Simulation on Jupyter Notebook
+
 I have made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpSimulation.ipynb
 
 Chirp signal is under noise level:
