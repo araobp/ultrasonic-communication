@@ -2,6 +2,8 @@
 
 ![ChirpFrame](./doc/ChirpFrame.jpg)
 
+As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic. This project is to study Arm Cortex-M4's DSP capabilities.
+
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
 This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
