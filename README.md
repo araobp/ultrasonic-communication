@@ -65,7 +65,7 @@ I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! B
 
 ### How much time does it take to compute complex FFT of 2048 samples?
 
-The measured value is 3msec for each FFT of 2048 samples at 80MHz system clock.
+The measured value is 3msec for each FFT of 2048 samples at 80MHz system clock. 2048 samples correspond to 20.5msec at 100kHz sampling rate, so 3msec is short enough compared to 20.5msec.
 
 ### Next step
 
