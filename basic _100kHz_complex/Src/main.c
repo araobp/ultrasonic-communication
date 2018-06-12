@@ -1,41 +1,40 @@
-
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  ** This notice applies to any and all portions of this file
-  * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
-  * inserted by the user or by software development tools
-  * are owned by their respective copyright owners.
-  *
-  * COPYRIGHT(c) 2018 STMicroelectronics
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ ** This notice applies to any and all portions of this file
+ * that are not between comment pairs USER CODE BEGIN and
+ * USER CODE END. Other portions of this file, whether
+ * inserted by the user or by software development tools
+ * are owned by their respective copyright owners.
+ *
+ * COPYRIGHT(c) 2018 STMicroelectronics
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *   1. Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *   2. Redistributions in binary form must reproduce the above copyright notice,
+ *      this list of conditions and the following disclaimer in the documentation
+ *      and/or other materials provided with the distribution.
+ *   3. Neither the name of STMicroelectronics nor the names of its contributors
+ *      may be used to endorse or promote products derived from this software
+ *      without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l4xx_hal.h"
@@ -68,15 +67,14 @@ float sampling_period;
 int32_t buf[PCM_SAMPLES] = { 0 };
 
 // PCM data store for further processing (FFT)
-int32_t pcm[PCM_SAMPLES] = { 0 };
+int32_t pcm[PCM_SAMPLES * 2] = { 0 };
 
 // FFT
-float32_t fft_input[PCM_SAMPLES * 2] = { 0.0f };
-//float32_t fft_output[FFT_SAMPLES * 2] = { 0.0f };
-float fft_magnitude[PCM_SAMPLES / 2] = { 0.0f };
-float fft_frequency[PCM_SAMPLES] = { 0.0f };
+float32_t fft_inout[PCM_SAMPLES * 2] = { 0.0f };
+float fft_frequency[PCM_SAMPLES / 2] = { 0.0f };
 float fft_window[PCM_SAMPLES * 2] = { 0.0f };
 const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
+float mag_max_history[8] = { 0.0f };
 
 // UART output flag
 bool output_result = false;
@@ -84,6 +82,14 @@ bool output_result = false;
 // UART input
 uint8_t rxbuf[1];
 bool mult = true;
+
+struct history {
+  float mag_max;
+  uint32_t start_time;
+  uint32_t finish_time;
+};
+
+struct history history[8];
 
 /* USER CODE END PV */
 
@@ -103,46 +109,62 @@ void fft(void) {
 
   if (output_result) {
 
-  // Execute f1 * f2
-  if (mult) mult_ref_chirp(fft_input, fft_input);
-  //mult_ref_chirp_sim(fft_input);
+    uint32_t start_time = HAL_GetTick();
 
-  // Windowing
-  // arm_mult_f32(fft_input, fft_window, fft_input, PCM_SAMPLES * 2);
+    // Execute f1 * f2
+    if (mult)
+      mult_ref_chirp(fft_inout, fft_inout);
+    //mult_ref_chirp_sim(fft_input);
 
-  // Execute complex FFT
-  arm_cfft_f32(&arm_cfft_sR_f32_len2048, fft_input, 0, 1);
+    // Windowing
+    arm_mult_f32(fft_inout, fft_window, fft_inout, PCM_SAMPLES * 2);
 
-  // Calculate magnitude
-  arm_cmplx_mag_f32(fft_input, fft_magnitude, PCM_SAMPLES);
+    // Execute complex FFT
+    arm_cfft_f32(&arm_cfft_sR_f32_len2048, fft_inout, 0, 1);
 
-  // Normalization (Unitary transformation) of magnitude
-  arm_scale_f32(fft_magnitude, 1.0f / sqrtf((float) PCM_SAMPLES), fft_magnitude,
-      PCM_SAMPLES/2);
+    // Calculate magnitude
+    arm_cmplx_mag_f32(fft_inout, fft_inout, PCM_SAMPLES);
 
-  // AC coupling
-  for (uint32_t i = 0; i < PCM_SAMPLES/2; i++) {
-    if (*(fft_frequency + i) < FFT_AC_COUPLING_HZ)
-      fft_magnitude[i] = 1.0f;
-    else
-      break;
-  }
+    // Normalization (Unitary transformation) of magnitude
+    arm_scale_f32(fft_inout, 1.0f / sqrtf((float) PCM_SAMPLES),
+        fft_inout,
+        PCM_SAMPLES / 2);
 
-  // Calculate max magnitude
-  float mag_max, frq_max;
-  uint32_t maxIndex;
-  arm_max_f32(fft_magnitude, PCM_SAMPLES / 2, &mag_max, &maxIndex);
-  frq_max = *(fft_frequency + maxIndex);
-/*
-  // Output result to UART when user button is pressed
-  if (output_result) {
-  */
-    printf("Frequency at max magnitude: %.1f, Max magnitude: %f\n", frq_max,
-        mag_max);
+    // AC coupling
+    for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+      if (fft_frequency[i] < FFT_AC_COUPLING_HZ)
+        fft_inout[i] = 1.0f;
+      else
+        break;
+    }
+
+    // Calculate max magnitude
+    float mag_max;
+    uint32_t maxIndex;
+    uint32_t center = (F1 + F2) / sampling_rate;
+    arm_max_f32(&fft_inout[center - 50], center + 50, &mag_max, &maxIndex);
+
+    uint32_t finish_time = HAL_GetTick();
+
+    for (int i = 1; i < 8; i++) {
+      history[i - 1] = history[i];
+    }
+    history[7].mag_max = mag_max;
+    history[7].start_time = start_time;
+    history[7].finish_time = finish_time;
+
+    /*
+     // Output result to UART when user button is pressed
+     if (output_result) {
+     */
+    printf("Magnitude history:\n");
+    for (int i = 0; i < 7; i++) {
+      printf("%.1f, %lu, %lu\n", history[i].mag_max, history[i].start_time, history[i].finish_time);
+    }
     printf("Frequency(Hz),Magnitude\n");
     // FFT
-    for (uint32_t i = 0; i < PCM_SAMPLES/2; i++) {
-      printf("%.1f,%e\n", fft_frequency[i], fft_magnitude[i]);
+    for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+      printf("%.1f,%e\n", fft_frequency[i], fft_inout[i]);
     }
     printf("EOFFT\n");
     printf("index,Amplitude\n");
@@ -150,7 +172,6 @@ void fft(void) {
       printf("%lu,%ld\n", i, pcm[i]);
     }
     printf("EOF\n");
-
 
     // Filtered PCM data (e.g., Hanning Window)
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
@@ -160,12 +181,11 @@ void fft(void) {
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  *
-  * @retval None
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ *
+ * @retval None
+ */
+int main(void) {
   /* USER CODE BEGIN 1 */
   int j, im, re;
   /* USER CODE END 1 */
@@ -219,12 +239,12 @@ int main(void)
   // Hanning window
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     j = i * 2;
-    fft_window[j] = 0.5f - 0.5f * arm_cos_f32((float)i * WINDOW_SCALE);
-    fft_window[j+1] = fft_window[j];
+    fft_window[j] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
+    fft_window[j + 1] = fft_window[j];
   }
 
   for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
-    fft_frequency[i] = (float)i * (float)sampling_rate / (float)PCM_SAMPLES;
+    fft_frequency[i] = (float) i * (float) sampling_rate / (float) PCM_SAMPLES;
   }
 
   /* USER CODE END 2 */
@@ -239,15 +259,15 @@ int main(void)
       for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
         im = i * 2;
         re = im + 1;
-        fft_input[im] = (float) pcm[i];
-        fft_input[re] = 0.0f;
+        fft_inout[im] = (float) pcm[i];
+        fft_inout[re] = 0.0f;
       }
       fft();
       flag = true;
     }
-  /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 
   }
   /* USER CODE END 3 */
@@ -255,18 +275,17 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
 
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
-    /**Initializes the CPU, AHB and APB busses clocks 
-    */
+  /**Initializes the CPU, AHB and APB busses clocks
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
@@ -277,46 +296,43 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     _Error_Handler(__FILE__, __LINE__);
   }
 
-    /**Initializes the CPU, AHB and APB busses clocks 
-    */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  /**Initializes the CPU, AHB and APB busses clocks
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+      | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
-  {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK) {
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_DFSDM1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2
+      | RCC_PERIPHCLK_DFSDM1;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
     _Error_Handler(__FILE__, __LINE__);
   }
 
-    /**Configure the main internal regulator output voltage 
-    */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
-  {
+  /**Configure the main internal regulator output voltage
+   */
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK) {
     _Error_Handler(__FILE__, __LINE__);
   }
 
-    /**Configure the Systick interrupt time 
-    */
-  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
+  /**Configure the Systick interrupt time
+   */
+  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
 
-    /**Configure the Systick 
-    */
+  /**Configure the Systick
+   */
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
   /* SysTick_IRQn interrupt configuration */
@@ -344,9 +360,8 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
  */
 void HAL_DFSDM_FilterRegConvCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
-  uint32_t start = 0;
   if (flag && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    for (uint32_t i = start; i < PCM_SAMPLES; i++) {
+    for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
       pcm[i] = buf[i];
     }
     flag = false;
@@ -389,13 +404,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  file: The file name as string.
-  * @param  line: The line in file as a number.
-  * @retval None
-  */
-void _Error_Handler(char *file, int line)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @param  file: The file name as string.
+ * @param  line: The line in file as a number.
+ * @retval None
+ */
+void _Error_Handler(char *file, int line) {
   /* USER CODE BEGIN Error_Handler_Debug */
   printf("Error! Line = %d\n", line);
   /* User can add his own implementation to report the HAL error return state */
@@ -406,14 +420,14 @@ void _Error_Handler(char *file, int line)
 
 #ifdef  USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t* file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
    ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
@@ -422,11 +436,11 @@ void assert_failed(uint8_t* file, uint32_t line)
 #endif /* USE_FULL_ASSERT */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

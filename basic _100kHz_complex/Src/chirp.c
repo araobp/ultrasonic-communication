@@ -44,20 +44,7 @@ void init_ref_chirp(void) {
 }
 
 void mult_ref_chirp(float32_t *pSrc, float32_t *pDst) {
-  int re, im;
-  float a, b, c, d;
-
-  for (int i = 0; i<PCM_SAMPLES; i++) {
-    re = i * 2;
-    im = re + 1;
-    a = pSrc[re];
-    b = pSrc[im];
-    c = down_chirp[re];
-    d = down_chirp[im];
-    // (a + jb) * (c + jd)
-    pDst[re] = a * c - b * d;
-    pDst[im] = a * d + b * c;
-  }
+  arm_cmplx_mult_cmplx_f32(pSrc, down_chirp, pDst, PCM_SAMPLES);
 }
 
 void mult_ref_chirp_sim(float32_t *pDst) {
