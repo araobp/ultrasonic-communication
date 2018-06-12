@@ -63,6 +63,10 @@ I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! B
 
 ![upchirp_downchirp](./doc/FFT_upXdown.jpg)
 
+### How much time does it take to compute complex FFT of 2048 samples?
+
+The measured value is 3msec for each FFT of 2048 samples at 80MHz system clock.
+
 ### Next step
 
 I have to come up with some synchronization technique: synchronization of TQ between the transmitter and the receiver.
