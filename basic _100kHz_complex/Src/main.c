@@ -56,8 +56,8 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
-// Flags to indicate ISR to copy data from buffer to PCM data store for FFT
-bool flag = true;
+// flag: "new PCM data has just been copied to buf"
+bool new_pcm_data = false;
 
 // Audio sample rate and period
 float sampling_rate;
@@ -67,14 +67,13 @@ float sampling_period;
 int32_t buf[PCM_SAMPLES] = { 0 };
 
 // PCM data store for further processing (FFT)
-int32_t pcm[PCM_SAMPLES * 2] = { 0 };
+float pcm[PCM_SAMPLES * 2] = { 0.0f };
 
 // FFT
 float32_t fft_inout[PCM_SAMPLES * 2] = { 0.0f };
 float fft_frequency[PCM_SAMPLES / 2] = { 0.0f };
 float fft_window[PCM_SAMPLES * 2] = { 0.0f };
 const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
-float mag_max_history[8] = { 0.0f };
 
 // UART output flag
 bool output_result = false;
@@ -82,14 +81,20 @@ bool output_result = false;
 // UART input
 uint8_t rxbuf[1];
 bool mult = true;
+bool all_data = true;
 
 struct history {
   float mag_max;
+  float mag_max_left;
+  float mag_max_right;
+  uint32_t max_idx;
+  uint32_t max_idx_left;
+  uint32_t max_idx_right;
   uint32_t start_time;
   uint32_t finish_time;
 };
 
-struct history history[8];
+struct history history[SYNC_RESOLUTION];
 
 /* USER CODE END PV */
 
@@ -107,76 +112,60 @@ void SystemClock_Config(void);
  */
 void fft(void) {
 
-  if (output_result) {
+  uint32_t start_time = HAL_GetTick();
 
-    uint32_t start_time = HAL_GetTick();
+  // Execute f1 * f2
+  if (mult)
+    mult_ref_chirp(fft_inout, fft_inout);
+  //mult_ref_chirp_sim(fft_input);
 
-    // Execute f1 * f2
-    if (mult)
-      mult_ref_chirp(fft_inout, fft_inout);
-    //mult_ref_chirp_sim(fft_input);
+  // Windowing
+  arm_mult_f32(fft_inout, fft_window, fft_inout, PCM_SAMPLES * 2);
 
-    // Windowing
-    arm_mult_f32(fft_inout, fft_window, fft_inout, PCM_SAMPLES * 2);
+  // Execute complex FFT
+  arm_cfft_f32(&arm_cfft_sR_f32_len2048, fft_inout, 0, 1);
 
-    // Execute complex FFT
-    arm_cfft_f32(&arm_cfft_sR_f32_len2048, fft_inout, 0, 1);
+  // Calculate magnitude
+  arm_cmplx_mag_f32(fft_inout, fft_inout, PCM_SAMPLES);
 
-    // Calculate magnitude
-    arm_cmplx_mag_f32(fft_inout, fft_inout, PCM_SAMPLES);
+  // Normalization (Unitary transformation) of magnitude
+  arm_scale_f32(fft_inout, 1.0f / sqrtf((float) PCM_SAMPLES), fft_inout,
+  PCM_SAMPLES / 2);
 
-    // Normalization (Unitary transformation) of magnitude
-    arm_scale_f32(fft_inout, 1.0f / sqrtf((float) PCM_SAMPLES),
-        fft_inout,
-        PCM_SAMPLES / 2);
-
-    // AC coupling
-    for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
-      if (fft_frequency[i] < FFT_AC_COUPLING_HZ)
-        fft_inout[i] = 1.0f;
-      else
-        break;
-    }
-
-    // Calculate max magnitude
-    float mag_max;
-    uint32_t maxIndex;
-    uint32_t center = (F1 + F2) / sampling_rate;
-    arm_max_f32(&fft_inout[center - 50], center + 50, &mag_max, &maxIndex);
-
-    uint32_t finish_time = HAL_GetTick();
-
-    for (int i = 1; i < 8; i++) {
-      history[i - 1] = history[i];
-    }
-    history[7].mag_max = mag_max;
-    history[7].start_time = start_time;
-    history[7].finish_time = finish_time;
-
-    /*
-     // Output result to UART when user button is pressed
-     if (output_result) {
-     */
-    printf("Magnitude history:\n");
-    for (int i = 0; i < 7; i++) {
-      printf("%.1f, %lu, %lu\n", history[i].mag_max, history[i].start_time, history[i].finish_time);
-    }
-    printf("Frequency(Hz),Magnitude\n");
-    // FFT
-    for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
-      printf("%.1f,%e\n", fft_frequency[i], fft_inout[i]);
-    }
-    printf("EOFFT\n");
-    printf("index,Amplitude\n");
-    for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-      printf("%lu,%ld\n", i, pcm[i]);
-    }
-    printf("EOF\n");
-
-    // Filtered PCM data (e.g., Hanning Window)
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-    output_result = false;
+  // AC coupling
+  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+    if (fft_frequency[i] < FFT_AC_COUPLING_HZ)
+      fft_inout[i] = 1.0f;
+    else
+      break;
   }
+
+  // Calculate max magnitude
+  float mag_max;
+  float mag_max_left;
+  float mag_max_right;
+  uint32_t max_idx;
+  uint32_t max_idx_left;
+  uint32_t max_idx_right;
+  uint32_t center = (F1 + F2) * PCM_SAMPLES / sampling_rate ;
+  uint32_t bandwidth = (F2 - F1) * PCM_SAMPLES / sampling_rate;
+  arm_max_f32(&fft_inout[center - bandwidth*2], bandwidth*4, &mag_max, &max_idx);
+  arm_max_f32(&fft_inout[center - bandwidth*2], bandwidth*2, &mag_max_left, &max_idx_left);
+  arm_max_f32(&fft_inout[center], bandwidth*2, &mag_max_right, &max_idx_right);
+
+  uint32_t finish_time = HAL_GetTick();
+
+  for (int i = 1; i < SYNC_RESOLUTION; i++) {
+    history[i - 1] = history[i];
+  }
+  history[SYNC_RESOLUTION - 1].mag_max = mag_max;
+  history[SYNC_RESOLUTION - 1].mag_max_left = mag_max_left;
+  history[SYNC_RESOLUTION - 1].mag_max_right = mag_max_right;
+  history[SYNC_RESOLUTION - 1].max_idx = max_idx;
+  history[SYNC_RESOLUTION - 1].max_idx_left = max_idx_left;
+  history[SYNC_RESOLUTION - 1].max_idx_right = max_idx_right + bandwidth*2;
+  history[SYNC_RESOLUTION - 1].start_time = start_time;
+  history[SYNC_RESOLUTION - 1].finish_time = finish_time;
 }
 /* USER CODE END 0 */
 
@@ -213,28 +202,22 @@ int main(void) {
   MX_DFSDM1_Init();
   /* USER CODE BEGIN 2 */
 
-  init_ref_chirp();
-
-  HAL_UART_Receive_IT(&huart2, rxbuf, 1);
-
-  // DMA from DFSDM to buf
-  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf, PCM_SAMPLES)
-      != HAL_OK) {
-    Error_Handler();
-  }
-
-  // FFT sample rate
+  // FFT sampling rate
   sampling_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
-  // Output basic info
-  printf("/// Audio Spectrum Analyzer ///\n\n");
-  printf("Sampling rate: %4.1f(kHz)\n", (float) sampling_rate / 1000.0f);
-  sampling_period = 1.0f / sampling_rate * PCM_SAMPLES;
-  printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
-      sampling_period * 1000.0f, PCM_SAMPLES);
-  printf("Push USER button to output single-shot FFT\n");
+  // Initialize reference chirp signal
+  init_ref_chirp(sampling_rate);
+
+  // Enable UART receive interrupt
+  HAL_UART_Receive_IT(&huart2, rxbuf, 1);
+
+  // Enable DMA from DFSDM to buf (peripheral to memory)
+  if (HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, buf, PCM_SAMPLES)
+      != HAL_OK) {
+    Error_Handler();
+  }
 
   // Hanning window
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
@@ -243,9 +226,18 @@ int main(void) {
     fft_window[j + 1] = fft_window[j];
   }
 
+  // FFT frequency
   for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
     fft_frequency[i] = (float) i * (float) sampling_rate / (float) PCM_SAMPLES;
   }
+
+  // Show starting message
+  printf("/// Audio Spectrum Analyzer ///\n\n");
+  printf("Sampling rate: %4.1f(kHz)\n", (float) sampling_rate / 1000.0f);
+  sampling_period = 1.0f / sampling_rate * PCM_SAMPLES;
+  printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
+      sampling_period * 1000.0f, PCM_SAMPLES);
+  printf("Push USER button to output single-shot FFT\n");
 
   /* USER CODE END 2 */
 
@@ -254,16 +246,53 @@ int main(void) {
   while (1) {
 
     HAL_Delay(1);
+
     // Wait for next PCM samples from M1
-    if (!flag) {
-      for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-        im = i * 2;
-        re = im + 1;
-        fft_inout[im] = (float) pcm[i];
-        fft_inout[re] = 0.0f;
+    if (new_pcm_data) {
+
+      for (uint32_t i = 0; i < SYNC_RESOLUTION; i++) {
+        int sync_position = ( PCM_SAMPLES / SYNC_RESOLUTION) * i;
+        for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
+          im = j * 2;
+          re = im + 1;
+          fft_inout[im] = pcm[j + sync_position];
+          fft_inout[re] = 0.0f;
+        }
+        fft();
       }
-      fft();
-      flag = true;
+
+      if (output_result) {  // Output debug info
+
+        printf("Magnitude history:\n");
+        for (int i = 0; i < SYNC_RESOLUTION; i++) {
+          printf("%.1f, %.1f, %.1f, %lu, %lu, %lu, %lu, %lu\n",
+              history[i].mag_max, history[i].mag_max_left, history[i].mag_max_right,
+              history[i].start_time,
+              history[i].finish_time, history[i].max_idx,
+              history[i].max_idx_left, history[i].max_idx_right);
+        }
+
+        if (all_data) {
+          printf("Frequency(Hz),Magnitude\n");
+          // FFT
+          for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+            printf("%.1f,%e\n", fft_frequency[i], fft_inout[i]);
+          }
+          printf("EOFFT\n");
+          printf("index,Amplitude\n");
+          for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
+            printf("%lu,%.1f\n", i, pcm[i]);
+          }
+          printf("EOF\n");
+        }
+
+        // Filtered PCM data (e.g., Hanning Window)
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+        output_result = false;
+      }
+
+      new_pcm_data = false;
+
     }
     /* USER CODE END WHILE */
 
@@ -360,11 +389,12 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
  */
 void HAL_DFSDM_FilterRegConvCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
-  if (flag && (hdfsdm_filter == &hdfsdm1_filter0)) {
+  if (!new_pcm_data && (hdfsdm_filter == &hdfsdm1_filter0)) {
+    arm_copy_f32(&pcm[PCM_SAMPLES], pcm, PCM_SAMPLES);
     for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-      pcm[i] = buf[i];
+      pcm[i + PCM_SAMPLES] = (float) buf[i];
     }
-    flag = false;
+    new_pcm_data = true;
   }
 }
 
@@ -391,13 +421,24 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  if (rxbuf[0] == '1') {
+
+  switch(rxbuf[0]) {
+  case '1':
     mult = false;
-    output_result = true;
-  } else if (rxbuf[0] == '2') {
-    output_result = true;
+    all_data = true;
+    break;
+  case '2':
     mult = true;
+    all_data = true;
+    break;
+  case '3':
+    mult = true;
+    all_data = false;
+    break;
   }
+
+  output_result = true;
+
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
   HAL_UART_Receive_IT(&huart2, rxbuf, 1);
 }

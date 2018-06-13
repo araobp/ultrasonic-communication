@@ -13,16 +13,16 @@
 float32_t up_chirp[PCM_SAMPLES * 2] = {0.0f};
 float32_t down_chirp[PCM_SAMPLES * 2] = {0.0f};
 
-const float delta_f = (float)(F2 - F1)/TQ;
-const float delta_t = TQ/(TQ * SAMPLING_RATE);
-
-void generate_ref_chirp(float *ref_chirp, bool up) {
+void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate) {
   float32_t sin_val;
   float32_t cos_val;
   float freq;
   float theta;
   float t = 0.0;
   int re, im;
+
+  float delta_f = (float)(F2 - F1)/TQ;
+  float delta_t = TQ/(TQ * sampling_rate);
 
   for (int i = 0; i< PCM_SAMPLES; i++) {
     if (up) freq = F1 + delta_f * t;  // Up chirp
@@ -38,9 +38,9 @@ void generate_ref_chirp(float *ref_chirp, bool up) {
   }
 }
 
-void init_ref_chirp(void) {
-  generate_ref_chirp(up_chirp, true);
-  generate_ref_chirp(down_chirp, false);
+void init_ref_chirp(float sampling_rate) {
+  generate_ref_chirp(up_chirp, true, sampling_rate);
+  generate_ref_chirp(down_chirp, false, sampling_rate);
 }
 
 void mult_ref_chirp(float32_t *pSrc, float32_t *pDst) {
