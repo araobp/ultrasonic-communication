@@ -73,8 +73,6 @@ The measured value is 3msec for each FFT of 2048 samples at 80MHz system clock. 
 
 I have to come up with some synchronization technique: synchronization of TQ between the transmitter and the receiver.
 
-![](https://docs.google.com/drawings/d/e/2PACX-1vRaxQrG0pZLEPxq0GQ9Vld_W--SE_uRuEyWjJN0GrBACwxZxBEmrckB1goaqiC6NNLDcgi2qvmrf7pP/pub?w=960&h=720)
-
 ## My original MEMS mic shield
 
 I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
