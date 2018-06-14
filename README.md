@@ -69,11 +69,23 @@ I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! B
 
 The measured value is 3msec for each FFT of 2048 samples at 80MHz system clock. 2048 samples correspond to 20.5msec at 100kHz sampling rate, so 3msec is short enough compared to 20.5msec.
 
-### Next step
+### Next steps
 
-I have to come up with some synchronization technique: synchronization of TQ between the transmitter and the receiver.
+#### Frame synchronization
 
-![](https://docs.google.com/drawings/d/e/2PACX-1vRaxQrG0pZLEPxq0GQ9Vld_W--SE_uRuEyWjJN0GrBACwxZxBEmrckB1goaqiC6NNLDcgi2qvmrf7pP/pub?w=960&h=720)
+I have to come up with some frame synchronization technique: synchronization of TQ between the transmitter and the receiver.
+
+#### sinc filter optimization (moving average)
+
+sinc5 filter seems to be the best for this project to reduce high-frequency noises.
+
+#### Bandpass filter design
+
+Design bandpass filter to remove unnecessary noise.
+
+Reference:
+- https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html
+- http://www.keil.com/pack/doc/CMSIS/DSP/html/group__FIR.html#gae8fb334ea67eb6ecbd31824ddc14cd6a
 
 ## My original MEMS mic shield
 
