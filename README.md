@@ -73,6 +73,7 @@ The measured value is 3msec for each FFT of 2048 samples at 80MHz system clock. 
 
 #### Frame synchronization
 
+<<<<<<< HEAD
 I have to come up with some frame synchronization technique: synchronization of TQ between the transmitter and the receiver.
 
 #### sinc filter optimization (moving average)
@@ -87,6 +88,8 @@ Reference:
 - https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html
 - http://www.keil.com/pack/doc/CMSIS/DSP/html/group__FIR.html#gae8fb334ea67eb6ecbd31824ddc14cd6a
 
+=======
+>>>>>>> 59ebebae288baef2dc9a52b80d6c1a2af4577938
 ## My original MEMS mic shield
 
 I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
