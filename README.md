@@ -61,7 +61,7 @@ Chirp is identifiable at around 35000 Hz:
 
 ### The first experiment of up x down on STM32L4 DSP (June 10, 2018)
 
-I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within TQ, since the time frame was not in sync between the transmitter and the sender.
+I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within TQ, since the time frame was not in sync between the transmitter and the receiver.
 
 ![upchirp_downchirp](./doc/FFT_upXdown.jpg)
 
