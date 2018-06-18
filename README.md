@@ -45,7 +45,7 @@ This time, I employ some compression technique, and chirp appears one time withi
 
 ### Simulation on Jupyter Notebook
 
-I made some simulation on Jupyter Notebook: https://github.com/araobp/ultrasonic-communication/blob/master/generator/ChirpSimulation.ipynb
+I made [chirp compression simulator](./simulation/ChirpSimulation.ipynb) on Jupyter Notebook.
 
 The two peaks below are constant noises and chirp signal is under noise level of white noise:
 
