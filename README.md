@@ -41,7 +41,7 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 
 ## Ultrasonic communications experiment (Chirp modulation with compression)
 
-This time, I employ some compression technique, and chirp appears one time within Time Quantum (TQ), unlike the previous experiment.
+This time, I employ some compression technique, and chirp sweep time corresponds to the length of time within time frame, unlike the previous experiment.
 
 ### Simulation on Jupyter Notebook
 
