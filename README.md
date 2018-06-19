@@ -47,6 +47,8 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 
 This time, I employ some compression technique, and chirp sweep time corresponds to the length of time within time frame, unlike the previous experiment.
 
+This material is great: https://www.ittc.ku.edu/workshops/Summer2004Lectures/Radar_Pulse_Compression.pdf
+
 ### Simulation of chirp compression on Jupyter Notebook
 
 I made [chirp compression simulator](./simulation/ChirpSimulation.ipynb) on Jupyter Notebook.
