@@ -47,23 +47,19 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 
 This time, I employ some compression technique, and chirp sweep time corresponds to the length of time within time frame, unlike the previous experiment.
 
-### Simulation on Jupyter Notebook
+### Simulation of chirp compression on Jupyter Notebook
 
 I made [chirp compression simulator](./simulation/ChirpSimulation.ipynb) on Jupyter Notebook.
 
-The two peaks below are constant noises and chirp signal is under noise level of white noise:
+The chirp signal is under white noise:
 
 ![upchirp_with_noise](./doc/Simulation_upchirp_with_noise.jpg)
 
-Chirp is identifiable at around 0 Hz:
+I made FFT [upchirp * upchirp], then the chirp signal became identifiable at around zero Hz:
 
-![upchirp_upchirp_conjugate](./doc/Simulation_upchirp_upchirp_conjugate.jpg)
+![upchirp_upchirp](./doc/Simulation_upchirp_upchirp.jpg)
 
-Chirp is identifiable at around 35000 Hz:
-
-![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
-
-### The first experiment of up x down on STM32L4 DSP (June 10, 2018)
+### The first chirp compression experiment on STM32L4 DSP (June 10, 2018)
 
 I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within the time frame, since the time frame was not in sync between the transmitter and the receiver.
 
@@ -77,7 +73,7 @@ The measured value is 3msec for each complex FFT of 2048 samples at 80MHz system
 
 I am a beginner in the DSP field, so I am still studying the math.
 
-I revised the chirp simulation and found that Real FFT is OK for finding peaks in frequency domain, so I do not use complex FFT any longer in this project.
+I revisited the chirp simulation and found that Real FFT is OK for finding peaks in frequency domain, so I do not use complex FFT any longer in this project.
 
 ```
 FFT ( received chirp signal with noise * reference chirp )
@@ -92,14 +88,6 @@ I have to come up with some frame synchronization technique.
 #### sinc filter optimization (moving average)
 
 sinc5 filter seems to be the best for this project to reduce high-frequency noises.
-
-#### Bandpass filter design
-
-Design bandpass filter (or LPF or HPF?) to remove unnecessary noise, before or after multiplying reference chirp signal.
-
-Reference:
-- https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html
-- http://www.keil.com/pack/doc/CMSIS/DSP/html/group__FIR.html#gae8fb334ea67eb6ecbd31824ddc14cd6a
 
 ## My original MEMS mic shield
 
