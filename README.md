@@ -61,9 +61,11 @@ I made FFT [upchirp * upchirp], then the chirp signal became identifiable at aro
 
 ### The first chirp compression experiment on STM32L4 DSP (June 10, 2018)
 
-I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within the time frame, since the time frame was not in sync between the transmitter and the receiver.
+I tried Upchirp * Downchip before Upchirp * Upchirp. I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within the time frame, since the time frame was not in sync between the transmitter and the receiver.
 
 ![upchirp_downchirp](./doc/FFT_upXdown.jpg)
+
+I should have tried Upchirp * Upchirp...
 
 ### How much time does it take to compute complex FFT of 2048 samples?
 
