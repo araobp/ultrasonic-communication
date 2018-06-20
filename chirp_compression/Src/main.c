@@ -71,9 +71,10 @@ int32_t buf[PCM_SAMPLES] = { 0 };
 float pcm[PCM_SAMPLES * 2] = { 0.0f };
 
 // FFT
-float32_t fft_inout[PCM_SAMPLES * 2] = { 0.0f };
+arm_rfft_fast_instance_f32 S;
+float32_t fft_inout[PCM_SAMPLES] = { 0.0f };
 float fft_frequency[PCM_SAMPLES / 2] = { 0.0f };
-float fft_window[PCM_SAMPLES * 2] = { 0.0f };
+float fft_window[PCM_SAMPLES] = { 0.0f };
 const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
 
 // UART output flag
@@ -86,11 +87,7 @@ bool all_data = true;
 
 struct history {
   float mag_max;
-  float mag_max_left;
-  float mag_max_right;
   uint32_t max_idx;
-  uint32_t max_idx_left;
-  uint32_t max_idx_right;
   uint32_t start_time;
   uint32_t finish_time;
 };
@@ -121,14 +118,15 @@ void fft(void) {
   //mult_ref_chirp_sim(fft_input);
 
   // Windowing
-  arm_mult_f32(fft_inout, fft_window, fft_inout, PCM_SAMPLES * 2);
+  arm_mult_f32(fft_inout, fft_window, fft_inout, PCM_SAMPLES);
 
-  // Execute complex FFT
-  arm_cfft_f32(&arm_cfft_sR_f32_len2048, fft_inout, 0, 1);
+  // Execute real FFT
+  arm_rfft_fast_f32(&S, fft_inout, fft_inout, 0);
 
   // Calculate magnitude
-  arm_cmplx_mag_f32(fft_inout, fft_inout, PCM_SAMPLES);
+  arm_cmplx_mag_f32(fft_inout, fft_inout, PCM_SAMPLES/2);
 
+  /*
   // Normalization (Unitary transformation) of magnitude
   arm_scale_f32(fft_inout, 1.0f / sqrtf((float) PCM_SAMPLES), fft_inout,
   PCM_SAMPLES / 2);
@@ -140,19 +138,15 @@ void fft(void) {
     else
       break;
   }
+  */
 
   // Calculate max magnitude
   float mag_max;
-  float mag_max_left;
-  float mag_max_right;
   uint32_t max_idx;
-  uint32_t max_idx_left;
-  uint32_t max_idx_right;
-  uint32_t center = (F1 + F2) * PCM_SAMPLES / sampling_rate ;
+  //uint32_t center = (F1 + F2) * PCM_SAMPLES / sampling_rate ;
+  uint32_t center = 0;
   uint32_t bandwidth = (F2 - F1) * PCM_SAMPLES / sampling_rate;
-  arm_max_f32(&fft_inout[center - bandwidth*2], bandwidth*4, &mag_max, &max_idx);
-  arm_max_f32(&fft_inout[center - bandwidth*2], bandwidth*2, &mag_max_left, &max_idx_left);
-  arm_max_f32(&fft_inout[center], bandwidth*2, &mag_max_right, &max_idx_right);
+  arm_max_f32(&fft_inout[center], bandwidth*8, &mag_max, &max_idx);
 
   uint32_t finish_time = HAL_GetTick();
 
@@ -160,11 +154,7 @@ void fft(void) {
     history[i - 1] = history[i];
   }
   history[SYNC_RESOLUTION - 1].mag_max = mag_max;
-  history[SYNC_RESOLUTION - 1].mag_max_left = mag_max_left;
-  history[SYNC_RESOLUTION - 1].mag_max_right = mag_max_right;
   history[SYNC_RESOLUTION - 1].max_idx = max_idx;
-  history[SYNC_RESOLUTION - 1].max_idx_left = max_idx_left;
-  history[SYNC_RESOLUTION - 1].max_idx_right = max_idx_right + bandwidth*2;
   history[SYNC_RESOLUTION - 1].start_time = start_time;
   history[SYNC_RESOLUTION - 1].finish_time = finish_time;
 }
@@ -178,7 +168,6 @@ void fft(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  int j, im, re;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -221,11 +210,12 @@ int main(void)
     Error_Handler();
   }
 
+  // Real FFT initialization
+  arm_rfft_fast_init_f32(&S, PCM_SAMPLES);
+
   // Hanning window
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-    j = i * 2;
-    fft_window[j] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
-    fft_window[j + 1] = fft_window[j];
+    fft_window[i] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
   }
 
   // FFT frequency
@@ -255,10 +245,7 @@ int main(void)
       for (uint32_t i = 0; i < SYNC_RESOLUTION; i++) {
         int sync_position = ( PCM_SAMPLES / SYNC_RESOLUTION) * i;
         for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
-          im = j * 2;
-          re = im + 1;
-          fft_inout[im] = pcm[j + sync_position];
-          fft_inout[re] = 0.0f;
+          fft_inout[j] = pcm[j + sync_position];
         }
         fft();
       }
@@ -267,11 +254,11 @@ int main(void)
 
         printf("Magnitude history:\n");
         for (int i = 0; i < SYNC_RESOLUTION; i++) {
-          printf("%.1f, %.1f, %.1f, %lu, %lu, %lu, %lu, %lu\n",
-              history[i].mag_max, history[i].mag_max_left, history[i].mag_max_right,
+          printf("mag_max: %.1f, mag_idx: %lu, start_time: %lu, finish_time: %lu\n",
+              history[i].mag_max,
+              history[i].max_idx,
               history[i].start_time,
-              history[i].finish_time, history[i].max_idx,
-              history[i].max_idx_left, history[i].max_idx_right);
+              history[i].finish_time);
         }
 
         if (all_data) {

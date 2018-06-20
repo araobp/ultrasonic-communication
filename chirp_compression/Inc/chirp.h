@@ -7,8 +7,10 @@
 #ifndef CHIRP_H_
 #define CHIRP_H_
 
-#define TQ 0.0205f
+// Amplitude of reference chirp
 #define AMPLITUDE 1.0f;
+
+// Chirp sweep range
 #define F1 17000
 #define F2 18000
 

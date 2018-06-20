@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
-<ProjectName>C:\Users\shiny\Documents\GitHub\ultrasonic-communication\basic _100kHz_complex\\basic_100kHz_complex</ProjectName>
+<ProjectName>C:\Users\shiny\Documents\GitHub\ultrasonic-communication\chirp_compression\\chirp_compression</ProjectName>
 <ProjectNature>C</ProjectNature> 
 <CMSIS>..\Drivers\CMSIS</CMSIS>
 <HAL_Driver>C:\Users\shiny\STM32Cube\Repository\STM32Cube_FW_L4_V1.11.0\Drivers\CMSIS</HAL_Driver>
@@ -22,7 +22,7 @@
 
 <configs>
   <config>
-    <name>basic_100kHz_complex</name>				
+    <name>chirp_compression</name>				
     <device>STM32L476RGTx</device>		 
     <heapSize>0x200</heapSize>
     <stackSize>0x400</stackSize>
