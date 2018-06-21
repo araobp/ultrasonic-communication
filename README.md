@@ -71,7 +71,7 @@ I also tried IFFT [FFT[upchirp] * FFT[downchirp]] to simulate Chirp compression 
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
-### The second chirp compression experiment on STM32L4 DSP (June 10, 2018)
+### The second chirp compression experiment on STM32L4 DSP (June 21, 2018)
 
 The technique of chirp compression in time domain resulted in bad compression in a real experiment on STM32L4 w/ MEMS mic.
 
