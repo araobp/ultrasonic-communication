@@ -59,7 +59,7 @@ I tried Chirp compression in frequency domain (Upchirp * Downchip before Upchirp
 
 The measured value is 3msec for each complex FFT of 2048 samples at 80MHz system clock. 2048 samples correspond to 20.5msec at 100kHz sampling rate, so 3msec is short enough compared to 20.5msec.
 
-### Simulation of chirp compression on Jupyter Notebook
+### Simulation of chirp compression on Jupyter Notebook (June 20, 2018)
 
 I made [chirp compression simulator](./simulation/ChirpSimulation.ipynb) on Jupyter Notebook.
 
@@ -75,7 +75,9 @@ I also tried IFFT [FFT[upchirp] * FFT[downchirp]] to simulate Chirp compression 
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
-But the technique above resulted in bad compression in a real experiment on STM32L4 w/ MEMS mic.
+### The second chirp compression experiment on STM32L4 DSP (June 10, 2018)
+
+The technique of chirp compression in time domain resulted in bad compression in a real experiment on STM32L4 w/ MEMS mic.
 
 On the contrary, an experiment of FFT [upchirp * upchirp] on STM32L4 w/ MEMS mic showed a very good result:
 
