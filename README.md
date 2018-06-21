@@ -85,15 +85,9 @@ So I have decided to employ FFT [upchirp * upchirp] for this project.
 
 ### Next steps
 
-#### Reference chirp signal generation at start up
-
-Generate reference chirp on STM32L4 at start up.
-
 #### Frame synchronization problems
 
-I am going to employ "Chirp compression in time domain" to avoid the frame sync problems.
-
-Refer to a sample code of "Convolution example" provided by Arm: https://www.keil.com/pack/doc/CMSIS/DSP/html/group__ConvolutionExample.html
+The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks around zero Hz. Minimize the difference for synchronization (to maximize correlation).
 
 #### sinc filter optimization (moving average)
 
