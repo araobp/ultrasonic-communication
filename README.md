@@ -75,6 +75,14 @@ I also tried IFFT [FFT[upchirp] * FFT[downchirp]] to simulate Chirp compression 
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
+But the technique above resulted in bad compression in a real experiment on STM32L4 w/ MEMS mic.
+
+On the contrary, an experiment of FFT [upchirp * upchirp] on STM32L4 w/ MEMS mic showed a very good result:
+
+![upchirp_upchirp](./doc/Experiment_upchirp_upchirp.jpg)
+
+So I have decided to employ FFT [upchirp * upchirp] for this project.
+
 ### Next steps
 
 #### Reference chirp signal generation at start up
