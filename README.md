@@ -85,9 +85,11 @@ So I have decided to employ FFT [upchirp * upchirp] for this project.
 
 #### Frame synchronization problems
 
-![](./doc/Simulation_upchirp_upchirp_delay.jpg)
+The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks around zero Hz.
 
-The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks around zero Hz. Minimize the difference for synchronization (to maximize correlation).
+Minimize the phase difference for synchronization (to maximize correlation).
+
+![](./doc/Simulation_upchirp_upchirp_delay.jpg)
 
 #### sinc filter optimization (moving average)
 
