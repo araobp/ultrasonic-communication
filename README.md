@@ -2,11 +2,7 @@
 
 ![ChirpFrame](./doc/ChirpFrame.jpg)
 
-As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic.
-
-This project is to study Arm Cortex-M4's DSP capabilities. STMicro gave me the STM32L4 and MEMS mic free at some trade show in Chiba, Japan. Thanks a lot to STMicro!
-
-I am a beginner in the area of digital signaling processing. I will study mathematics required for DSP by developing a prototype on DSP this time.
+STMicro gave me STM32L4 evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro! As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic.
 
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
@@ -75,7 +71,7 @@ I also tried IFFT [FFT[upchirp] * FFT[downchirp]] to simulate Chirp compression 
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
-### The second chirp compression experiment on STM32L4 DSP (June 10, 2018)
+### The second chirp compression experiment on STM32L4 DSP (June 21, 2018)
 
 The technique of chirp compression in time domain resulted in bad compression in a real experiment on STM32L4 w/ MEMS mic.
 
@@ -89,7 +85,11 @@ So I have decided to employ FFT [upchirp * upchirp] for this project.
 
 #### Frame synchronization problems
 
-The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks around zero Hz. Minimize the difference for synchronization (to maximize correlation).
+The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks around zero Hz.
+
+Minimize the phase difference for synchronization (to maximize correlation).
+
+![](./doc/Simulation_upchirp_upchirp_delay.jpg)
 
 #### sinc filter optimization (moving average)
 
