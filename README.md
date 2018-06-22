@@ -41,6 +41,8 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 
 ## Ultrasonic communications experiment (Chirp modulation with compression)
 
+![](./doc/FFT_upXdown.jpg)
+
 ==> [Experiment3](EXPERIMENT3.md)
 
 ### Conclusion
