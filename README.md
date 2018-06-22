@@ -47,7 +47,7 @@ This material is great: https://www.ittc.ku.edu/workshops/Summer2004Lectures/Rad
 
 ### The first chirp compression experiment on STM32L4 DSP (June 10, 2018)
 
-I tried Chirp compression in frequency domain (Upchirp * Downchip before Upchirp * Upchirp). I transmitted very weak chirp signals to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within the time frame, since the time frame was not in sync between the transmitter and the receiver.
+I tried Chirp compression in frequency domain (real upchirp * complex down-chip). I transmitted very weak chirp signals (real upchirp) to STM32L4 DSP with MEMS mic. It worked! But I observed two peaks most of time, since the FFT calculation was performed on a chirp signal split into two within the time frame, since the time frame was not in sync between the transmitter and the receiver.
 
 ![upchirp_downchirp](./doc/FFT_upXdown.jpg)
 
@@ -71,7 +71,7 @@ I also tried IFFT [FFT[upchirp] * FFT[downchirp]] to simulate Chirp compression 
 
 ![upchirp_downchirp](./doc/Simulation_upchirp_downchirp.jpg)
 
-### The second chirp compression experiment on STM32L4 DSP (June 21, 2018)
+### The second chirp compression experiment on STM32L4 DSP (June 22, 2018)
 
 The technique of chirp compression in time domain resulted in bad compression in a real experiment on STM32L4 w/ MEMS mic.
 
@@ -79,13 +79,21 @@ On the contrary, an experiment of FFT [upchirp * upchirp] on STM32L4 w/ MEMS mic
 
 ![upchirp_upchirp](./doc/Experiment_upchirp_upchirp.jpg)
 
-So I have decided to employ FFT [upchirp * upchirp] for this project.
+However, I got that this techinique is not so good, since I observed a peak at zero Hz sometimes, even when chirp signal was not transmitted to the receiver.
+
+### The final conclusion
+
+|Techinique                               | peak magnitude/amplitude              |Compression    |
+|-----------------------------------------|---------------------------------------|---------------|
+|FFT[Real upchirp * complex downchirp]    | peaks at around chirp frequency * 2 Hz|Very Good, sinc5 filter improves SNR|
+|IFFT[FFT[real upchirp]*FFT[real upchirp]]| compressed wave in time domain        |Not good       |
+|FFT[Real upchirp * Real upchirp]          | peaks at around zero Hz              |Disturbed by noises|
 
 ### Next steps
 
 #### Frame synchronization problems
 
-The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks around zero Hz.
+The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks.
 
 Minimize the phase difference for synchronization (to maximize correlation).
 
@@ -97,7 +105,7 @@ I have come up with the following method:
 
 #### sinc filter optimization (moving average)
 
-sinc5 filter reduces high-frequency noises more than sinc3. But it might not be so important...
+sinc5 filter improves SNR at around frequencies of peaks.
 
 ## My original MEMS mic shield
 
