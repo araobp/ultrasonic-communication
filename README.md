@@ -87,7 +87,7 @@ However, I got that this techinique is not so good, since I observed a peak at z
 |-----------------------------------------|---------------------------------------|---------------|
 |FFT[Real upchirp * complex downchirp]    | peaks at around chirp frequency * 2 Hz|Very Good, sinc5 filter improves SNR|
 |IFFT[FFT[real upchirp]*FFT[real upchirp]]| compressed wave in time domain        |Not good       |
-|FFT[Real upchirp * Real upchirp]          | peaks at around zero Hz              |Distrubed by noises|
+|FFT[Real upchirp * Real upchirp]          | peaks at around zero Hz              |Disturbed by noises|
 
 ### Next steps
 
