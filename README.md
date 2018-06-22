@@ -71,7 +71,7 @@ I have come up with the following method:
 
 ### sinc filter optimization (moving average)
 
-sinc5 filter improves SNR at around frequencies of peaks.
+I observed that sinc5 filter improved SNR at around frequencies of peaks, better than sinc3.
 
 ## My original MEMS mic shield
 
