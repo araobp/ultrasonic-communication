@@ -86,8 +86,10 @@ bool mult = true;
 bool all_data = true;
 
 struct history {
-  float mag_max;
-  uint32_t max_idx;
+  float mag_max_right;
+  float mag_max_left;
+  uint32_t max_idx_right;
+  uint32_t max_idx_left;
   uint32_t start_time;
   uint32_t finish_time;
 };
@@ -115,7 +117,7 @@ void fft(void) {
   // Execute f1 * f2
   if (mult)
     mult_ref_chirp(fft_inout, fft_inout);
-  //mult_ref_chirp_sim(fft_input);
+    // mult_ref_chirp_sim(fft_inout);
 
   // Windowing
   arm_mult_f32(fft_inout, fft_window, fft_inout, PCM_SAMPLES);
@@ -126,35 +128,33 @@ void fft(void) {
   // Calculate magnitude
   arm_cmplx_mag_f32(fft_inout, fft_inout, PCM_SAMPLES/2);
 
+  // Shift FFT
+
+
   /*
   // Normalization (Unitary transformation) of magnitude
   arm_scale_f32(fft_inout, 1.0f / sqrtf((float) PCM_SAMPLES), fft_inout,
   PCM_SAMPLES / 2);
-
-  // AC coupling
-  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
-    if (fft_frequency[i] < FFT_AC_COUPLING_HZ)
-      fft_inout[i] = 1.0f;
-    else
-      break;
-  }
   */
 
   // Calculate max magnitude
-  float mag_max;
-  uint32_t max_idx;
-  //uint32_t center = (F1 + F2) * PCM_SAMPLES / sampling_rate ;
-  uint32_t center = 0;
+  float mag_max_right;
+  uint32_t max_idx_right;
+  float mag_max_left;
+  uint32_t max_idx_left;
   uint32_t bandwidth = (F2 - F1) * PCM_SAMPLES / sampling_rate;
-  arm_max_f32(&fft_inout[center], bandwidth*8, &mag_max, &max_idx);
+  arm_max_f32(&fft_inout[0], bandwidth*8, &mag_max_right, &max_idx_right);
+  arm_max_f32(&fft_inout[PCM_SAMPLES-bandwidth*8], bandwidth*8, &mag_max_left, &max_idx_left);
 
   uint32_t finish_time = HAL_GetTick();
 
   for (int i = 1; i < SYNC_RESOLUTION; i++) {
     history[i - 1] = history[i];
   }
-  history[SYNC_RESOLUTION - 1].mag_max = mag_max;
-  history[SYNC_RESOLUTION - 1].max_idx = max_idx;
+  history[SYNC_RESOLUTION - 1].mag_max_right = mag_max_right;
+  history[SYNC_RESOLUTION - 1].max_idx_right = max_idx_right;
+  history[SYNC_RESOLUTION - 1].mag_max_left = mag_max_left;
+  history[SYNC_RESOLUTION - 1].max_idx_left = bandwidth * 8 - max_idx_left;
   history[SYNC_RESOLUTION - 1].start_time = start_time;
   history[SYNC_RESOLUTION - 1].finish_time = finish_time;
 }
@@ -254,9 +254,11 @@ int main(void)
 
         printf("Magnitude history:\n");
         for (int i = 0; i < SYNC_RESOLUTION; i++) {
-          printf("mag_max: %.1f, mag_idx: %lu, start_time: %lu, finish_time: %lu\n",
-              history[i].mag_max,
-              history[i].max_idx,
+          printf("max_r: %.1f, idx_r: %lu, max_l: %.1f, idx_l: %lu, start_time: %lu, finish_time: %lu\n",
+              history[i].mag_max_right,
+              history[i].max_idx_right,
+              history[i].mag_max_left,
+              history[i].max_idx_left,
               history[i].start_time,
               history[i].finish_time);
         }

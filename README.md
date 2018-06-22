@@ -91,6 +91,10 @@ Minimize the phase difference for synchronization (to maximize correlation).
 
 ![](./doc/Simulation_upchirp_upchirp_delay.jpg)
 
+I have come up with the following method:
+
+![](https://docs.google.com/drawings/d/e/2PACX-1vT9da0oKUWgUHHTmYUO8Y0Rix6ORT5aeQxAz8Ihjoxc4vWMvFLudPTet1UHLMConm5RDk9kFaXTXnj8/pub?w=960&h=720)
+
 #### sinc filter optimization (moving average)
 
 sinc5 filter reduces high-frequency noises more than sinc3. But it might not be so important...

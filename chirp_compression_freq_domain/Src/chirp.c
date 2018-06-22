@@ -36,7 +36,7 @@ void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float ph
 }
 
 void init_ref_chirp(float sampling_rate) {
-  generate_ref_chirp(ref_chirp, true, sampling_rate, -PI/2.0);
+  generate_ref_chirp(ref_chirp, false, sampling_rate, -PI/2.0);
 }
 
 void mult_ref_chirp(float32_t *pSrc, float32_t *pDst) {
