@@ -41,6 +41,8 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 
 ## Ultrasonic communications experiment (Chirp modulation with compression)
 
+I tested various Chirp compression techniques by simulating chirp compression and also by implementing test code on STM32L4 DSP.
+
 ![](./doc/FFT_upXdown.jpg)
 
 ==> [Experiment3](EXPERIMENT3.md)
@@ -53,9 +55,9 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 |IFFT[FFT[real upchirp]*FFT[real upchirp]]| compressed wave in time domain        |Not good       |
 |FFT[Real upchirp * Real upchirp]          | peaks at around zero Hz              |Disturbed by noises|
 
-### Next steps
+## Next steps
 
-#### Frame synchronization problems
+### Frame synchronization problems
 
 The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks.
 
@@ -67,7 +69,7 @@ I have come up with the following method:
 
 ![](https://docs.google.com/drawings/d/e/2PACX-1vT9da0oKUWgUHHTmYUO8Y0Rix6ORT5aeQxAz8Ihjoxc4vWMvFLudPTet1UHLMConm5RDk9kFaXTXnj8/pub?w=960&h=720)
 
-#### sinc filter optimization (moving average)
+### sinc filter optimization (moving average)
 
 sinc5 filter improves SNR at around frequencies of peaks.
 
