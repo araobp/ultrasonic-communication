@@ -43,6 +43,8 @@ I tested Chirp modulation as one of spread spectrum techniques. It worked! But t
 
 I tested various Chirp compression techniques by simulating chirp compression and also by implementing test code on STM32L4 DSP.
 
+Test code of FFT[real up-chirp * complex down-chirp] on STM32L4 DSP showed the best result as follows:
+
 ![](./doc/FFT_upXdown.jpg)
 
 ==> [Experiment3](EXPERIMENT3.md)
