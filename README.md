@@ -97,7 +97,7 @@ The phase difference between chirp from the transmitter and chirp from the recei
 
 Minimize the phase difference for synchronization (to maximize correlation).
 
-![](./doc/Simulation_upchirp_upchirp_delay.jpg)
+![](./doc/Simulation_upchirp_downchirp_shift.jpg)
 
 I have come up with the following method:
 
