@@ -74,7 +74,6 @@
 
 /* USER CODE BEGIN Private defines */
 #define PCM_SAMPLES 2048UL
-#define SYNC_RESOLUTION 4UL
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

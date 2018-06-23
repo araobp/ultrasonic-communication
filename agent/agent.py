@@ -1,24 +1,21 @@
 import serial
 import time
 
+MODE = b'2'
+INTERVAL = 2.5
+
 ser = serial.Serial('COM15', 115200)
 
 HEADER = 'HEADER'
-FILTER = 'FILTER'
-CSV = 'CSV'
-RAW = 'RAW'
+FFT = 'FFT'
 mode = HEADER
 
 mic = ''
 sampling_rate = 0
 
 filename_fft = ''
-filename_raw = ''
-filename_filter = ''
 
 file_fft = None
-file_raw = None
-file_filter = None
 
 def param(line):
     return line.split(':')[1][1:].rstrip()
@@ -29,10 +26,12 @@ def print_mode():
 if __name__ == '__main__':
 
     print_mode()
+    ser.write(MODE)
 
     while True:
 
         line = ser.readline().decode('ascii')
+        #print(line, end='')
 
         if (mode == HEADER):
             if (line.startswith('MEMS mic')):
@@ -43,29 +42,18 @@ if __name__ == '__main__':
                 sampling_rate = param(line)
                 print('Sampling rate: {}'.format(sampling_rate))
 
-            if (line.startswith('Frequency(Hz)')):
-                mode = CSV
+            if (line.startswith('index')):
+                mode = FFT
                 print_mode()
-                filename ='{}_{}_{}'.format(str(int(time.time())),
-                                            sampling_rate, mic)
-                filename_fft = '{}.fft'.format(filename)
-                file_fft = open(filename_fft, 'w')
-                filename_raw = '{}.raw'.format(filename)
-                file_raw = open(filename_raw, 'w')
+                file_fft = open('out.fft', 'w')
                 file_fft.write(line)
 
-        elif (mode == CSV):
-            if (line == '\n'):
-                mode = RAW
-                print_mode()
-            else:
-                file_fft.write(line)
-
-        elif (mode == RAW):
-            if (line == 'EORAW\n'):
+        elif (mode == FFT):
+            if (line == 'EOF\n'):
                 mode = HEADER
                 print_mode()
                 file_fft.close()
-                file_raw.close()
+                time.sleep(INTERVAL)
+                ser.write(MODE)
             else:
-                file_raw.write(line)
+               file_fft.write(line)

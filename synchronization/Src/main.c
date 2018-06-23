@@ -72,7 +72,6 @@ float pcm[PCM_SAMPLES * 2] = { 0.0f };
 
 // FFT
 float32_t inout[PCM_SAMPLES * 2] = { 0.0f };
-float fft_frequency[PCM_SAMPLES] = { 0.0f };
 float fft_window[PCM_SAMPLES * 2] = { 0.0f };
 const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
 
@@ -81,19 +80,25 @@ bool output_result = false;
 
 // UART input
 uint8_t rxbuf[1];
-bool mult = true;
 bool all_data = true;
 
 struct history {
-  float mag_max_right;
+  float mag_max;
   float mag_max_left;
-  uint32_t max_idx_right;
+  float mag_max_right;
+  uint32_t max_idx;
   uint32_t max_idx_left;
+  uint32_t max_idx_right;
   uint32_t start_time;
   uint32_t finish_time;
 };
 
-struct history history[SYNC_RESOLUTION];
+struct history history[8];
+
+uint32_t center;
+uint32_t bandwidth;
+
+uint32_t p_offset = 0;
 
 /* USER CODE END PV */
 
@@ -109,14 +114,12 @@ void SystemClock_Config(void);
 /*
  * reference: https://www.keil.com/pack/doc/CMSIS/DSP/html/arm_fft_bin_example_f32_8c-example.html
  */
-void fft(void) {
+void fft(uint32_t idx) {
 
   uint32_t start_time = HAL_GetTick();
 
-  // Execute up-chirp * down-chirp
-  if (mult)
-    mult_ref_chirp(inout, inout);
-    // mult_ref_chirp_sim(fft_inout);
+  // Execute real up-chirp w/ real noise * complex down-chirp
+  mult_ref_chirp(inout);
 
   // Windowing
   arm_mult_f32(inout, fft_window, inout, PCM_SAMPLES * 2);
@@ -125,35 +128,29 @@ void fft(void) {
   arm_cfft_f32(&arm_cfft_sR_f32_len2048, inout, 0, 1);
 
   // Calculate magnitude
-  arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES);
-
-
-  /*
-  // Normalization (Unitary transformation) of magnitude
-  arm_scale_f32(fft_inout, 1.0f / sqrtf((float) PCM_SAMPLES), fft_inout,
-  PCM_SAMPLES / 2);
-  */
+  arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES / 2);
 
   // Calculate max magnitude
-  float mag_max_right;
-  uint32_t max_idx_right;
+  float mag_max;
   float mag_max_left;
+  float mag_max_right;
+  uint32_t max_idx;
   uint32_t max_idx_left;
-  uint32_t bandwidth = (F2 - F1) * PCM_SAMPLES / sampling_rate;
-  arm_max_f32(&inout[0], bandwidth*8, &mag_max_right, &max_idx_right);
-  arm_max_f32(&inout[PCM_SAMPLES-bandwidth*8], bandwidth*8, &mag_max_left, &max_idx_left);
+  uint32_t max_idx_right;
+  arm_max_f32(&inout[center - bandwidth*2], bandwidth*4, &mag_max, &max_idx);
+  arm_max_f32(&inout[center - bandwidth*2], bandwidth*2, &mag_max_left, &max_idx_left);
+  arm_max_f32(&inout[center], bandwidth*2, &mag_max_right, &max_idx_right);
 
   uint32_t finish_time = HAL_GetTick();
 
-  for (int i = 1; i < SYNC_RESOLUTION; i++) {
-    history[i - 1] = history[i];
-  }
-  history[SYNC_RESOLUTION - 1].mag_max_right = mag_max_right;
-  history[SYNC_RESOLUTION - 1].max_idx_right = max_idx_right;
-  history[SYNC_RESOLUTION - 1].mag_max_left = mag_max_left;
-  history[SYNC_RESOLUTION - 1].max_idx_left = bandwidth * 8 - max_idx_left;
-  history[SYNC_RESOLUTION - 1].start_time = start_time;
-  history[SYNC_RESOLUTION - 1].finish_time = finish_time;
+  history[idx].mag_max = mag_max;
+  history[idx].mag_max_left = mag_max_left;
+  history[idx].mag_max_right = mag_max_right;
+  history[idx].max_idx = max_idx;
+  history[idx].max_idx_left = max_idx_left;
+  history[idx].max_idx_right = max_idx_right + bandwidth*2;
+  history[idx].start_time = start_time;
+  history[idx].finish_time = finish_time;
 }
 /* USER CODE END 0 */
 
@@ -165,8 +162,8 @@ void fft(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  uint32_t v, re, im;
-
+  int im, re;
+  int p_turn = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -197,6 +194,10 @@ int main(void)
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
+  // Frequency range of peak magnitudes of compressed chirp
+  center = (F1 + F2) * PCM_SAMPLES / sampling_rate ;
+  bandwidth = (F2 - F1) * PCM_SAMPLES / sampling_rate;
+
   // Initialize reference chirp signal
   init_ref_chirp(sampling_rate);
 
@@ -213,28 +214,24 @@ int main(void)
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     re = i * 2;
     im = re + 1;
-    v = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
-    fft_window[re] = v;
-    fft_window[im] = v;
-  }
-
-  // FFT frequency
-  for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
-    fft_frequency[i] = (float) i * (float) sampling_rate / (float) PCM_SAMPLES;
+    fft_window[im] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
+    fft_window[re] = fft_window[im];
   }
 
   // Show starting message
-  printf("/// Audio Spectrum Analyzer ///\n\n");
+  printf("/// Receiver ///\n\n");
   printf("Sampling rate: %4.1f(kHz)\n", (float) sampling_rate / 1000.0f);
   sampling_period = 1.0f / sampling_rate * PCM_SAMPLES;
   printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
       sampling_period * 1000.0f, PCM_SAMPLES);
   printf("Push USER button to output single-shot FFT\n");
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t offset = PCM_SAMPLES / 8;
+  uint32_t shift = PCM_SAMPLES / 4;
+
   while (1) {
 
     HAL_Delay(1);
@@ -242,40 +239,34 @@ int main(void)
     // Wait for next PCM samples from M1
     if (new_pcm_data) {
 
-      for (uint32_t i = 0; i < SYNC_RESOLUTION; i++) {
-        int sync_position = ( PCM_SAMPLES / SYNC_RESOLUTION) * i;
+      for (uint32_t i = 0; i < 4; i++) {
+        int sync_position = p_turn * offset + shift * i;
         for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
           re = j * 2;
           im = re + 1;
           inout[re] = pcm[j + sync_position];
           inout[im] = 0.0f;
         }
-        fft();
+        fft(i * 2 + p_turn);
       }
+      p_turn = (p_turn == 0)? 1: 0;
 
-      if (output_result) {  // Output debug info
+      if (output_result && p_turn == 1) {  // Output debug info
 
         printf("Magnitude history:\n");
-        for (int i = 0; i < SYNC_RESOLUTION; i++) {
-          printf("max_r: %.1f, idx_r: %lu, max_l: %.1f, idx_l: %lu, start_time: %lu, finish_time: %lu\n",
-              history[i].mag_max_right,
-              history[i].max_idx_right,
-              history[i].mag_max_left,
-              history[i].max_idx_left,
+        for (int i = 0; i < 8; i++) {
+          printf("max: %.1f, max_r: %.1f, max_l: %.1f, s_time: %lu, f_time: %lu, i: %lu, i_left: %lu, i_right: %lu\n",
+              history[i].mag_max, history[i].mag_max_left, history[i].mag_max_right,
               history[i].start_time,
-              history[i].finish_time);
+              history[i].finish_time, history[i].max_idx,
+              history[i].max_idx_left, history[i].max_idx_right);
         }
 
         if (all_data) {
-          printf("Frequency(Hz),Magnitude\n");
+          printf("index,Magnitude\n");
           // FFT
-          for (uint32_t i = 0; i < PCM_SAMPLES/2; i++) {
-            printf("%.1f,%e\n", fft_frequency[i], inout[i]);
-          }
-          printf("EOFFT\n");
-          printf("index,Amplitude\n");
-          for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-            printf("%lu,%.1f\n", i, pcm[i]);
+          for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+            printf("%lu,%e\n", i, inout[i]);
           }
           printf("EOF\n");
         }
@@ -422,15 +413,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
   switch(rxbuf[0]) {
   case '1':
-    mult = false;
     all_data = true;
     break;
   case '2':
-    mult = true;
     all_data = true;
     break;
   case '3':
-    mult = true;
     all_data = false;
     break;
   }
