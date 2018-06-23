@@ -214,8 +214,8 @@ int main(void)
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     re = i * 2;
     im = re + 1;
-    fft_window[im] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
-    fft_window[re] = fft_window[im];
+    fft_window[re] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
+    fft_window[im] = fft_window[re];
   }
 
   // Show starting message
