@@ -75,7 +75,7 @@ I have come up with the following method:
 
 I made the sync code. It seemed to work.
 
-I observed that Magnitude of a synchronized position (i=25) was larger than the others.
+I observed that Magnitude of chirp at a synchronized position (around i=25) was significantly larger than the others. The result below also showed me that one chirp can express multiple symbols: for example, |up|(0), |down|(1), |up0:up1|(2), |down0:down1|(3).
 
 ```
 Magnitude history:
