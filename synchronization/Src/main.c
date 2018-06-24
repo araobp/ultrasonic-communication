@@ -86,19 +86,21 @@ struct history {
   float mag_max;
   float mag_max_left;
   float mag_max_right;
-  uint32_t max_idx;
-  uint32_t max_idx_left;
-  uint32_t max_idx_right;
+  uint32_t max_freq;
+  uint32_t max_freq_left;
+  uint32_t max_freq_right;
   uint32_t start_time;
   uint32_t finish_time;
+  float mag_mean;
 };
 
 struct history history[8];
-
 uint32_t center;
 uint32_t bandwidth;
-
-uint32_t p_offset = 0;
+uint32_t bandwidth2;
+uint32_t bandwidth4;
+uint32_t idx_left_zero;
+float mag_stat[10];
 
 /* USER CODE END PV */
 
@@ -111,9 +113,11 @@ void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-/*
- * reference: https://www.keil.com/pack/doc/CMSIS/DSP/html/arm_fft_bin_example_f32_8c-example.html
- */
+
+uint32_t idx2freq(uint32_t idx) {
+  return sampling_rate * idx / PCM_SAMPLES;
+}
+
 void fft(uint32_t idx) {
 
   uint32_t start_time = HAL_GetTick();
@@ -137,20 +141,30 @@ void fft(uint32_t idx) {
   uint32_t max_idx;
   uint32_t max_idx_left;
   uint32_t max_idx_right;
-  arm_max_f32(&inout[center - bandwidth*2], bandwidth*4, &mag_max, &max_idx);
-  arm_max_f32(&inout[center - bandwidth*2], bandwidth*2, &mag_max_left, &max_idx_left);
-  arm_max_f32(&inout[center], bandwidth*2, &mag_max_right, &max_idx_right);
+  arm_max_f32(&inout[idx_left_zero], bandwidth4, &mag_max, &max_idx);
+  arm_max_f32(&inout[idx_left_zero], bandwidth2, &mag_max_left, &max_idx_left);
+  arm_max_f32(&inout[center], bandwidth2, &mag_max_right, &max_idx_right);
+
+  for (int i = 0; i < 9; i++) {
+    mag_stat[i + 1] = mag_stat[i];
+  }
+
+  // Mean magnitude (two-time-frame before)
+  mag_stat[0] = mag_max;
+  float mag_mean;
+  arm_mean_f32(&mag_stat[2], 8, &mag_mean);
 
   uint32_t finish_time = HAL_GetTick();
 
   history[idx].mag_max = mag_max;
   history[idx].mag_max_left = mag_max_left;
   history[idx].mag_max_right = mag_max_right;
-  history[idx].max_idx = max_idx;
-  history[idx].max_idx_left = max_idx_left;
-  history[idx].max_idx_right = max_idx_right + bandwidth*2;
+  history[idx].max_freq = idx2freq(idx_left_zero + max_idx);
+  history[idx].max_freq_left = idx2freq(idx_left_zero + max_idx_left);
+  history[idx].max_freq_right = idx2freq(center + max_idx_right);
   history[idx].start_time = start_time;
   history[idx].finish_time = finish_time;
+  history[idx].mag_mean = mag_mean;
 }
 /* USER CODE END 0 */
 
@@ -164,6 +178,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
   int im, re;
   int p_turn = 0;
+  int offset, shift;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -194,9 +209,12 @@ int main(void)
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
-  // Frequency range of peak magnitudes of compressed chirp
-  center = (F1 + F2) * PCM_SAMPLES / sampling_rate ;
+  // Statistics-related
+  center = (F1 + F2) * PCM_SAMPLES / sampling_rate;
   bandwidth = (F2 - F1) * PCM_SAMPLES / sampling_rate;
+  bandwidth2 = bandwidth * 2;
+  bandwidth4 = bandwidth * 4;
+  idx_left_zero = center - bandwidth2;
 
   // Initialize reference chirp signal
   init_ref_chirp(sampling_rate);
@@ -229,8 +247,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t offset = PCM_SAMPLES / 8;
-  uint32_t shift = PCM_SAMPLES / 4;
+  offset = PCM_SAMPLES / 8;
+  shift = PCM_SAMPLES / 4;
 
   while (1) {
 
@@ -253,13 +271,13 @@ int main(void)
 
       if (output_result && p_turn == 1) {  // Output debug info
 
-        printf("Magnitude history:\n");
+        printf("\nmax_freq,max_freq_left,max_freq_right,start_time,finish_time,max,max_right,max_left,mag_mean\n");
         for (int i = 0; i < 8; i++) {
-          printf("max: %.1f, max_r: %.1f, max_l: %.1f, s_time: %lu, f_time: %lu, i: %lu, i_left: %lu, i_right: %lu\n",
+          printf("%lu,%lu,%lu,%lu,%lu,%.1f,%.1f,%.1f,%.1f\n",
+              history[i].max_freq, history[i].max_freq_left, history[i].max_freq_right,
+              history[i].start_time, history[i].finish_time,
               history[i].mag_max, history[i].mag_max_left, history[i].mag_max_right,
-              history[i].start_time,
-              history[i].finish_time, history[i].max_idx,
-              history[i].max_idx_left, history[i].max_idx_right);
+              history[i].mag_mean);
         }
 
         if (all_data) {
