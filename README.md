@@ -73,26 +73,14 @@ I have come up with the following method:
 
 Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization.
 
-### Expressing symbols
+### Expressing data in symbol
 
 This implementation use up-chirp and down-chirp to express 0 and 1:
 
 - up-chirp means 0.
 - down-chirp means 1.
 
-So one chirp contains 1 bit info.
-
-Later on, I consider shifting chirp timing back and forth to express 1 bit as well: one chirp contains 2 bit info in total.
-
-```
-              Symbols (*)
-     
-             Time shift (time-frame/2)
-              *   |   *
-                  |   
-down-chirp  --*---+---*-- up-chirp
-  
-```
+So one symbol contains 1 bit info.
 
 #### Sync experiment on June 24, 2018
 
