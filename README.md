@@ -87,7 +87,7 @@ Later on, I consider shifting chirp timing back and forth to express 1 bit as we
 ```
               Symbols (*)
      
-             Time shift
+             Time shift (time-frame/2)
               *   |   *
                   |   
 down-chirp  --*---+---*-- up-chirp
