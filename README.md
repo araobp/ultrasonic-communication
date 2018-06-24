@@ -82,6 +82,8 @@ This implementation use up-chirp and down-chirp to express 0 and 1:
 
 So one chirp contains 1 bit info.
 
+Later on, I consider shifting chirp timing back and forth to express 1 bit as well: one chirp contains 2 bit info in total.
+
 #### Sync experiment on June 24, 2018
 
 I made the sync code. It seemed to work.
