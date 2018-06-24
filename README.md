@@ -71,6 +71,17 @@ I have come up with the following method:
 
 ![](https://docs.google.com/drawings/d/e/2PACX-1vT9da0oKUWgUHHTmYUO8Y0Rix6ORT5aeQxAz8Ihjoxc4vWMvFLudPTet1UHLMConm5RDk9kFaXTXnj8/pub?w=960&h=720)
 
+Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization.
+
+### Expressing symbols
+
+This implementation use up-chirp and down-chirp to express 0 and 1:
+
+- up-chirp means 0.
+- down-chirp means 1.
+
+So one chirp contains 1 bit info.
+
 #### Sync experiment on June 24, 2018
 
 I made the sync code. It seemed to work.
