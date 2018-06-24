@@ -92,6 +92,7 @@ struct history {
   uint32_t start_time;
   uint32_t finish_time;
   float mag_mean;
+  float snr;
 };
 
 struct history history[8];
@@ -100,7 +101,7 @@ uint32_t bandwidth;
 uint32_t bandwidth2;
 uint32_t bandwidth4;
 uint32_t idx_left_zero;
-float mag_stat[10];
+float mag_stat[12];
 
 /* USER CODE END PV */
 
@@ -118,7 +119,7 @@ uint32_t idx2freq(uint32_t idx) {
   return sampling_rate * idx / PCM_SAMPLES;
 }
 
-void fft(uint32_t idx) {
+void fft(uint32_t idx, float mag_mean) {
 
   uint32_t start_time = HAL_GetTick();
 
@@ -145,17 +146,7 @@ void fft(uint32_t idx) {
   arm_max_f32(&inout[idx_left_zero], bandwidth2, &mag_max_left, &max_idx_left);
   arm_max_f32(&inout[center], bandwidth2, &mag_max_right, &max_idx_right);
 
-  for (int i = 0; i < 9; i++) {
-    mag_stat[i + 1] = mag_stat[i];
-  }
-
-  // Mean magnitude (two-time-frame before)
-  mag_stat[0] = mag_max;
-  float mag_mean;
-  arm_mean_f32(&mag_stat[2], 8, &mag_mean);
-
   uint32_t finish_time = HAL_GetTick();
-
   history[idx].mag_max = mag_max;
   history[idx].mag_max_left = mag_max_left;
   history[idx].mag_max_right = mag_max_right;
@@ -165,6 +156,7 @@ void fft(uint32_t idx) {
   history[idx].start_time = start_time;
   history[idx].finish_time = finish_time;
   history[idx].mag_mean = mag_mean;
+  history[idx].snr = (mag_max - mag_mean)/mag_mean;
 }
 /* USER CODE END 0 */
 
@@ -250,6 +242,11 @@ int main(void)
   offset = PCM_SAMPLES / 8;
   shift = PCM_SAMPLES / 4;
 
+  float mag_max;
+  float mag_mean;
+  float mag_max_max;
+  bool receiving = false;
+
   while (1) {
 
     HAL_Delay(1);
@@ -257,6 +254,12 @@ int main(void)
     // Wait for next PCM samples from M1
     if (new_pcm_data) {
 
+      // Mean magnitude (four-time-frame before)
+      if (!receiving) arm_mean_f32(&mag_stat[4], 8, &mag_mean);
+      // TODO
+      if (mag_mean == 0.0f) mag_mean = 3.4028235E38;
+
+      // FFT four times
       for (uint32_t i = 0; i < 4; i++) {
         int sync_position = p_turn * offset + shift * i;
         for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
@@ -265,19 +268,38 @@ int main(void)
           inout[re] = pcm[j + sync_position];
           inout[im] = 0.0f;
         }
-        fft(i * 2 + p_turn);
+        fft(i * 2 + p_turn, mag_mean);
       }
       p_turn = (p_turn == 0)? 1: 0;
 
+      if (p_turn == 1) {
+        for (int i = 0; i < 11; i++) {
+          mag_stat[i + 1] = mag_stat[i];
+        }
+        for (int i = 0; i < 8; i++) {
+          mag_max = history[i].mag_max;
+          if (mag_max > mag_max_max) mag_max_max = mag_max;
+        }
+        mag_stat[0] = mag_max_max;
+
+        if ((mag_max_max / mag_mean) > SNR_THRESHOLD) {
+          receiving = true;
+        } else {
+          receiving = false;
+        }
+      }
+
+      mag_max_max = 0.0f;
+
       if (output_result && p_turn == 1) {  // Output debug info
 
-        printf("\nmax_freq,max_freq_left,max_freq_right,start_time,finish_time,max,max_right,max_left,mag_mean\n");
+        printf("\nmax_freq,max_freq_left,max_freq_right,start_time,finish_time,max,max_right,max_left,mag_mean,snr\n");
         for (int i = 0; i < 8; i++) {
-          printf("%lu,%lu,%lu,%lu,%lu,%.1f,%.1f,%.1f,%.1f\n",
+          printf("%lu,%lu,%lu,%lu,%lu,%.1f,%.1f,%.1f,%.1f,%.1f\n",
               history[i].max_freq, history[i].max_freq_left, history[i].max_freq_right,
               history[i].start_time, history[i].finish_time,
               history[i].mag_max, history[i].mag_max_left, history[i].mag_max_right,
-              history[i].mag_mean);
+              history[i].mag_mean, history[i].snr);
         }
 
         if (all_data) {
