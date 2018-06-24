@@ -100,6 +100,17 @@ max: 192139792.0, max_r: 22508948.0, max_l: 192139792.0, s_time: 301417, f_time:
 max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 301400, i: 66, i_left: 9, i_right: 66
 ```
 
+
+### Improving SNR
+
+By sucrificing the bit rate (transmission speed), SNR can be improved.
+
+Two approaches:
+- Synchronous addition: multiple sets of 2048 PCM samples
+- Longer time frame (longer air flight time): longer than 20.5msec
+
+I would rather try synchronous addition, since I don't want to change 20.5 msec time frame that is optimized for the sweep range of 17000-18000 Hz.
+
 ### sinc filter optimization (moving average)
 
 I observed that sinc5 filter improved SNR at around frequencies of peaks, better than sinc3.
