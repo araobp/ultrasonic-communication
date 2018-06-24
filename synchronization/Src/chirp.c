@@ -10,7 +10,7 @@
 #include "main.h"
 #include "stdbool.h"
 
-// float32_t up_chirp[PCM_SAMPLES * 2] = {0.0f};
+float32_t up_chirp[PCM_SAMPLES * 2] = {0.0f};
 float32_t down_chirp[PCM_SAMPLES * 2] = {0.0f};
 
 void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float phase) {
@@ -39,7 +39,7 @@ void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float ph
 }
 
 void init_ref_chirp(float sampling_rate) {
-//  generate_ref_chirp(up_chirp, true, sampling_rate, -90.0);
+  generate_ref_chirp(up_chirp, true, sampling_rate, -90.0);
   generate_ref_chirp(down_chirp, false, sampling_rate, -90.0);
 }
 
@@ -47,6 +47,6 @@ void mult_ref_chirp(float32_t *pInOut) {
   arm_cmplx_mult_cmplx_f32(pInOut, down_chirp, pInOut, PCM_SAMPLES);
 }
 
-//void mult_ref_chirp_sim(float32_t *pDst) {
-//  mult_ref_chirp(up_chirp, pDst);
-//}
+void mult_ref_chirp_sim(float32_t *pInOut) {
+  arm_cmplx_mult_cmplx_f32(up_chirp, down_chirp, pInOut, PCM_SAMPLES);
+}

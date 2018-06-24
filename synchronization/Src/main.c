@@ -93,6 +93,7 @@ struct history {
   uint32_t finish_time;
   float mag_mean;
   float snr;
+  char rank;
 };
 
 struct history history[8];
@@ -101,7 +102,6 @@ uint32_t bandwidth;
 uint32_t bandwidth2;
 uint32_t bandwidth4;
 uint32_t idx_left_zero;
-float mag_stat[12];
 
 /* USER CODE END PV */
 
@@ -117,6 +117,20 @@ void SystemClock_Config(void);
 
 uint32_t idx2freq(uint32_t idx) {
   return sampling_rate * idx / PCM_SAMPLES;
+}
+
+void detect_symbol() {
+  // Execute real up-chirp w/ real noise * complex down-chirp
+  mult_ref_chirp(inout);
+
+  // Windowing
+  arm_mult_f32(inout, fft_window, inout, PCM_SAMPLES * 2);
+
+  // Execute complex FFT
+  arm_cfft_f32(&arm_cfft_sR_f32_len2048, inout, 0, 1);
+
+  // Calculate magnitude
+  arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES / 2);
 }
 
 void fft(uint32_t idx, float mag_mean) {
@@ -169,8 +183,24 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   int im, re;
-  int p_turn = 0;
+  int j = 0;
+  int turn = 0;
   int offset, shift;
+  float mag_stat[12] = { 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37 };
+  float mag_max;
+  float mag_mean;
+  float mag_max_max;
+
+  enum state {
+    IDLE,
+    SYNCHRONIZING,
+    SYNCHRONIZED,
+    DATA_RECEIVING
+  };
+  enum state state_machine = IDLE;
+  int sync_cnt = 0;
+  int sync_position = 0;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -242,11 +272,6 @@ int main(void)
   offset = PCM_SAMPLES / 8;
   shift = PCM_SAMPLES / 4;
 
-  float mag_max;
-  float mag_mean;
-  float mag_max_max;
-  bool receiving = false;
-
   while (1) {
 
     HAL_Delay(1);
@@ -255,47 +280,76 @@ int main(void)
     if (new_pcm_data) {
 
       // Mean magnitude (four-time-frame before)
-      if (!receiving) arm_mean_f32(&mag_stat[4], 8, &mag_mean);
-      // TODO
-      if (mag_mean == 0.0f) mag_mean = 3.4028235E38;
+      if (state_machine == IDLE) arm_mean_f32(&mag_stat[4], 8, &mag_mean);
 
       // FFT four times
       for (uint32_t i = 0; i < 4; i++) {
-        int sync_position = p_turn * offset + shift * i;
+        sync_position = turn * offset + shift * i;
         for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
           re = j * 2;
           im = re + 1;
           inout[re] = pcm[j + sync_position];
           inout[im] = 0.0f;
         }
-        fft(i * 2 + p_turn, mag_mean);
+        fft(i * 2 + turn, mag_mean);
       }
-      p_turn = (p_turn == 0)? 1: 0;
+      turn = (turn == 0)? 1: 0;
 
-      if (p_turn == 1) {
+      if (turn == 1) {
         for (int i = 0; i < 11; i++) {
           mag_stat[i + 1] = mag_stat[i];
         }
         for (int i = 0; i < 8; i++) {
+          history[j].rank='-';
           mag_max = history[i].mag_max;
-          if (mag_max > mag_max_max) mag_max_max = mag_max;
+          if (mag_max > mag_max_max) {
+              mag_max_max = mag_max;
+              j = i;
+          }
         }
         mag_stat[0] = mag_max_max;
+        history[j].rank='+';
 
-        if ((mag_max_max / mag_mean) > SNR_THRESHOLD) {
-          receiving = true;
-        } else {
-          receiving = false;
+        float snr = (mag_max_max - mag_mean)/ mag_mean;
+        switch (state_machine) {
+        case IDLE:
+          if (snr >= SNR_THRESHOLD) {
+            state_machine = SYNCHRONIZING;
+            sync_cnt++;
+          }
+          break;
+        case SYNCHRONIZING:
+          if (snr < SNR_THRESHOLD) {
+            state_machine = IDLE;
+            sync_cnt = 0;
+          } else {
+            sync_cnt++;
+          }
+          if (sync_cnt >= 3) {
+            state_machine = SYNCHRONIZED;
+            sync_position = j;
+          }
+          break;
+        case SYNCHRONIZED:
+          if (snr < SNR_THRESHOLD) {
+            state_machine = IDLE;
+            sync_cnt = 0;
+          }
+          break;
+        default:
+          break;
         }
       }
 
       mag_max_max = 0.0f;
 
-      if (output_result && p_turn == 1) {  // Output debug info
+      if (output_result && turn == 1) {  // Output debug info
 
-        printf("\nmax_freq,max_freq_left,max_freq_right,start_time,finish_time,max,max_right,max_left,mag_mean,snr\n");
+        printf("\nstate: %d\n", state_machine);
+        printf("rank,nmax_freq,max_freq_left,max_freq_right,start_time,finish_time,max,max_right,max_left,mag_mean,snr\n");
         for (int i = 0; i < 8; i++) {
-          printf("%lu,%lu,%lu,%lu,%lu,%.1f,%.1f,%.1f,%.1f,%.1f\n",
+          printf("%c,%lu,%lu,%lu,%lu,%lu,%.1f,%.1f,%.1f,%.1f,%.1f\n",
+              history[i].rank,
               history[i].max_freq, history[i].max_freq_left, history[i].max_freq_right,
               history[i].start_time, history[i].finish_time,
               history[i].mag_max, history[i].mag_max_left, history[i].mag_max_right,

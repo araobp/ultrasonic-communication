@@ -14,6 +14,6 @@
 
 void init_ref_chirp(float sampling_rate);
 void mult_ref_chirp(float32_t *pInOut);
-//void mult_ref_chirp_sim(float32_t *pDst);
+void mult_ref_chirp_sim(float32_t *pInOut);
 
 #endif /* CHIRP_H_ */
