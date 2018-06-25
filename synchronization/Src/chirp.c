@@ -21,8 +21,8 @@ void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float ph
   float t = 0.0;
   int re, im;
 
-  float delta_f = (float)(F2 - F1)/TQ;
-  float delta_t = TQ/(TQ * sampling_rate);
+  float delta_f = (float)(F2 - F1)/TIME_FRAME;
+  float delta_t = TIME_FRAME/(TIME_FRAME * sampling_rate);
 
   for (int i = 0; i< PCM_SAMPLES; i++) {
     if (up) freq = F1 + delta_f * t;  // Up chirp

@@ -100,16 +100,17 @@ max: 192139792.0, max_r: 22508948.0, max_l: 192139792.0, s_time: 301417, f_time:
 max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 301400, i: 66, i_left: 9, i_right: 66
 ```
 
+### Improving SNR (signal-to-noise ratio)
 
-### Improving SNR
+SNR can be improved by optimizing the chirp bandwidth. I experimented on the hardware, and observed that SNR at bandwidth 16000Hz-19000Hz(3000Hz sweep range) was better than SNR at bandwidth 17000Hz-18000Hz(1000Hz sweep range).
 
-By sucrificing the bit rate (transmission speed), SNR can be improved.
+SNR can also be improved by sacrificing the bit rate (transmission speed).
 
 Two approaches:
 - Synchronous addition: multiple sets of 2048 PCM samples
-- Longer time frame (longer air flight time): longer than 20.5msec
+- Longer time frame (longer time of air flight): longer than 20.5msec
 
-I would rather try synchronous addition, since I don't want to change 20.5 msec time frame that is optimized for the sweep range of 17000-18000 Hz.
+I would rather try synchronous addition, since I don't want to change 20.5 msec time frame.
 
 ### sinc filter optimization (moving average)
 

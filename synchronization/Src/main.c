@@ -70,38 +70,31 @@ int32_t buf[PCM_SAMPLES] = { 0 };
 // PCM data store for further processing (FFT)
 float pcm[PCM_SAMPLES * 2] = { 0.0f };
 
-// FFT
-float32_t inout[PCM_SAMPLES * 2] = { 0.0f };
+// FFT-related
 float fft_window[PCM_SAMPLES * 2] = { 0.0f };
 const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
 
 // UART output flag
 bool output_result = false;
 
-// UART input
+// UART input/output
 uint8_t rxbuf[1];
 bool all_data = true;
 
+// Stats
 struct history {
-  float mag_max;
-  float mag_max_left;
-  float mag_max_right;
-  uint32_t max_freq;
-  uint32_t max_freq_left;
-  uint32_t max_freq_right;
-  uint32_t start_time;
-  uint32_t finish_time;
-  float mag_mean;
-  float snr;
-  char rank;
+  float mag_max;  // Max magnitude in the bandwidth
+  float mag_max_left;  // Max magnitude in the left
+  float mag_max_right;  // Max magnitude in the right
+  uint32_t max_freq;  // Frequency at max magnitude in the bandwidth
+  uint32_t max_freq_left;   // Frequency at max magnitude in the left
+  uint32_t max_freq_right;  // Frequency at max magnitude in the right
+  uint32_t start_time;   // DSP start time
+  uint32_t finish_time;  // DSP finish time
+  float mag_mean;  // Mean magnitude in the past
+  float snr;  // S/N Ratio
+  char rank;  // Magnitude ranking
 };
-
-struct history history[8];
-uint32_t center;
-uint32_t bandwidth;
-uint32_t bandwidth2;
-uint32_t bandwidth4;
-uint32_t idx_left_zero;
 
 /* USER CODE END PV */
 
@@ -119,23 +112,8 @@ uint32_t idx2freq(uint32_t idx) {
   return sampling_rate * idx / PCM_SAMPLES;
 }
 
-void detect_symbol() {
-  // Execute real up-chirp w/ real noise * complex down-chirp
-  mult_ref_chirp(inout);
-
-  // Windowing
-  arm_mult_f32(inout, fft_window, inout, PCM_SAMPLES * 2);
-
-  // Execute complex FFT
-  arm_cfft_f32(&arm_cfft_sR_f32_len2048, inout, 0, 1);
-
-  // Calculate magnitude
-  arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES / 2);
-}
-
-void fft(uint32_t idx, float mag_mean) {
-
-  uint32_t start_time = HAL_GetTick();
+// Digital signal processing
+void dsp(float *inout) {
 
   // Execute real up-chirp w/ real noise * complex down-chirp
   mult_ref_chirp(inout);
@@ -149,28 +127,6 @@ void fft(uint32_t idx, float mag_mean) {
   // Calculate magnitude
   arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES / 2);
 
-  // Calculate max magnitude
-  float mag_max;
-  float mag_max_left;
-  float mag_max_right;
-  uint32_t max_idx;
-  uint32_t max_idx_left;
-  uint32_t max_idx_right;
-  arm_max_f32(&inout[idx_left_zero], bandwidth4, &mag_max, &max_idx);
-  arm_max_f32(&inout[idx_left_zero], bandwidth2, &mag_max_left, &max_idx_left);
-  arm_max_f32(&inout[center], bandwidth2, &mag_max_right, &max_idx_right);
-
-  uint32_t finish_time = HAL_GetTick();
-  history[idx].mag_max = mag_max;
-  history[idx].mag_max_left = mag_max_left;
-  history[idx].mag_max_right = mag_max_right;
-  history[idx].max_freq = idx2freq(idx_left_zero + max_idx);
-  history[idx].max_freq_left = idx2freq(idx_left_zero + max_idx_left);
-  history[idx].max_freq_right = idx2freq(center + max_idx_right);
-  history[idx].start_time = start_time;
-  history[idx].finish_time = finish_time;
-  history[idx].mag_mean = mag_mean;
-  history[idx].snr = (mag_max - mag_mean)/mag_mean;
 }
 /* USER CODE END 0 */
 
@@ -186,11 +142,28 @@ int main(void)
   int j = 0;
   int turn = 0;
   int offset, shift;
+
+  float32_t data[PCM_SAMPLES * 2] = { 0.0f };
+
+  // Stats-related
+  struct history history[8];
+  struct history *phist;
+  uint32_t center;
+  uint32_t bandwidth;
+  uint32_t bandwidth2;
+  uint32_t bandwidth4;
+  uint32_t idx_left_zero;
   float mag_stat[12] = { 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37, 1E37 };
   float mag_max;
   float mag_mean;
   float mag_max_max;
+  float mag_max_left;
+  float mag_max_right;
+  uint32_t max_idx;
+  uint32_t max_idx_left;
+  uint32_t max_idx_right;
 
+  // State machine
   enum state {
     IDLE,
     SYNCHRONIZING,
@@ -198,8 +171,11 @@ int main(void)
     DATA_RECEIVING
   };
   enum state state_machine = IDLE;
+
+  // Frame synchronization
   int sync_cnt = 0;
   int sync_position = 0;
+
 
   /* USER CODE END 1 */
 
@@ -276,26 +252,62 @@ int main(void)
 
     HAL_Delay(1);
 
-    // Wait for next PCM samples from M1
+    // Wait for next PCM samples from DFSDM (MEMS mic)
     if (new_pcm_data) {
 
       // Mean magnitude (four-time-frame before)
       if (state_machine == IDLE) arm_mean_f32(&mag_stat[4], 8, &mag_mean);
 
-      // FFT four times
+      // Execute FFT four times per time frame (every 20.5msec)
       for (uint32_t i = 0; i < 4; i++) {
+
         sync_position = turn * offset + shift * i;
+
+        //*** DSP START ********
+
+        uint32_t start_time = HAL_GetTick();
+
+        // Copy PCM data to input/output buffer for DSP
         for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
           re = j * 2;
           im = re + 1;
-          inout[re] = pcm[j + sync_position];
-          inout[im] = 0.0f;
+          data[re] = pcm[j + sync_position];
+          data[im] = 0.0f;
         }
-        fft(i * 2 + turn, mag_mean);
+
+        // Digital signal processing
+        dsp(data);
+
+        // Calculate indexes of max magnitudes
+        arm_max_f32(&data[idx_left_zero], bandwidth4, &mag_max, &max_idx);
+        arm_max_f32(&data[idx_left_zero], bandwidth2, &mag_max_left, &max_idx_left);
+        arm_max_f32(&data[center], bandwidth2, &mag_max_right, &max_idx_right);
+
+        uint32_t finish_time = HAL_GetTick();
+
+        //*** DSP END *********
+
+        // Stats
+        int idx = i * 2 + turn;  // Stats index
+        phist = &history[idx];
+        phist->mag_max = mag_max;
+        phist->mag_max_left = mag_max_left;
+        phist->mag_max_right = mag_max_right;
+        phist->max_freq = idx2freq(idx_left_zero + max_idx);
+        phist->max_freq_left = idx2freq(idx_left_zero + max_idx_left);
+        phist->max_freq_right = idx2freq(center + max_idx_right);
+        phist->start_time = start_time;
+        phist->finish_time = finish_time;
+        phist->mag_mean = mag_mean;
+        phist->snr = (mag_max - mag_mean)/mag_mean;
+
       }
+
       turn = (turn == 0)? 1: 0;
 
       if (turn == 1) {
+
+        // Find max magnitude in the history
         for (int i = 0; i < 11; i++) {
           mag_stat[i + 1] = mag_stat[i];
         }
@@ -309,8 +321,12 @@ int main(void)
         }
         mag_stat[0] = mag_max_max;
         history[j].rank='+';
+        mag_max_max = 0.0f;
 
+        // S/N Ratio
         float snr = (mag_max_max - mag_mean)/ mag_mean;
+
+        // State machine
         switch (state_machine) {
         case IDLE:
           if (snr >= SNR_THRESHOLD) {
@@ -341,8 +357,6 @@ int main(void)
         }
       }
 
-      mag_max_max = 0.0f;
-
       if (output_result && turn == 1) {  // Output debug info
 
         printf("\nstate: %d\n", state_machine);
@@ -360,7 +374,7 @@ int main(void)
           printf("index,Magnitude\n");
           // FFT
           for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
-            printf("%lu,%e\n", i, inout[i]);
+            printf("%lu,%e\n", i, data[i]);
           }
           printf("EOF\n");
         }
