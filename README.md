@@ -61,19 +61,15 @@ Test code of FFT[real up-chirp * complex down-chirp] on STM32L4 DSP showed the b
 
 ### Frame synchronization problems
 
-The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks.
+Unsynchronized chirp results in two peaks.
 
 ==> [Simulation](./simulation/ChirpSynchronization.ipynb)
 
-Minimize the phase difference for synchronization (to maximize correlation).
-
-![](./doc/Simulation_upchirp_downchirp_shift.jpg)
-
-I have come up with the following method:
+I have come up with the following method for synchronization:
 
 ![](https://docs.google.com/drawings/d/e/2PACX-1vT9da0oKUWgUHHTmYUO8Y0Rix6ORT5aeQxAz8Ihjoxc4vWMvFLudPTet1UHLMConm5RDk9kFaXTXnj8/pub?w=960&h=720)
 
-Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization.
+Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization, maybe every 8 time frames.
 
 ### Expressing data in symbol
 
@@ -105,8 +101,13 @@ max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 3
 ### Improving SNR (signal-to-noise ratio)
 
 - Bandwidth optimization: 16000Hz-19000Hz(3000Hz) rather than 17000Hz-18000Hz(1000Hz).
-- IQ modulation: baseband * carrier
 - Synchronous addition: multiple sets of 2048 PCM samples
+
+### IQ modulation
+
+Try IQ modulation to see if SNR improves.
+
+==> [Simulation](./simulation/IQ_modulation.ipynb)
 
 ### sinc filter optimization (moving average)
 
