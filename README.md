@@ -61,7 +61,9 @@ Test code of FFT[real up-chirp * complex down-chirp] on STM32L4 DSP showed the b
 
 ### Frame synchronization problems
 
-The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks: ./simulation/ChirpSynchronization.ipynb
+The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks.
+
+==> [Simulation](./simulation/ChirpSynchronization.ipynb)
 
 Minimize the phase difference for synchronization (to maximize correlation).
 
