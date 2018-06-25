@@ -55,13 +55,13 @@ Test code of FFT[real up-chirp * complex down-chirp] on STM32L4 DSP showed the b
 |-----------------------------------------|---------------------------------------|---------------|
 |FFT[Real upchirp * complex downchirp]    | peaks at around chirp frequency * 2 Hz|Very Good, sinc5 filter improves SNR|
 |IFFT[FFT[real upchirp]*FFT[real upchirp]]| compressed wave in time domain        |Not good       |
-|FFT[Real upchirp * Real upchirp]          | peaks at around zero Hz              |Disturbed by noises|
+|FFT[Real upchirp * Real upchirp]          | peaks at around zero Hz              |Disturbed by noises around zero Hz|
 
 ## Next steps
 
 ### Frame synchronization problems
 
-The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks.
+The phase difference between chirp from the transmitter and chirp from the receiver results in two peaks: ./simulation/ChirpSynchronization.ipynb
 
 Minimize the phase difference for synchronization (to maximize correlation).
 
@@ -102,15 +102,9 @@ max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 3
 
 ### Improving SNR (signal-to-noise ratio)
 
-SNR can be improved by optimizing the chirp bandwidth. I experimented on the hardware, and observed that SNR at bandwidth 16000Hz-19000Hz(3000Hz sweep range) was better than SNR at bandwidth 17000Hz-18000Hz(1000Hz sweep range).
-
-SNR can also be improved by sacrificing the bit rate (transmission speed).
-
-Two approaches:
+- Bandwidth optimization: 16000Hz-19000Hz(3000Hz) rather than 17000Hz-18000Hz(1000Hz).
+- IQ modulation: baseband * carrier
 - Synchronous addition: multiple sets of 2048 PCM samples
-- Longer time frame (longer time of air flight): longer than 20.5msec
-
-I would rather try synchronous addition, since I don't want to change 20.5 msec time frame.
 
 ### sinc filter optimization (moving average)
 
