@@ -59,10 +59,6 @@ Test code of FFT[real up-chirp * complex down-chirp] on STM32L4 DSP showed the b
 
 ## Next steps
 
-### Bug fix
-
-The current implementation has a bug: chirp's frequency inclement is not linear. Fix it!
-
 ### Frame synchronization problems
 
 Unsynchronized chirp results in two peaks.
