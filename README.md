@@ -2,7 +2,7 @@
 
 ![](./doc/chirp_x_carrier.jpg)
 
-Ultra-sonic wave to deliver data to the receiver
+[Formula] Ultra-sonic wave to deliver data to the receiver
 
 ## Background and motivation
 
