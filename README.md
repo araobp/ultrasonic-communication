@@ -2,11 +2,11 @@
 
 ![](./doc/chirp_x_carrier.jpg)
 
-## Motivation
+## Background and motivation
 
 STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro!
 
-As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic.
+As an IoT hobyyist, I am becoming interested in DSP with MEMS mic.
 
 ## Platform: STM32L4 platform and FFT test code on MEMS mic
 
@@ -24,7 +24,7 @@ The system architecture is as follows:
 
 ## Experiments
 
-I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave.
+I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise. I will make another experiment in the near future to test OFDM and CDMA as well.
 
 ==> [EXPERIMENTS](EXPERIMENTS.md)
 
