@@ -2,7 +2,11 @@
 
 ![](./doc/chirp_x_carrier.jpg)
 
-STMicro gave me STM32L4 evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro! As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic.
+## Motivation
+
+STMicro gave me STM32L4 evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro!
+
+As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic.
 
 ## Preparation: STM32L4 platform and FFT test code on MEMS mic
 
