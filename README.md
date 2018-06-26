@@ -8,7 +8,7 @@ STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS micro
 
 As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic.
 
-## Preparation: STM32L4 platform and FFT test code on MEMS mic
+## Platform: STM32L4 platform and FFT test code on MEMS mic
 
 This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
 
@@ -22,46 +22,38 @@ The system architecture is as follows:
 
 ==> [Test code](./basic)
 
-## Ultrasonic communications experiment (FSK modulation)
+## Experiments
 
-My first idea was FSK modulation of 18 frequencies (18 symboles) to send data on ultrasonic wave. The method worked very well in a silent room, but did not work in a noisy environment such as a meeting room. I had to come up with another approach, such as spread spectrum.
+I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave.
 
-![](./doc/18symbols.jpg)
+==> [EXPERIMENTS](EXPERIMENTS.md)
 
-==> [Experiment](EXPERIMENT.md)
+## Current work
 
-==> [Test code](./ultracom)
+### Expressing data in symbol
 
+This implementation use up-chirp and down-chirp to express 0 and 1:
 
-## Ultrasonic communications experiment (Chirp modulation)
+- up-chirp means 0.
+- down-chirp means 1.
 
-I tested Chirp modulation as one of spread spectrum techniques. It worked! But the noise problem still remained, and the result was useless in a noisy room. I had to come up with a noise suppression technique such as Chirp compression.
+So one symbol contains 1 bit info.
 
-![](./doc/Chirp.jpg)
+![](./doc/chirp_baseband.jpg)
 
-==> [Experiment2](EXPERIMENT2.md)
+### IQ modulation
 
-==> [Test code](./chirp)
+Try IQ modulation to see if SNR improves.
 
-## Ultrasonic communications experiment (Chirp modulation with compression)
+==> [Simulation](./simulation/IQ_modulation.ipynb)
 
-I tested various Chirp compression techniques by simulating chirp compression and also by implementing test code on STM32L4 DSP.
+If IQ modulation improves SNR, I will also test low-pass filter on Arm Cortex-M4 DSP.
 
-Test code of FFT[real up-chirp * complex down-chirp] on STM32L4 DSP showed the best result as follows:
+### Improving SNR (signal-to-noise ratio)
 
-![](./doc/FFT_upXdown.jpg)
-
-==> [Experiment3](EXPERIMENT3.md)
-
-### Conclusion
-
-|Techinique                               | peak magnitude/amplitude              |Compression    |
-|-----------------------------------------|---------------------------------------|---------------|
-|FFT[Real upchirp * complex downchirp]    | peaks at around chirp frequency * 2 Hz|Very Good, sinc5 filter improves SNR|
-|IFFT[FFT[real upchirp]*FFT[real upchirp]]| compressed wave in time domain        |Not good       |
-|FFT[Real upchirp * Real upchirp]          | peaks at around zero Hz              |Disturbed by noises around zero Hz|
-
-## Next steps
+- Bandwidth optimization.
+- Synchronous addition: multiple sets of 2048 PCM samples.
+- Hardware sinc filter optimization on DFSDM.
 
 ### Frame synchronization problems
 
@@ -74,17 +66,6 @@ I have come up with the following method for synchronization:
 ![](https://docs.google.com/drawings/d/e/2PACX-1vT9da0oKUWgUHHTmYUO8Y0Rix6ORT5aeQxAz8Ihjoxc4vWMvFLudPTet1UHLMConm5RDk9kFaXTXnj8/pub?w=960&h=720)
 
 Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization, maybe every 8 time frames.
-
-### Expressing data in symbol
-
-This implementation use up-chirp and down-chirp to express 0 and 1:
-
-- up-chirp means 0.
-- down-chirp means 1.
-
-So one symbol contains 1 bit info.
-
-![](./doc/chirp_baseband.jpg)
 
 #### Sync experiment on June 24, 2018
 
@@ -103,23 +84,6 @@ max: 336429216.0, max_r: 159654848.0, max_l: 336429216.0, s_time: 301391, f_time
 max: 192139792.0, max_r: 22508948.0, max_l: 192139792.0, s_time: 301417, f_time: 301422, i: 55, i_left: 37, i_right: 55
 max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 301400, i: 66, i_left: 9, i_right: 66
 ```
-
-### Improving SNR (signal-to-noise ratio)
-
-- Bandwidth optimization: 16000Hz-19000Hz(3000Hz) rather than 17000Hz-18000Hz(1000Hz).
-- Synchronous addition: multiple sets of 2048 PCM samples
-
-### IQ modulation
-
-Try IQ modulation to see if SNR improves.
-
-==> [Simulation](./simulation/IQ_modulation.ipynb)
-
-If IQ modulation improves SNR, I will also test low-pass filter on Arm Cortex-M4 DSP.
-
-### sinc filter optimization (moving average)
-
-I observed that sinc5 filter improved SNR at around frequencies of peaks, better than sinc3.
 
 ## My original MEMS mic shield
 
