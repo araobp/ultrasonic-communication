@@ -32,6 +32,16 @@ I have made several experiments over the past month to study how data can be tra
 
 ## Current work
 
+### IQ modulation
+
+Try IQ modulation to see if SNR improves.
+
+==> [Formula](./misc/Formula.ipynb)
+
+==> [Simulation](./simulation/IQ_modulation.ipynb)
+
+If IQ modulation improves SNR, I will also test low-pass filter (sinc FIR) on Arm Cortex-M4 DSP.
+
 ### Expressing data in symbol
 
 This implementation use up-chirp and down-chirp to express 0 and 1:
@@ -42,15 +52,6 @@ This implementation use up-chirp and down-chirp to express 0 and 1:
 So one symbol contains 1 bit info.
 
 ![](./doc/chirp_baseband.jpg)
-
-### IQ modulation
-
-Try IQ modulation to see if SNR improves.
-
-==> [Formula](./misc/Formula.ipynb)
-==> [Simulation](./simulation/IQ_modulation.ipynb)
-
-If IQ modulation improves SNR, I will also test low-pass filter (sinc FIR) on Arm Cortex-M4 DSP.
 
 ### Improving SNR (signal-to-noise ratio)
 
