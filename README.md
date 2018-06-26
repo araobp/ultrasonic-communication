@@ -1,10 +1,10 @@
-# Ultrasonic communications (STM32L4 DSP w/ MEMS mic)
+# Ultrasonic communications (Arm Cortex-M4 DSP w/ MEMS mic)
 
 ![](./doc/chirp_x_carrier.jpg)
 
 ## Motivation
 
-STMicro gave me STM32L4 evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro!
+STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro!
 
 As an IoT hobyyist, I am becoming interested in developing an IoT demo using DSP with MEMS mic.
 
@@ -112,6 +112,8 @@ max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 3
 Try IQ modulation to see if SNR improves.
 
 ==> [Simulation](./simulation/IQ_modulation.ipynb)
+
+If IQ modulation improves SNR, I will also test low-pass filter on Arm Cortex-M4 DSP.
 
 ### sinc filter optimization (moving average)
 
