@@ -2,6 +2,8 @@
 
 ![](./doc/chirp_x_carrier.jpg)
 
+Ultra-sonic wave to deliver data to the receiver
+
 ## Background and motivation
 
 STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro!
