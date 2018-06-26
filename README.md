@@ -47,9 +47,10 @@ So one symbol contains 1 bit info.
 
 Try IQ modulation to see if SNR improves.
 
+==> [Formula](./misc/Formula.ipynb)
 ==> [Simulation](./simulation/IQ_modulation.ipynb)
 
-If IQ modulation improves SNR, I will also test low-pass filter on Arm Cortex-M4 DSP.
+If IQ modulation improves SNR, I will also test low-pass filter (sinc FIR) on Arm Cortex-M4 DSP.
 
 ### Improving SNR (signal-to-noise ratio)
 
