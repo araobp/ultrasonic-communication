@@ -1,4 +1,4 @@
-# Ultrasonic communications (Arm Cortex-M4 DSP w/ MEMS mic)
+# Ultrasonic communications (Arm Cortex-M4 w/ MEMS mic)
 
 ![](./doc/chirp_x_carrier.jpg)
 
