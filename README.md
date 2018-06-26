@@ -89,7 +89,7 @@ max: 192139792.0, max_r: 22508948.0, max_l: 192139792.0, s_time: 301417, f_time:
 max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 301400, i: 66, i_left: 9, i_right: 66
 ```
 
-## My original MEMS mic shield
+### Developing my original MEMS mic shield
 
 I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
 
