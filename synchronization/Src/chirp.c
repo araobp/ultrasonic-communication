@@ -25,8 +25,8 @@ void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float ph
   float delta_t = TIME_FRAME/(TIME_FRAME * sampling_rate);
 
   for (int i = 0; i< PCM_SAMPLES; i++) {
-    if (up) freq = F1 + delta_f * t;  // Up chirp
-    else freq = F2 - delta_f * t;  // Down chirp
+    if (up) freq = F1 + delta_f * t /2.0;  // Up chirp
+    else freq = F2 - delta_f * t / 2.0;    // Down chirp
     theta = 360.0 * freq * t + phase;
     t = t + delta_t;
     arm_sin_cos_f32(theta, &sin_val, &cos_val);
