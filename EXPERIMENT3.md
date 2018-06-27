@@ -40,7 +40,7 @@ On the contrary, an experiment of FFT [upchirp * upchirp] on STM32L4 w/ MEMS mic
 
 However, I got that this techinique is not so good, since I observed a peak at zero Hz sometimes, even when chirp signal was not transmitted to the receiver.
 
-## Sync experiment on June 24, 2018
+### Sync experiment on June 24, 2018
 
 I made the sync code. It seemed to work.
 
