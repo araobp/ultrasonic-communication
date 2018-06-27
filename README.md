@@ -1,9 +1,5 @@
 # Ultrasonic communications (Arm Cortex-M4 w/ MEMS mic)
 
-![](./doc/chirp_x_carrier.jpg)
-
-[Formula] Ultra-sonic wave to deliver data to the receiver
-
 ## Background and motivation
 
 STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro!
@@ -40,7 +36,9 @@ Try IQ modulation to see if SNR improves.
 
 ==> [Simulation](./simulation/IQ_modulation.ipynb)
 
-If IQ modulation improves SNR, I will also test low-pass filter (sinc FIR) on Arm Cortex-M4 DSP.
+I will also test low-pass filter (sinc FIR) on Arm Cortex-M4L DSP.
+
+![](./doc/FIR.jpg)
 
 ### Expressing data in symbol
 
