@@ -38,7 +38,7 @@ Try IQ modulation to see if SNR improves.
 
 IQ demoduation requires Low-Pass Filter(LPF) to remove unnecessary frequencies for baseband signal analysis. I have made LPF simulation and calculated FIR coefficients.
 
-==> [Simulation](./simulation/FIR_LPF_desing.ipynb)
+==> [Simulation](./simulation/FIR%20LPF%20desing.ipynb)
 
 ![](./doc/FIR.jpg)
 
