@@ -36,7 +36,9 @@ Try IQ modulation to see if SNR improves.
 
 ==> [Simulation](./simulation/IQ_modulation.ipynb)
 
-I will also test low-pass filter (sinc FIR) on Arm Cortex-M4L DSP.
+IQ demoduation requires Low-Pass Filter(LPF) to remove unnecessary frequencies for baseband signal analysis. I have made LPF simulation and calculated FIR coefficients.
+
+==> [Simulation](./simulation/FIR%20LPF%20desing.ipynb)
 
 ![](./doc/FIR.jpg)
 
