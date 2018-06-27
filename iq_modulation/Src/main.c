@@ -269,10 +269,7 @@ int main(void)
 
         // Copy PCM data to input/output buffer for DSP
         for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
-          re = j * 2;
-          im = re + 1;
-          data[re] = pcm[j + sync_position];
-          data[im] = 0.0f;
+          data[j] = pcm[j + sync_position];
         }
 
         // Digital signal processing
