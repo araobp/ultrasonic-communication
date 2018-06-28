@@ -50,6 +50,7 @@
 #include "arm_math.h"
 #include "arm_const_structs.h"
 #include "chirp.h"
+#include "iq_modem.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -114,6 +115,9 @@ uint32_t idx2freq(uint32_t idx) {
 
 // Digital signal processing
 void dsp(float *inout) {
+
+  // IQ demodulation
+  iq_demodulation(inout);
 
   // Execute real up-chirp w/ real noise * complex down-chirp
   mult_ref_chirp(inout);

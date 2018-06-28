@@ -26,11 +26,10 @@ I have made several experiments over the past month to study how data can be tra
 
 ==> [EXPERIMENTS](EXPERIMENTS.md)
 
-## Current work
 
 ### IQ modulation
 
-Try IQ modulation to see if SNR improves.
+I tried IQ modulation to see if SNR improves.
 
 ==> [Formula](./misc/Formula.ipynb)
 
@@ -41,6 +40,20 @@ IQ demoduation requires Low-Pass Filter(LPF) to remove unnecessary frequencies f
 ==> [Simulation](./simulation/FIR%20LPF%20design.ipynb)
 
 ![](./doc/FIR.jpg)
+
+However, my C program with "digital" IQ modulation did not fit into RAM on STM32! I gave up this approach, and I will try "Orthogonal Chirp" instead.
+
+### Spreading chirp along time axis
+
+Due to the limited RAM size, this approach is not appropriate. Synchronous addition is another way to increase the gain, but the transmission speed becomes very small.
+
+## Current work
+
+# Orthogonal chirp
+
+I have made simulation on Orthogonal chirp (mixing cosine chirp and sine chirp), and I confirmed that it increases the gain on the receiver.
+
+==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
 ### Expressing data in symbol
 
