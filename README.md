@@ -49,7 +49,7 @@ Due to the limited RAM size, this approach is not appropriate. Synchronous addit
 
 ## Current work
 
-# Orthogonal chirp
+### Orthogonal chirp
 
 I made simulation of Orthogonal chirp (mixing cosine chirp and sine chirp) and synchronous addition. I confirmed that those methods improve SNR on the receiver.
 
