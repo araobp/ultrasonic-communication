@@ -1,6 +1,6 @@
 # Ultrasonic communications (Arm Cortex-M4 w/ MEMS mic)
 
-![](Simulation_upchirp_upchirp.jpg)
+![](./doc/Simulation_upchirp_upchirp.jpg)
 
 ## Background and motivation
 
