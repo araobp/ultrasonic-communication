@@ -64,8 +64,6 @@ This implementation use up-chirp and down-chirp to express 0 and 1:
 
 So one symbol contains 1 bit info.
 
-![](./doc/chirp_baseband.jpg)
-
 ### Improving SNR (signal-to-noise ratio)
 
 - Bandwidth optimization.
