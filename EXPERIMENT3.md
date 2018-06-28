@@ -38,7 +38,7 @@ On the contrary, an experiment of FFT [upchirp * upchirp] on STM32L4 w/ MEMS mic
 
 ![upchirp_upchirp](./doc/Experiment_upchirp_upchirp.jpg)
 
-However, I got that this techinique is not so good, since I observed a peak at zero Hz sometimes, even when chirp signal was not transmitted to the receiver.
+However, I got that this techinique is not so good, since I observed a peak at zero Hz sometimes, even when chirp signal was not transmitted to the receiver. I need to come up with a technique to improve SNR.
 
 ### Sync experiment on June 24, 2018
 
