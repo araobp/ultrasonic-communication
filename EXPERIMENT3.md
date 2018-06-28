@@ -59,3 +59,22 @@ max: 98077944.0, max_r: 75327512.0, max_l: 98077944.0, s_time: 301396, f_time: 3
 ```
 
 
+
+### IQ modulation
+
+I tried IQ modulation to see if SNR improves.
+
+==> [Formula](./misc/Formula.ipynb)
+
+==> [Simulation](./simulation/IQ_modulation.ipynb)
+
+IQ demoduation requires Low-Pass Filter(LPF) to remove unnecessary frequencies for baseband signal analysis. I have made LPF simulation and calculated FIR coefficients.
+
+==> [Simulation](./simulation/FIR%20LPF%20design.ipynb)
+
+![](./doc/FIR.jpg)
+
+However, my C program with "digital" IQ modulation did not fit into RAM on STM32! I gave up this approach, and I will try "Orthogonal Chirp" instead.
+
+
+
