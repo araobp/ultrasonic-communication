@@ -51,9 +51,9 @@ Due to the limited RAM size, this approach is not appropriate. Synchronous addit
 
 ## Current work
 
-### Orthogonal chirp
+### Orthogonal chirp (baseband) instead of IQ modulation
 
-I have made simulation on Orthogonal chirp (mixing cosine chirp and sine chirp), and I confirmed that it increases the gain on the receiver.
+I have made simulation on Orthogonal chirp (mixing cosine chirp and sine chirp), and I confirmed that it increases the gain on the receiver. I also simulated synchronouos addition that also improves SNR.
 
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
