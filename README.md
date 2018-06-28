@@ -24,7 +24,21 @@ The system architecture is as follows:
 
 I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise.
 
-==> [EXPERIMENTS](EXPERIMENTS.md)
+#### Ultrasonic communications experiment (FSK modulation)
+
+==> [Experiment](EXPERIMENT.md)
+
+==> [Test code](./ultracom)
+
+#### Ultrasonic communications experiment (Chirp modulation)
+
+==> [Experiment2](EXPERIMENT2.md)
+
+==> [Test code](./chirp)
+
+#### Ultrasonic communications experiment (Chirp modulation with compression)
+
+==> [Experiment3](EXPERIMENT3.md)
 
 ## Current work
 
