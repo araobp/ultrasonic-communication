@@ -22,7 +22,7 @@ The system architecture is as follows:
 
 ## Experiments
 
-I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise. I will make another experiment in the near future to test OFDM and CDMA as well.
+I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise.
 
 ==> [EXPERIMENTS](EXPERIMENTS.md)
 
