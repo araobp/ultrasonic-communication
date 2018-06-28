@@ -51,7 +51,7 @@ Due to the limited RAM size, this approach is not appropriate. Synchronous addit
 
 ## Current work
 
-# Orthogonal chirp
+### Orthogonal chirp
 
 I have made simulation on Orthogonal chirp (mixing cosine chirp and sine chirp), and I confirmed that it increases the gain on the receiver.
 
