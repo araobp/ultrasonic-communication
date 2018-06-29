@@ -8,10 +8,6 @@ STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS micro
 
 As an IoT hobyyist, I am becoming interested in DSP with MEMS mic.
 
-## Mathematical formula expressing ultrasonic wave
-
-==> [Formula](./misc/Formula.ipynb)
-
 ## Platform: STM32L4 platform and FFT test code on MEMS mic
 
 This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
@@ -26,29 +22,15 @@ The system architecture is as follows:
 
 ==> [Test code](./experiments/basic)
 
-## Experiments
+## Mathematical formula expressing ultrasonic wave
 
-I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise.
+I employ chirp modulation for ultrasonic communications.
 
-#### Ultrasonic communications experiment (FSK modulation)
+![](./doc/formula.jpg)
 
-==> [Experiment](./experiments/EXPERIMENT.md)
+==> [Formula](./misc/Formula.ipynb)
 
-==> [Test code](./experiments/ultracom)
-
-#### Ultrasonic communications experiment (Chirp modulation)
-
-![](./doc/Simulation_upchirp_upchirp.jpg)
-
-==> [Experiment2](./experiments/EXPERIMENT2.md)
-
-==> [Test code](./experiments/chirp)
-
-#### Ultrasonic communications experiment (Chirp modulation with compression)
-
-==> [Experiment3](./experiments/EXPERIMENT3.md)
-
-## Current work
+## Work ongoing
 
 ### Simulation of orthogonal chirp
 
@@ -109,3 +91,25 @@ I am going to make my original shield with Knowles MEMS mic:
 - LEDs
 - Tactile switches
 - EEPROM
+
+## Experiments I made over the past month
+
+I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise.
+
+#### Ultrasonic communications experiment (FSK modulation)
+
+==> [Experiment](./experiments/EXPERIMENT.md)
+
+==> [Test code](./experiments/ultracom)
+
+#### Ultrasonic communications experiment (Chirp modulation)
+
+![](./doc/Simulation_upchirp_upchirp.jpg)
+
+==> [Experiment2](./experiments/EXPERIMENT2.md)
+
+==> [Test code](./experiments/chirp)
+
+#### Ultrasonic communications experiment (Chirp modulation with compression)
+
+==> [Experiment3](./experiments/EXPERIMENT3.md)
