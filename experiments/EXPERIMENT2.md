@@ -123,7 +123,7 @@ It could transmit a character code "S" to the receiver. It showed better reachab
 
 ## Chirp expriment on June 3, 2018
 
-![HelloWorld](./doc/ChirpFrameHelloWorld.jpg)
+![HelloWorld](./ChirpFrameHelloWorld.jpg)
 
 It could transmit a message "Hello World!" to the receiver. This time, the sweep range is 17000 - 18000Hz, and two-time chirps within 20.5 msec. The distance between the mini speaker and the receiver is around 1 meter.
 
