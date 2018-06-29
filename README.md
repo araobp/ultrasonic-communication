@@ -24,6 +24,8 @@ The system architecture is as follows:
 
 ## Mathematical formula expressing ultrasonic wave
 
+I employ chirp modulation for ultrasonic communications.
+
 ![](./doc/formula.jpg)
 
 ==> [Formula](./misc/Formula.ipynb)
