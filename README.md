@@ -96,7 +96,8 @@ I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Kno
 I am going to make my original shield with Knowles MEMS mic:
 
 - Knowles MEMS mic
-- LCDs
+- Character LCD
+- Small OEL display
 - LEDs
 - Tactile switches
-- CAN tranceiver
+- EEPROM
