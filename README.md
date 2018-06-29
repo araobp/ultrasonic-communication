@@ -2,8 +2,6 @@
 
 ![](./doc/orthogonal_upchirp.jpg)
 
-![](./doc/Simulation_upchirp_upchirp.jpg)
-
 ## Background and motivation
 
 STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS microphones for free at [a trade show held in Makuhari city](https://www.st.com/content/st_com/en/about/events/events.html/techno-frontier-2018.html), Chiba, Japan. Thanks a lot to STMicro!
@@ -35,6 +33,8 @@ I have made several experiments over the past month to study how data can be tra
 ==> [Test code](./ultracom)
 
 #### Ultrasonic communications experiment (Chirp modulation)
+
+![](./doc/Simulation_upchirp_upchirp.jpg)
 
 ==> [Experiment2](EXPERIMENT2.md)
 
