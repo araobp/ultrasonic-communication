@@ -8,6 +8,10 @@ STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS micro
 
 As an IoT hobyyist, I am becoming interested in DSP with MEMS mic.
 
+## Mathematical formula expressing ultrasonic wave
+
+==> [Formula](./misc/Formula.ipynb)
+
 ## Platform: STM32L4 platform and FFT test code on MEMS mic
 
 This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
