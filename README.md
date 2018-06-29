@@ -44,11 +44,19 @@ I have made several experiments over the past month to study how data can be tra
 
 ## Current work
 
-### Orthogonal chirp
+### Simulation of orthogonal chirp
 
 I made simulation of Orthogonal chirp (mixing cosine chirp and sine chirp) and synchronous addition. I confirmed that those methods improve SNR on the receiver.
 
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
+
+### Experiment of orthogonal chirp (June 29, 2018)
+
+Very weak orthogonal chirp tone was transmitted to the receiver:
+![](./doc/experiment.jpg)
+
+The receiver could detect the signal and showed a strong peak of magnitude around zero Hz:
+![](./doc/Experiment_orthogonal_upchirp_upchirp.jpg)
 
 ### Expressing data in symbol
 
