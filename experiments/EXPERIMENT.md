@@ -2,7 +2,7 @@
 
 ## Hex number in 4bit length
 
-![18symbols](./doc/18symbols.jpg)
+![18symbols](./18symbols.jpg)
 
 I assign the following frequencies to each hexa-decimal number of 4 bit data length. I am going to increase the frequencies to ultrasonic range later on.
 
@@ -132,15 +132,9 @@ Frequency at max magnitude: 19970.7, Max magnitude: 12264.990234
 Hex data: F
 ```
 
-## Tone generator on Jupyter
-
-This generator can mix sine waves of multiple frequencies:
-
-==> [Tone Generator](./generator/ToneGenerator.ipynb)
-
 ## Second test: "Hello World!" over ultrasonic on May 22, 2018
 
-![Hello World](./doc/HelloWorld_Spectrogram.jpg)
+![Hello World](./HelloWorld_Spectrogram.jpg)
 
 ```
 /// Ultrasonic communication receiver ///
