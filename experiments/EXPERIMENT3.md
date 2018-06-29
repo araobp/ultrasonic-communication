@@ -20,11 +20,11 @@ I made [chirp compression simulator](../simulation/ChirpSimulation.ipynb) on Jup
 
 The chirp signal is under white noise:
 
-![upchirp_with_noise](./doc/Simulation_upchirp_with_noise.jpg)
+![upchirp_with_noise](./Simulation_upchirp_with_noise.jpg)
 
 I made FFT [upchirp * upchirp], then the chirp signal became identifiable at around zero Hz:
 
-![upchirp_upchirp](./Simulation_upchirp_upchirp.jpg)
+![upchirp_upchirp](./doc/Simulation_upchirp_upchirp.jpg)
 
 I also tried IFFT [FFT[upchirp] * FFT[downchirp]] to simulate Chirp compression in time domain. Again, the chirp signal is under noise level, but the chirp signal is identifiable around zero Hz after compression. The good thing of this technique is that it does not require a larger buffer (i.e., larger memory) for compression processing, and it can also detect phase shift of chirp signal by measuring the shift of peak to the left or to the right:
 
