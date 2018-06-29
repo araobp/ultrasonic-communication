@@ -28,29 +28,7 @@ The system architecture is as follows:
 
 ==> [Formula](./misc/Formula.ipynb)
 
-## Experiments
-
-I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise.
-
-#### Ultrasonic communications experiment (FSK modulation)
-
-==> [Experiment](./experiments/EXPERIMENT.md)
-
-==> [Test code](./experiments/ultracom)
-
-#### Ultrasonic communications experiment (Chirp modulation)
-
-![](./doc/Simulation_upchirp_upchirp.jpg)
-
-==> [Experiment2](./experiments/EXPERIMENT2.md)
-
-==> [Test code](./experiments/chirp)
-
-#### Ultrasonic communications experiment (Chirp modulation with compression)
-
-==> [Experiment3](./experiments/EXPERIMENT3.md)
-
-## Current work
+## Work ongoing
 
 ### Simulation of orthogonal chirp
 
@@ -111,3 +89,25 @@ I am going to make my original shield with Knowles MEMS mic:
 - LEDs
 - Tactile switches
 - EEPROM
+
+## Experiments I made over the past month
+
+I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise.
+
+#### Ultrasonic communications experiment (FSK modulation)
+
+==> [Experiment](./experiments/EXPERIMENT.md)
+
+==> [Test code](./experiments/ultracom)
+
+#### Ultrasonic communications experiment (Chirp modulation)
+
+![](./doc/Simulation_upchirp_upchirp.jpg)
+
+==> [Experiment2](./experiments/EXPERIMENT2.md)
+
+==> [Test code](./experiments/chirp)
+
+#### Ultrasonic communications experiment (Chirp modulation with compression)
+
+==> [Experiment3](./experiments/EXPERIMENT3.md)
