@@ -2,7 +2,7 @@
 
 ## Hex number in 4bit length
 
-![18symbols](./doc/18symbols.jpg)
+![18symbols](./18symbols.jpg)
 
 I assign the following frequencies to each hexa-decimal number of 4 bit data length. I am going to increase the frequencies to ultrasonic range later on.
 
