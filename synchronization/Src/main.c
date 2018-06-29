@@ -116,6 +116,7 @@ uint32_t idx2freq(uint32_t idx) {
 void dsp(float *inout) {
 
   // Execute real up-chirp w/ real noise * complex down-chirp
+  // mult_ref_chirp(inout);
   mult_ref_chirp(inout);
 
   // Windowing
@@ -125,7 +126,7 @@ void dsp(float *inout) {
   arm_cfft_f32(&arm_cfft_sR_f32_len2048, inout, 0, 1);
 
   // Calculate magnitude
-  arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES / 2);
+  arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES);
 
 }
 /* USER CODE END 0 */
@@ -208,11 +209,13 @@ int main(void)
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
   // Statistics-related
-  center = (F1 + F2) * PCM_SAMPLES / sampling_rate;
-  bandwidth = (F2 - F1) * PCM_SAMPLES / sampling_rate;
+  // center = (F0 + F1) * PCM_SAMPLES / sampling_rate;
+  center = 0;
+  bandwidth = (F1 - F0) * PCM_SAMPLES / sampling_rate;
   bandwidth2 = bandwidth * 2;
   bandwidth4 = bandwidth * 4;
-  idx_left_zero = center - bandwidth2;
+  // idx_left_zero = center - bandwidth2;
+  idx_left_zero = PCM_SAMPLES - bandwidth2;
 
   // Initialize reference chirp signal
   init_ref_chirp(sampling_rate);
@@ -279,9 +282,16 @@ int main(void)
         dsp(data);
 
         // Calculate indexes of max magnitudes
-        arm_max_f32(&data[idx_left_zero], bandwidth4, &mag_max, &max_idx);
+        // arm_max_f32(&data[idx_left_zero], bandwidth4, &mag_max, &max_idx);
         arm_max_f32(&data[idx_left_zero], bandwidth2, &mag_max_left, &max_idx_left);
         arm_max_f32(&data[center], bandwidth2, &mag_max_right, &max_idx_right);
+        if (mag_max_left > mag_max_right) {
+          mag_max = mag_max_left;
+          max_idx = max_idx_left;
+        } else {
+          mag_max = mag_max_right;
+          max_idx = max_idx_right;
+        }
 
         uint32_t finish_time = HAL_GetTick();
 
@@ -373,7 +383,7 @@ int main(void)
         if (all_data) {
           printf("index,Magnitude\n");
           // FFT
-          for (uint32_t i = 0; i < PCM_SAMPLES / 2; i++) {
+          for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
             printf("%lu,%e\n", i, data[i]);
           }
           printf("EOF\n");

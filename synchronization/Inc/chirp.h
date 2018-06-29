@@ -7,10 +7,12 @@
 #ifndef CHIRP_H_
 #define CHIRP_H_
 
+#include "stdbool.h"
+
 #define TIME_FRAME 0.0205f
 #define AMPLITUDE 1.0f;
-#define F1 16000
-#define F2 19000
+#define F0 16000
+#define F1 19000
 
 void init_ref_chirp(float sampling_rate);
 void mult_ref_chirp(float32_t *pInOut);

@@ -10,8 +10,8 @@
 #include "main.h"
 #include "stdbool.h"
 
-float32_t up_chirp[PCM_SAMPLES * 2] = {0.0f};
-float32_t down_chirp[PCM_SAMPLES * 2] = {0.0f};
+float32_t up_chirp[PCM_SAMPLES * 2];
+float32_t down_chirp[PCM_SAMPLES * 2];
 
 void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float phase) {
   float32_t sin_val;
@@ -21,12 +21,12 @@ void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float ph
   float t = 0.0;
   int re, im;
 
-  float delta_f = (float)(F2 - F1)/TIME_FRAME;
+  float delta_f = (float)(F1 - F0)/TIME_FRAME;
   float delta_t = TIME_FRAME/(TIME_FRAME * sampling_rate);
 
   for (int i = 0; i< PCM_SAMPLES; i++) {
-    if (up) freq = F1 + delta_f * t /2.0;  // Up chirp
-    else freq = F2 - delta_f * t / 2.0;    // Down chirp
+    if (up) freq = F0 + delta_f * t /2.0;  // Up chirp
+    else freq = F1 - delta_f * t / 2.0;    // Down chirp
     theta = 360.0 * freq * t + phase;
     t = t + delta_t;
     arm_sin_cos_f32(theta, &sin_val, &cos_val);
@@ -44,9 +44,12 @@ void init_ref_chirp(float sampling_rate) {
 }
 
 void mult_ref_chirp(float32_t *pInOut) {
-  arm_cmplx_mult_cmplx_f32(pInOut, down_chirp, pInOut, PCM_SAMPLES);
+//  arm_cmplx_mult_cmplx_f32(pInOut, down_chirp, pInOut, PCM_SAMPLES);
+  arm_cmplx_mult_cmplx_f32(pInOut, up_chirp, pInOut, PCM_SAMPLES);
 }
 
 void mult_ref_chirp_sim(float32_t *pInOut) {
-  arm_cmplx_mult_cmplx_f32(up_chirp, down_chirp, pInOut, PCM_SAMPLES);
+//  arm_cmplx_mult_cmplx_f32(up_chirp, down_chirp, pInOut, PCM_SAMPLES);
+//  arm_cmplx_mult_cmplx_f32(up_chirp, up_chirp, pInOut, PCM_SAMPLES);
+  pInOut = up_chirp;
 }
