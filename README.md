@@ -20,7 +20,7 @@ The system architecture is as follows:
 
 ==> [Platform](PLATFORM.md)
 
-==> [Test code](./basic)
+==> [Test code](./experiments/basic)
 
 ## Experiments
 
@@ -28,21 +28,21 @@ I have made several experiments over the past month to study how data can be tra
 
 #### Ultrasonic communications experiment (FSK modulation)
 
-==> [Experiment](EXPERIMENT.md)
+==> [Experiment](./experiments/EXPERIMENT.md)
 
-==> [Test code](./ultracom)
+==> [Test code](./experiments/ultracom)
 
 #### Ultrasonic communications experiment (Chirp modulation)
 
 ![](./doc/Simulation_upchirp_upchirp.jpg)
 
-==> [Experiment2](EXPERIMENT2.md)
+==> [Experiment2](./experiments/EXPERIMENT2.md)
 
-==> [Test code](./chirp)
+==> [Test code](./experiments/chirp)
 
 #### Ultrasonic communications experiment (Chirp modulation with compression)
 
-==> [Experiment3](EXPERIMENT3.md)
+==> [Experiment3](./experiments/EXPERIMENT3.md)
 
 ## Current work
 
@@ -61,6 +61,8 @@ Very weak orthogonal chirp tone was transmitted to the receiver:
 The receiver could detect the signal and showed a strong peak of magnitude around zero Hz:
 
 ![](./doc/Experiment_orthogonal_upchirp_upchirp.jpg)
+
+==> [Test code](./synchronization)
 
 ### Expressing data in symbol
 
