@@ -11,13 +11,13 @@ I observed two kinds of noises in a room:
 
 Spectrum is spread out like Mt. Fuji:
 
-![Chirp](./doc/Chirp.jpg)
+![Chirp](./Chirp.jpg)
 
 ## Chirp de-modulation
 
 All the frequencies appear in one TQ(Time Quantum). I used [Audacity](https://www.audacityteam.org/) to capture the spectrogram:
 
-![Chirp_Spectrogram](./doc/Chirp_Spectrogram.jpg)
+![Chirp_Spectrogram](./Chirp_Spectrogram.jpg)
 
 Reference: 
 - [Chirp compression (Wikipedia)](https://en.wikipedia.org/wiki/Chirp_compression)
@@ -57,29 +57,29 @@ Transmission speed: 8bits * 1000 / (20.5(msec) * 19) = 20.5bps
 
 I used a very cheap speaker (100yen: $1) with my laptop PC to playback the "S" wav file.
 
-![speaker](./doc/speaker.jpg)
+![speaker](../doc/speaker.jpg)
 
 Sweep range: 16000Hz - 16000Hz
 
-![16000](./doc/FFT_Chirp_16000.jpg)
+![16000](./FFT_Chirp_16000.jpg)
 
 Sweep range: 16000Hz - 17000Hz
 
-![16000_17000](./doc/FFT_Chirp_16000_17000.jpg)
+![16000_17000](./FFT_Chirp_16000_17000.jpg)
 
 Sweep range: 16000Hz - 18000Hz
 
-![16000_18000](./doc/FFT_Chirp_16000_18000.jpg)
+![16000_18000](./FFT_Chirp_16000_18000.jpg)
 
 Sweep range: 17000Hz - 18000Hz (2 times in 20.5msec)
 
-![17000_18000_2x](./doc/FFT_Chirp_17000_18000_2xdb.jpg)
+![17000_18000_2x](./FFT_Chirp_17000_18000_2xdb.jpg)
 
-![17000_18000_2x](./doc/FFT_Chirp_17000_18000_2x.jpg)
+![17000_18000_2x](./FFT_Chirp_17000_18000_2x.jpg)
 
 Paper rubbing
 
-![Paper rubbing](./doc/FFT_Paper_Rubbing.jpg)
+![Paper rubbing](./FFT_Paper_Rubbing.jpg)
 
 ### The best chrip signal
 
@@ -123,7 +123,7 @@ It could transmit a character code "S" to the receiver. It showed better reachab
 
 ## Chirp expriment on June 3, 2018
 
-![HelloWorld](./doc/ChirpFrameHelloWorld.jpg)
+![HelloWorld](./ChirpFrameHelloWorld.jpg)
 
 It could transmit a message "Hello World!" to the receiver. This time, the sweep range is 17000 - 18000Hz, and two-time chirps within 20.5 msec. The distance between the mini speaker and the receiver is around 1 meter.
 
