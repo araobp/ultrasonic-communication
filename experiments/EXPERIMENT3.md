@@ -20,7 +20,7 @@ I made [chirp compression simulator](../simulation/ChirpSimulation.ipynb) on Jup
 
 The chirp signal is under white noise:
 
-![upchirp_with_noise](./Simulation_upchirp_with_noise.jpg)
+![upchirp_with_noise](./doc/Simulation_upchirp_with_noise.jpg)
 
 I made FFT [upchirp * upchirp], then the chirp signal became identifiable at around zero Hz:
 
