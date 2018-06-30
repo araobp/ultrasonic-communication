@@ -10,6 +10,8 @@ STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS micro
 
 As an IoT hobyyist, I am becoming interested in DSP with MEMS mic.
 
+Also thanks to this: https://github.com/y2kblog/NUCLEO-L476RG_DFSDM_PDM-Mic.
+
 ## Project goal
 
 I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area networking" by cheap DSP and MEMS mic.
