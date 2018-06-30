@@ -58,7 +58,7 @@ Very weak orthogonal chirp tone was transmitted to the receiver:
 
 ![](./doc/experiment.jpg)
 
-The receiver could detect the signal and showed a strong peak of magnitude around zero Hz:
+The receiver could detect the signal and showed a strong peak of magnitude around zero Hz, as long as its time frame is in sync with the transmitter:
 
 ![](./doc/Experiment_orthogonal_upchirp_upchirp.jpg)
 
