@@ -8,6 +8,10 @@ STMicro gave me STM32L4(Arm Cortex-M4) evaluation board and a pair of MEMS micro
 
 As an IoT hobyyist, I am becoming interested in DSP with MEMS mic.
 
+## Project documentation
+
+==> [Specification](https://docs.google.com/presentation/d/e/2PACX-1vSd3PQnKqmKbjcGNyNh_gygd175jgfzZYH5iwcEPqmmgiy7k3yYzqqHzfs7u-95jm_9hHgc0ugAvv2U/pub?start=false&loop=false&delayms=3000)
+
 ## Platform: STM32L4 platform and FFT test code on MEMS mic
 
 This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
@@ -72,12 +76,6 @@ So one symbol contains 1 bit info.
 Unsynchronized chirp results in two peaks.
 
 ==> [Simulation](./simulation/ChirpSynchronization.ipynb)
-
-==> [State machine spec](https://docs.google.com/presentation/d/e/2PACX-1vSd3PQnKqmKbjcGNyNh_gygd175jgfzZYH5iwcEPqmmgiy7k3yYzqqHzfs7u-95jm_9hHgc0ugAvv2U/pub?start=false&loop=false&delayms=3000)
-
-I have come up with the following method for synchronization:
-
-![](https://docs.google.com/drawings/d/e/2PACX-1vT9da0oKUWgUHHTmYUO8Y0Rix6ORT5aeQxAz8Ihjoxc4vWMvFLudPTet1UHLMConm5RDk9kFaXTXnj8/pub?w=960&h=720)
 
 Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization, maybe every 8 time frames.
 
