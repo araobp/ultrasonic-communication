@@ -5,7 +5,7 @@
 
 from numpy import zeros, append, linspace, sin, cos, exp, pi, int16, abs, real, imag, random, sqrt, log10
 from scipy.io.wavfile import write
-from scipy.signal import spectrogram
+from scipy.signal import spectrogram, buttord, butter, lfilter
 from scipy.fftpack import fft, ifft, fftfreq, fftshift
 import matplotlib.pyplot as plt
 import peakutils
@@ -130,3 +130,12 @@ def add_delay(chirp, delay_rate=0.0):
 def play(wave):
     write(WAVE_FILE, Fs, real(wave).astype(int16))
     display(Audio('./' + WAVE_FILE))
+
+# Low pass filter
+def lpf(f, cutoff):
+    WP = float(cutoff)/float(Fs/2)
+    WS = 1.3 * WP
+    N, Wn = buttord(wp=WP, ws=WS, gpass=2, gstop=30, analog=0)
+    b, a = butter(N, Wn, btype='low', analog=0, output='ba')
+    g = lfilter(b, a, f)
+    return g
