@@ -36,7 +36,7 @@ The system architecture is as follows:
 
 ## Mathematical formula expressing ultrasonic wave
 
-I employ chirp modulation for ultrasonic communications.
+I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very bad performance at high SNR in a noisy room. So I decided to employ chirp modulation in this project.
 
 ==> [Formula](./misc/Formula.ipynb)
 
