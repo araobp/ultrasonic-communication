@@ -13,7 +13,7 @@
 float32_t up_chirp[PCM_SAMPLES * 2];
 float32_t down_chirp[PCM_SAMPLES * 2];
 
-void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float phase) {
+void generate_ref_chirp(float *ref_chirp, int updown, float sampling_rate, float phase) {
   float32_t sin_val;
   float32_t cos_val;
   float freq;
@@ -25,8 +25,11 @@ void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float ph
   float delta_t = TIME_FRAME/(TIME_FRAME * sampling_rate);
 
   for (int i = 0; i< PCM_SAMPLES; i++) {
-    if (up) freq = F0 + delta_f * t /2.0;  // Up chirp
-    else freq = F1 - delta_f * t / 2.0;    // Down chirp
+    if (updown == UP_CHIRP) {
+      freq = F0 + delta_f * t /2.0;  // Up chirp
+    } else if (updown == DOWN_CHIRP) {
+      freq = F1 - delta_f * t / 2.0;    // Down chirp
+    }
     theta = 360.0 * freq * t + phase;
     t = t + delta_t;
     arm_sin_cos_f32(theta, &sin_val, &cos_val);
@@ -39,16 +42,19 @@ void generate_ref_chirp(float *ref_chirp, bool up, float sampling_rate, float ph
 }
 
 void init_ref_chirp(float sampling_rate) {
-  generate_ref_chirp(up_chirp, true, sampling_rate, -90.0);
-  generate_ref_chirp(down_chirp, false, sampling_rate, -90.0);
+  generate_ref_chirp(up_chirp, UP_CHIRP, sampling_rate, -90.0);
+  generate_ref_chirp(down_chirp, DOWN_CHIRP, sampling_rate, -90.0);
 }
 
-void mult_ref_chirp(float32_t *pInOut) {
-//  arm_cmplx_mult_cmplx_f32(pInOut, down_chirp, pInOut, PCM_SAMPLES);
-  arm_cmplx_mult_cmplx_f32(pInOut, up_chirp, pInOut, PCM_SAMPLES);
+void mult_ref_chirp(float32_t *pInOut, int updown) {
+  if (updown == UP_CHIRP) {
+    arm_cmplx_mult_cmplx_f32(pInOut, up_chirp, pInOut, PCM_SAMPLES);
+  } else if (updown == DOWN_CHIRP) {
+    arm_cmplx_mult_cmplx_f32(pInOut, down_chirp, pInOut, PCM_SAMPLES);
+  }
 }
 
-void mult_ref_chirp_sim(float32_t *pInOut) {
+void mult_ref_chirp_sim(float32_t *pInOut, int updown) {
 //  arm_cmplx_mult_cmplx_f32(up_chirp, down_chirp, pInOut, PCM_SAMPLES);
 //  arm_cmplx_mult_cmplx_f32(up_chirp, up_chirp, pInOut, PCM_SAMPLES);
   pInOut = up_chirp;

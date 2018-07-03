@@ -62,9 +62,9 @@ const uint32_t PCM_SAMPLES_DOUBLE = PCM_SAMPLES * 2;
 // flag: "new PCM data has just been copied to buf"
 bool new_pcm_data = false;
 
-// Audio sample rate and period
-float sampling_rate;
-float sampling_period;
+// Audio sampling rate and period
+float f_s;
+float T;
 
 // DMA peripheral to memory buffer
 int32_t buf[PCM_SAMPLES] = { 0 };
@@ -81,7 +81,16 @@ bool output_result = false;
 
 // UART input/output
 uint8_t rxbuf[1];
-bool all_data = true;
+bool all_data = false;
+
+// State machine
+enum state {
+  IDLE, SYNCHRONIZING, SYNCHRONIZED, DATA_RECEIVING
+};
+enum state state = IDLE;
+
+const char STATE[4][16] = { "IDLE", "SYNCHRONIZING", "SYNCHRONIZED",
+    "DATA_RECEIVING" };
 
 // Stats
 struct history {
@@ -116,17 +125,17 @@ void SystemClock_Config(void);
 
 int32_t idx2freq(uint32_t idx) {
   if (idx < PCM_SAMPLES_HALF) {
-    return sampling_rate * idx / PCM_SAMPLES;
+    return (int32_t) f_s * idx / PCM_SAMPLES;
   } else {
-    return sampling_rate * (idx - PCM_SAMPLES) / PCM_SAMPLES;
+    return ((int32_t) f_s * (PCM_SAMPLES - idx) / PCM_SAMPLES) * -1;
   }
 }
 
 // Digital signal processing pipeline
-void pipeline(float *inout) {
+void pipeline(float *inout, int updown) {
 
   // Execute real up-chirp w/ real noise * complex up-chirp
-  mult_ref_chirp(inout);
+  mult_ref_chirp(inout, updown);
 
   // Windowing
   arm_mult_f32(inout, fft_window, inout, PCM_SAMPLES * 2);
@@ -139,8 +148,19 @@ void pipeline(float *inout) {
 
 }
 
-void dsp(float32_t *inout, uint32_t sync_position, struct history* phist,
-    float32_t mag_mean) {
+// Digital signal processing
+void dsp(float32_t *inout, uint32_t sync_position, struct history *phist,
+    float32_t mag_mean, int updown) {
+
+  uint32_t re, im;
+
+  // Copy PCM data to input/output buffer for DSP
+  for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
+    re = j * 2;
+    im = re + 1;
+    inout[re] = pcm[j + sync_position];
+    inout[im] = 0.0f;
+  }
 
   float mag_max;
   float mag_max_left;
@@ -149,27 +169,17 @@ void dsp(float32_t *inout, uint32_t sync_position, struct history* phist,
   uint32_t max_idx_left;
   uint32_t max_idx_right;
 
-  uint32_t re, im;
-
   uint32_t start_time = HAL_GetTick();
 
-// Copy PCM data to input/output buffer for DSP
-  for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
-    re = j * 2;
-    im = re + 1;
-    inout[re] = pcm[j + sync_position];
-    inout[im] = 0.0f;
-  }
-
 // Digital signal processing pipeline
-  pipeline(inout);
+  pipeline(inout, updown);
 
 // Calculate indexes of max magnitudes
   arm_max_f32(&inout[idx_left_zero], bandwidth2, &mag_max_left, &max_idx_left);
   arm_max_f32(&inout[0], bandwidth2, &mag_max_right, &max_idx_right);
   if (mag_max_left > mag_max_right) {
     mag_max = mag_max_left;
-    max_idx = max_idx_left;
+    max_idx = idx_left_zero + max_idx_left;
   } else {
     mag_max = mag_max_right;
     max_idx = max_idx_right;
@@ -181,7 +191,7 @@ void dsp(float32_t *inout, uint32_t sync_position, struct history* phist,
   phist->mag_max = mag_max;
   phist->mag_max_left = mag_max_left;
   phist->mag_max_right = mag_max_right;
-  phist->max_freq = idx2freq(idx_left_zero + max_idx);
+  phist->max_freq = idx2freq(max_idx);
   phist->max_freq_left = idx2freq(idx_left_zero + max_idx_left);
   phist->max_freq_right = idx2freq(max_idx_right);
   phist->start_time = start_time;
@@ -189,6 +199,26 @@ void dsp(float32_t *inout, uint32_t sync_position, struct history* phist,
   phist->mag_mean = mag_mean;
   phist->snr = (mag_max - mag_mean) / mag_mean;
 
+}
+
+uint32_t symbol_snr(float32_t *inout, uint32_t sync_position,
+    struct history *phist, int updown) {
+  dsp(inout, sync_position, phist, phist->mag_mean, updown);
+  return phist->snr;
+}
+
+void print_history(enum state prev_state, enum state state,
+    struct history *hist, int num) {
+  printf("\nstate: %s => %s\n", STATE[prev_state], STATE[state]);
+  printf(
+      "r,  freq,freq_l,freq_r, t_s, t_f,      max,    max_r,    max_l, mag_mean,   snr\n");
+  for (int i = 0; i < num; i++) {
+    printf("%c,%6ld,%6ld,%6ld,%4lu,%4lu, %4.2e, %4.2e, %4.2e, %4.2e,%6.1f\n",
+        hist[i].rank, hist[i].max_freq, hist[i].max_freq_left,
+        hist[i].max_freq_right, hist[i].start_time % 1000,
+        hist[i].finish_time % 1000, hist[i].mag_max, hist[i].mag_max_left,
+        hist[i].mag_max_right, hist[i].mag_mean, hist[i].snr);
+  }
 }
 
 /* USER CODE END 0 */
@@ -205,8 +235,6 @@ int main(void) {
   int turn = 0;
   int offset, shift;
 
-  float32_t data[PCM_SAMPLES_DOUBLE];
-
 // Stats-related
   struct history history[8];
 
@@ -217,16 +245,14 @@ int main(void) {
   float mag_mean;
   float mag_max_max;
 
-// State machine
-  enum state {
-    IDLE, SYNCHRONIZING, SYNCHRONIZED
-  };
-  enum state state = IDLE;
+  float32_t data[PCM_SAMPLES_DOUBLE];
 
-// Frame synchronization
+  // Time frame synchronization
   int sync_cnt = 0;
   int sync_position = 0;
   float32_t snr;
+
+  enum state prev_state = IDLE;
 
   /* USER CODE END 1 */
 
@@ -254,17 +280,17 @@ int main(void) {
   /* USER CODE BEGIN 2 */
 
 // FFT sampling rate
-  sampling_rate = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
+  f_s = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
 // Statistics-related
-  bandwidth = (F1 - F0) * PCM_SAMPLES / sampling_rate;
+  bandwidth = (F1 - F0) * PCM_SAMPLES / f_s;
   bandwidth2 = bandwidth * 2;
   idx_left_zero = PCM_SAMPLES - bandwidth2;
 
 // Initialize reference chirp signal
-  init_ref_chirp(sampling_rate);
+  init_ref_chirp(f_s);
 
 // Enable UART receive interrupt
   HAL_UART_Receive_IT(&huart2, rxbuf, 1);
@@ -275,7 +301,7 @@ int main(void) {
     Error_Handler();
   }
 
-// Hanning window
+// Generate Hanning window
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     re = i * 2;
     im = re + 1;
@@ -283,12 +309,12 @@ int main(void) {
     fft_window[im] = fft_window[re];
   }
 
-// Show starting message
+// Print starting message
   printf("/// Receiver ///\n\n");
-  printf("Sampling rate: %4.1f(kHz)\n", (float) sampling_rate / 1000.0f);
-  sampling_period = 1.0f / sampling_rate * PCM_SAMPLES;
+  printf("Sampling rate: %4.1f(kHz)\n", (float) f_s / 1000.0f);
+  T = 1.0f / f_s * PCM_SAMPLES;
   printf("Sampling period: %.1f(msec), Samples per period: %ld\n\n",
-      sampling_period * 1000.0f, PCM_SAMPLES);
+      T * 1000.0f, PCM_SAMPLES);
   printf("Push USER button to output single-shot FFT\n");
   /* USER CODE END 2 */
 
@@ -297,6 +323,8 @@ int main(void) {
   offset = PCM_SAMPLES / 8;
   shift = PCM_SAMPLES / 4;
 
+  uint32_t l = 0;
+
   while (1) {
 
     HAL_Delay(1);
@@ -304,11 +332,14 @@ int main(void) {
     // Wait for next PCM samples from DFSDM (MEMS mic)
     if (new_pcm_data) {
 
+      prev_state = state;
+
       switch (state) {
 
       case IDLE:
         sync_cnt = 0;
         arm_mean_f32(&mag_stat[4], 8, &mag_mean);
+        // intentionally no break here
 
       case SYNCHRONIZING:
 
@@ -316,16 +347,20 @@ int main(void) {
         for (uint32_t i = 0; i < 4; i++) {
           sync_position = turn * offset + shift * i;
           int idx = i * 2 + turn;  // Stats index
-          dsp(data, sync_position, &history[idx], mag_mean);
+          dsp(data, sync_position, &history[idx], mag_mean, UP_CHIRP);
         }
 
         turn = (turn == 0) ? 1 : 0;
 
         if (turn == 1) {
-          // Find max magnitude in the history
-          for (int i = 0; i < 11; i++) {
+
+          // Shift magnitude history
+          for (int i = 10; i >= 0; i--) {
             mag_stat[i + 1] = mag_stat[i];
           }
+
+          // Find max magnitude in the history
+          mag_max_max = 0.0f;
           for (int i = 0; i < 8; i++) {
             history[j].rank = '-';
             mag_max = history[i].mag_max;
@@ -334,16 +369,16 @@ int main(void) {
               j = i;
             }
           }
+
           mag_stat[0] = mag_max_max;
           history[j].rank = '+';
-          mag_max_max = 0.0f;
 
           // S/N Ratio
           snr = (mag_max_max - mag_mean) / mag_mean;
 
           if (snr >= SNR_THRESHOLD) {
             state = SYNCHRONIZING;
-            if (++sync_cnt >=3) {
+            if (++sync_cnt >= 3) {
               state = SYNCHRONIZED;
               sync_position = j;
             }
@@ -354,34 +389,62 @@ int main(void) {
         break;
 
       case SYNCHRONIZED:
-        dsp(data, sync_position, &history[0], mag_mean);
-        mag_max = history[0].mag_max;
-        snr = (mag_max - mag_mean) / mag_mean;
-
+        snr = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
         if (snr >= SNR_THRESHOLD) {
-          // process symbol
-
+          ;
         } else {
-          state = IDLE;
+          snr = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
+          if (snr >= SNR_THRESHOLD) {
+            state = DATA_RECEIVING;
+          } else {
+            state = IDLE;
+          }
+        }
+        history[0].rank = '~';
+        history[1].rank = '~';
+        break;
+
+      case DATA_RECEIVING:
+        snr = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
+        if (snr >= SNR_THRESHOLD) {
+          // 1 bit data is 1
+          history[0].rank = '1';
+          history[1].rank = '-';
+        } else {
+          snr = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
+          if (snr >= SNR_THRESHOLD) {
+            // 1 bit data is 0
+            history[0].rank = '-';
+            history[1].rank = '0';
+          } else {
+            state = IDLE;
+          }
         }
         break;
 
       default:
         break;
       }
-    }
 
-    if (output_result && turn == 1) {  // Output debug info
+      //if (output_result && turn == 1) {  // Output debug info
 
-      printf("\nstate: %d\n", state);
-      printf(
-          "rank,max_freq,max_freq_left,max_freq_right,start_time,finish_time,max,max_right,max_left,mag_mean,snr\n");
-      for (int i = 0; i < 8; i++) {
-        printf("%c,%ld,%ld,%ld,%lu,%lu,%.1f,%.1f,%.1f,%.1f,%.1f\n",
-            history[i].rank, history[i].max_freq, history[i].max_freq_left,
-            history[i].max_freq_right, history[i].start_time,
-            history[i].finish_time, history[i].mag_max, history[i].mag_max_left,
-            history[i].mag_max_right, history[i].mag_mean, history[i].snr);
+      switch (prev_state) {
+      case IDLE:
+        if (state == SYNCHRONIZING) {
+          print_history(prev_state, state, history, 8);
+        }
+        break;
+      case SYNCHRONIZING:
+        if (turn == 1) {  // Output debug info
+          print_history(prev_state, state, history, 8);
+        }
+        break;
+      case SYNCHRONIZED:
+      case DATA_RECEIVING:
+          print_history(prev_state, state, history, 2);
+        break;
+      default:
+        break;
       }
 
       if (all_data) {
@@ -396,10 +459,10 @@ int main(void) {
       // Filtered PCM data (e.g., Hanning Window)
       HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
       output_result = false;
+      /*}*/
+
+      new_pcm_data = false;
     }
-
-    new_pcm_data = false;
-
   }
 }
 /* USER CODE END WHILE */
