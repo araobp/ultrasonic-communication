@@ -38,8 +38,6 @@ The system architecture is as follows:
 
 I employ chirp modulation for ultrasonic communications.
 
-![](./doc/formula.jpg)
-
 ==> [Formula](./misc/Formula.ipynb)
 
 ## Work ongoing
