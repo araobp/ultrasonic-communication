@@ -46,10 +46,6 @@ I employ chirp modulation for ultrasonic communications.
 
 ### Simulation of orthogonal chirp
 
-![](./doc/formula_orthogonal_chirp.jpg)
-
-I made simulation of Orthogonal chirp (mixing cosine chirp and sine chirp) and synchronous addition. I confirmed that those methods improve SNR on the receiver.
-
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
 ### Experiment of orthogonal chirp (June 29, 2018)
