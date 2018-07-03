@@ -44,6 +44,8 @@ I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very b
 
 ### Simulation of orthogonal chirp
 
+Since I/Q modulation code did not fit into RAM of STM32, I am trying orthogonal chirp instead.
+
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
 ### Experiment of orthogonal chirp (June 29, 2018)
