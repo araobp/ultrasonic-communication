@@ -74,7 +74,7 @@
 
 /* USER CODE BEGIN Private defines */
 #define PCM_SAMPLES 2048UL
-#define SNR_THRESHOLD 1.5f
+#define SNR_THRESHOLD 3.0f
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

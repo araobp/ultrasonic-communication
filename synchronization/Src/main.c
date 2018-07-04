@@ -155,10 +155,10 @@ void dsp(float32_t *inout, uint32_t sync_position, struct history *phist,
   uint32_t re, im;
 
   // Copy PCM data to input/output buffer for DSP
-  for (uint32_t j = 0; j < PCM_SAMPLES; j++) {
-    re = j * 2;
+  for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
+    re = i * 2;
     im = re + 1;
-    inout[re] = pcm[j + sync_position];
+    inout[re] = pcm[sync_position + i];
     inout[im] = 0.0f;
   }
 
@@ -209,9 +209,10 @@ uint32_t symbol_snr(float32_t *inout, uint32_t sync_position,
 
 void print_history(enum state prev_state, enum state state,
     struct history *hist, int num) {
+
   printf("\nstate: %s => %s\n", STATE[prev_state], STATE[state]);
   printf(
-      "r,  freq,freq_l,freq_r, t_s, t_f,      max,    max_r,    max_l, mag_mean,   snr\n");
+      "r,  freq,freq_l,freq_r, t_s, t_f,      max,    max_l,    max_r, mag_mean,   snr\n");
   for (int i = 0; i < num; i++) {
     printf("%c,%6ld,%6ld,%6ld,%4lu,%4lu, %4.2e, %4.2e, %4.2e, %4.2e,%6.1f\n",
         hist[i].rank, hist[i].max_freq, hist[i].max_freq_left,
@@ -219,6 +220,7 @@ void print_history(enum state prev_state, enum state state,
         hist[i].finish_time % 1000, hist[i].mag_max, hist[i].mag_max_left,
         hist[i].mag_max_right, hist[i].mag_mean, hist[i].snr);
   }
+
 }
 
 /* USER CODE END 0 */
@@ -230,10 +232,10 @@ void print_history(enum state prev_state, enum state state,
  */
 int main(void) {
   /* USER CODE BEGIN 1 */
-  int im, re;
-  int j = 0;
-  int turn = 0;
-  int offset, shift;
+  uint32_t im, re;
+  uint32_t max_idx = 0;
+  uint32_t turn = 0;
+  uint32_t offset, shift;
 
 // Stats-related
   struct history history[8];
@@ -248,11 +250,14 @@ int main(void) {
   float32_t data[PCM_SAMPLES_DOUBLE];
 
   // Time frame synchronization
-  int sync_cnt = 0;
-  int sync_position = 0;
-  float32_t snr;
+  uint32_t sync_cnt = 0;
+  uint32_t sync_position = 0;
+  float32_t snr, snr_up, snr_down;
 
   enum state prev_state = IDLE;
+
+  char msg[128];
+  int msg_len = 0;
 
   /* USER CODE END 1 */
 
@@ -323,8 +328,6 @@ int main(void) {
   offset = PCM_SAMPLES / 8;
   shift = PCM_SAMPLES / 4;
 
-  uint32_t l = 0;
-
   while (1) {
 
     HAL_Delay(1);
@@ -338,12 +341,21 @@ int main(void) {
 
       case IDLE:
         sync_cnt = 0;
+        msg_len = 0;
         arm_mean_f32(&mag_stat[4], 8, &mag_mean);
         // intentionally no break here
 
       case SYNCHRONIZING:
 
         // Execute FFT four times per time frame (every 20.5msec)
+        //
+        //             sync_position = turn * offset + shift * i
+        //             |
+        //             V
+        // data        <-2048 samples->
+        // turn 0  |---|---|---|---|
+        // turn 1  : |---|---|---|---|
+        //          -> offset
         for (uint32_t i = 0; i < 4; i++) {
           sync_position = turn * offset + shift * i;
           int idx = i * 2 + turn;  // Stats index
@@ -362,16 +374,16 @@ int main(void) {
           // Find max magnitude in the history
           mag_max_max = 0.0f;
           for (int i = 0; i < 8; i++) {
-            history[j].rank = '-';
+            history[i].rank = '-';
             mag_max = history[i].mag_max;
             if (mag_max > mag_max_max) {
               mag_max_max = mag_max;
-              j = i;
+              max_idx = i;
             }
           }
 
           mag_stat[0] = mag_max_max;
-          history[j].rank = '+';
+          history[max_idx].rank = '+';
 
           // S/N Ratio
           snr = (mag_max_max - mag_mean) / mag_mean;
@@ -380,7 +392,7 @@ int main(void) {
             state = SYNCHRONIZING;
             if (++sync_cnt >= 3) {
               state = SYNCHRONIZED;
-              sync_position = j;
+              sync_position = max_idx * offset;
             }
           } else {
             state = IDLE;
@@ -389,36 +401,40 @@ int main(void) {
         break;
 
       case SYNCHRONIZED:
-        snr = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
-        if (snr >= SNR_THRESHOLD) {
-          ;
-        } else {
-          snr = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
-          if (snr >= SNR_THRESHOLD) {
+        snr_up = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
+        snr_down = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
+        if ((snr_up >= SNR_THRESHOLD) || (snr_down >= SNR_THRESHOLD)) {
+          if (snr_down > snr_up) {
+            history[0].rank = '-';
+            history[1].rank = 'D';
             state = DATA_RECEIVING;
           } else {
-            state = IDLE;
+            history[0].rank = 'U';
+            history[1].rank = '-';
           }
+        } else {
+          state = IDLE;
         }
-        history[0].rank = '~';
-        history[1].rank = '~';
         break;
 
       case DATA_RECEIVING:
-        snr = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
-        if (snr >= SNR_THRESHOLD) {
-          // 1 bit data is 1
-          history[0].rank = '1';
-          history[1].rank = '-';
-        } else {
-          snr = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
-          if (snr >= SNR_THRESHOLD) {
-            // 1 bit data is 0
+        snr_up = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
+        snr_down = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
+        if ((snr_up >= SNR_THRESHOLD) || (snr_down >= SNR_THRESHOLD)) {
+          if (snr_down > snr_up) {
             history[0].rank = '-';
             history[1].rank = '0';
+            msg[msg_len++] = '0';
           } else {
-            state = IDLE;
+            history[0].rank = '1';
+            history[1].rank = '-';
+            msg[msg_len++] = '1';
           }
+        } else {
+          msg[msg_len] = '\0';
+          printf("%s\n", msg);
+          state = IDLE;
+          msg_len = 0;
         }
         break;
 
