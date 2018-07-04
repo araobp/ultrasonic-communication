@@ -36,9 +36,7 @@ The system architecture is as follows:
 
 ## Mathematical formula expressing ultrasonic wave
 
-I employ chirp modulation for ultrasonic communications.
-
-![](./doc/formula.jpg)
+I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very bad performance at low SNR in a noisy room. So I decided to employ chirp modulation in this project.
 
 ==> [Formula](./misc/Formula.ipynb)
 
@@ -46,9 +44,7 @@ I employ chirp modulation for ultrasonic communications.
 
 ### Simulation of orthogonal chirp
 
-![](./doc/formula_orthogonal_chirp.jpg)
-
-I made simulation of Orthogonal chirp (mixing cosine chirp and sine chirp) and synchronous addition. I confirmed that those methods improve SNR on the receiver.
+Since I/Q modulation code did not fit into RAM of STM32, I am trying orthogonal chirp instead.
 
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
