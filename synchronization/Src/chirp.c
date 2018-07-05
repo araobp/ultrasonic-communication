@@ -29,6 +29,8 @@ void generate_ref_chirp(float *ref_chirp, int updown, float sampling_rate, float
       freq = F0 + delta_f * t /2.0;  // Up chirp
     } else if (updown == DOWN_CHIRP) {
       freq = F1 - delta_f * t / 2.0;    // Down chirp
+    } else {
+      freq = 0.0f;
     }
     theta = 360.0 * freq * t + phase;
     t = t + delta_t;

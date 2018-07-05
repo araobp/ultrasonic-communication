@@ -69,11 +69,12 @@ float T;
 // DMA peripheral to memory buffer
 int32_t buf[PCM_SAMPLES] = { 0 };
 
-// PCM data store for further processing (FFT)
-float pcm[PCM_SAMPLES * 2] = { 0.0f };
+// FIFO queue of PCM data for further processing (FFT)
+// Note: PCM_SAMPLES * 4 does not work. Array size limitation???
+float fifo_queue[PCM_SAMPLES * 3] = { 0.0f };
 
 // FFT-related
-float fft_window[PCM_SAMPLES * 2];
+float hann_window[PCM_SAMPLES];
 const float WINDOW_SCALE = 2.0f * M_PI / (float) PCM_SAMPLES;
 
 // UART output flag
@@ -138,7 +139,7 @@ void pipeline(float *inout, int updown) {
   mult_ref_chirp(inout, updown);
 
   // Windowing
-  arm_mult_f32(inout, fft_window, inout, PCM_SAMPLES * 2);
+  arm_cmplx_mult_real_f32(inout, hann_window, inout, PCM_SAMPLES);
 
   // Execute complex FFT
   arm_cfft_f32(&arm_cfft_sR_f32_len2048, inout, 0, 1);
@@ -158,7 +159,7 @@ void dsp(float32_t *inout, uint32_t sync_position, struct history *phist,
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
     re = i * 2;
     im = re + 1;
-    inout[re] = pcm[sync_position + i];
+    inout[re] = fifo_queue[sync_position + i];
     inout[im] = 0.0f;
   }
 
@@ -232,7 +233,6 @@ void print_history(enum state prev_state, enum state state,
  */
 int main(void) {
   /* USER CODE BEGIN 1 */
-  uint32_t im, re;
   uint32_t max_idx = 0;
   uint32_t turn = 0;
   uint32_t offset, shift;
@@ -247,11 +247,11 @@ int main(void) {
   float mag_mean;
   float mag_max_max;
 
-  float32_t data[PCM_SAMPLES_DOUBLE];
+  float32_t fft_input[PCM_SAMPLES_DOUBLE];
 
   // Time frame synchronization
   uint32_t sync_cnt = 0;
-  uint32_t sync_position = 0;
+  uint32_t sync_position = PCM_SAMPLES_HALF;
   float32_t snr, snr_up, snr_down;
 
   enum state prev_state = IDLE;
@@ -308,10 +308,7 @@ int main(void) {
 
 // Generate Hanning window
   for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-    re = i * 2;
-    im = re + 1;
-    fft_window[re] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
-    fft_window[im] = fft_window[re];
+    hann_window[i] = 0.5f - 0.5f * arm_cos_f32((float) i * WINDOW_SCALE);
   }
 
 // Print starting message
@@ -340,6 +337,7 @@ int main(void) {
       switch (state) {
 
       case IDLE:
+
         sync_cnt = 0;
         msg_len = 0;
         arm_mean_f32(&mag_stat[4], 8, &mag_mean);
@@ -357,9 +355,9 @@ int main(void) {
         // turn 1  : |---|---|---|---|
         //          -> offset
         for (uint32_t i = 0; i < 4; i++) {
-          sync_position = turn * offset + shift * i;
+          sync_position = PCM_SAMPLES_HALF + turn * offset + shift * i;
           int idx = i * 2 + turn;  // Stats index
-          dsp(data, sync_position, &history[idx], mag_mean, UP_CHIRP);
+          dsp(fft_input, sync_position, &history[idx], mag_mean, UP_CHIRP);
         }
 
         turn = (turn == 0) ? 1 : 0;
@@ -382,7 +380,7 @@ int main(void) {
             }
           }
 
-          mag_stat[0] = mag_max_max;
+          mag_stat[0] = mag_max_max;  // TODO: is this necessary?
           history[max_idx].rank = '+';
 
           // S/N Ratio
@@ -392,7 +390,7 @@ int main(void) {
             state = SYNCHRONIZING;
             if (++sync_cnt >= 3) {
               state = SYNCHRONIZED;
-              sync_position = max_idx * offset;
+              sync_position = PCM_SAMPLES_HALF + max_idx * offset;
             }
           } else {
             state = IDLE;
@@ -401,8 +399,11 @@ int main(void) {
         break;
 
       case SYNCHRONIZED:
-        snr_up = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
-        snr_down = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
+        // TODO: SYNCHRONIZED also requires re-sync.
+
+        snr_up = symbol_snr(fft_input, sync_position, &history[0], UP_CHIRP);
+        snr_down = symbol_snr(fft_input, sync_position, &history[1], DOWN_CHIRP);
+
         if ((snr_up >= SNR_THRESHOLD) || (snr_down >= SNR_THRESHOLD)) {
           if (snr_down > snr_up) {
             history[0].rank = '-';
@@ -412,24 +413,75 @@ int main(void) {
             history[0].rank = 'U';
             history[1].rank = '-';
           }
+          history[2].rank = '-';
+          history[3].rank = '-';
         } else {
           state = IDLE;
         }
         break;
 
       case DATA_RECEIVING:
-        snr_up = symbol_snr(data, sync_position, &history[0], UP_CHIRP);
-        snr_down = symbol_snr(data, sync_position, &history[1], DOWN_CHIRP);
+
+        snr_up = symbol_snr(fft_input, sync_position, &history[0], UP_CHIRP);
+        snr_down = symbol_snr(fft_input, sync_position, &history[1], DOWN_CHIRP);
+
         if ((snr_up >= SNR_THRESHOLD) || (snr_down >= SNR_THRESHOLD)) {
-          if (snr_down > snr_up) {
+
+          uint32_t sync_position_l = sync_position - offset;
+          uint32_t sync_position_r = sync_position + offset;
+
+          float32_t snr_l, snr_r;
+
+          if (snr_down > snr_up) {  // Bit low
             history[0].rank = '-';
             history[1].rank = '0';
             msg[msg_len++] = '0';
-          } else {
+
+            // re-synchronization
+            snr_l = symbol_snr(fft_input, sync_position_l, &history[2], DOWN_CHIRP);
+            snr_r = symbol_snr(fft_input, sync_position_r, &history[3], DOWN_CHIRP);
+
+            if ( (snr_down > snr_l) && (snr_down > snr_r) ) {
+              history[2].rank = '-';
+              history[3].rank = '-';
+            } else {  // Adjust sync_position
+              if (snr_l > snr_r) {
+                sync_position = sync_position_l;
+                history[2].rank = 'L';
+                history[3].rank = '-';
+              } else {
+                sync_position = sync_position_r;
+                history[2].rank = '-';
+                history[3].rank = 'R';
+              }
+            }
+
+          } else {  // Bit high
             history[0].rank = '1';
             history[1].rank = '-';
             msg[msg_len++] = '1';
+
+            // re-synchronization
+            snr_l = symbol_snr(fft_input, sync_position_l, &history[2], UP_CHIRP);
+            snr_r = symbol_snr(fft_input, sync_position_r, &history[3], UP_CHIRP);
+
+            if ( (snr_up > snr_l) && (snr_up > snr_r) ) {
+              history[2].rank = '-';
+              history[3].rank = '-';
+            } else {  // Adjust sync_position
+              if (snr_l > snr_r) {
+                sync_position = sync_position_l;
+                history[2].rank = 'L';
+                history[3].rank = '-';
+              } else {
+                sync_position = sync_position_r;
+                history[2].rank = '-';
+                history[3].rank = 'R';
+              }
+            }
+
           }
+
         } else {
           msg[msg_len] = '\0';
           printf("%s\n", msg);
@@ -456,8 +508,10 @@ int main(void) {
         }
         break;
       case SYNCHRONIZED:
+        print_history(prev_state, state, history, 2);
+        break;
       case DATA_RECEIVING:
-          print_history(prev_state, state, history, 2);
+        print_history(prev_state, state, history, 4);
         break;
       default:
         break;
@@ -467,7 +521,7 @@ int main(void) {
         printf("index,Magnitude\n");
         // FFT
         for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-          printf("%lu,%e\n", i, data[i]);
+          printf("%lu,%e\n", i, fft_input[i]);
         }
         printf("EOF\n");
       }
@@ -574,9 +628,9 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
 void HAL_DFSDM_FilterRegConvCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
   if (!new_pcm_data && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    arm_copy_f32(&pcm[PCM_SAMPLES], pcm, PCM_SAMPLES);
+    arm_copy_f32(&fifo_queue[PCM_SAMPLES], fifo_queue, PCM_SAMPLES_DOUBLE);
     for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-      pcm[i + PCM_SAMPLES] = (float) buf[i];
+      fifo_queue[PCM_SAMPLES_DOUBLE + i] = (float) buf[i];
     }
     new_pcm_data = true;
   }
