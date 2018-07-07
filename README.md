@@ -36,9 +36,15 @@ I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very b
 
 ### Time frame synchronization and orthogonal chirp
 
+This is a working code for STM32L4:
+
 ==> [Code](./synchronization)
 
-#### Orthogonal chirp
+#### Simulation of time-frame synchronization
+
+==> [Simulation](./simulation/ChirpSynchronization.ipynb)
+
+#### Simulation of orthogonal chirp
 
 Since I/Q modulation code did not fit into RAM of STM32, I am trying orthogonal chirp instead.
 
@@ -120,21 +126,6 @@ R,   4.3
 
 [Conclusion]
 - Go with FFT per addition of two frames, for the time being.
-
-### Expressing data in symbol
-
-This implementation use up-chirp and down-chirp to express 0 and 1:
-
-- up-chirp means 0.
-- down-chirp means 1.
-
-So one symbol contains 1 bit info.
-
-### Improving SNR (signal-to-noise ratio)
-
-- Bandwidth optimization.
-- Synchronous addition: multiple sets of 2048 PCM samples.
-- Hardware sinc filter optimization on DFSDM.
 
 ### Frame synchronization problems
 
