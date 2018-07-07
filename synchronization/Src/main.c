@@ -94,6 +94,12 @@ const char STATE[4][16] = { "IDLE", "SYNCHRONIZING", "SYNCHRONIZED",
     "DATA_RECEIVING" };
 const char SIMPLE_STATE[4] = { 'I', 'G', 'S' ,'R' };
 
+enum ope_mode {
+  NORMAL, SIMPLE, DETAIL
+};
+
+const enum ope_mode MODE = NORMAL;
+
 // Stats
 struct history {
   float mag_max;  // Max magnitude in the bandwidth

@@ -75,12 +75,6 @@
 /* USER CODE BEGIN Private defines */
 #define PCM_SAMPLES 2048UL
 #define SNR_THRESHOLD 3.0f
-
-enum ope_mode {
-  NORMAL, SIMPLE, DETAIL
-};
-const enum ope_mode MODE = NORMAL;
-
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
