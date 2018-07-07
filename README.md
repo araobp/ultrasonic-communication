@@ -22,8 +22,6 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 ## Platform: STM32L4 platform and FFT test code on MEMS mic
 
-This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
-
 ==> [Platform](PLATFORM.md)
 
 ==> [Test code](./experiments/basic)
