@@ -42,6 +42,8 @@ This is a working code for STM32L4:
 
 #### Simulation of time-frame synchronization
 
+Unsynchronized chirp results in two peaks in frequency domain. Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization.
+
 ==> [Simulation](./simulation/ChirpSynchronization.ipynb)
 
 #### Simulation of orthogonal chirp
@@ -126,14 +128,6 @@ R,   4.3
 
 [Conclusion]
 - Go with FFT per addition of two frames, for the time being.
-
-### Frame synchronization problems
-
-Unsynchronized chirp results in two peaks.
-
-==> [Simulation](./simulation/ChirpSynchronization.ipynb)
-
-Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization, maybe every 8 time frames.
 
 ### Developing my original MEMS mic shield
 
