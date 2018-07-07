@@ -92,6 +92,7 @@ enum state state = IDLE;
 
 const char STATE[4][16] = { "IDLE", "SYNCHRONIZING", "SYNCHRONIZED",
     "DATA_RECEIVING" };
+const char SIMPLE_STATE[4] = { 'I', 'G', 'S' ,'R' };
 
 // Stats
 struct history {
@@ -133,35 +134,28 @@ int32_t idx2freq(uint32_t idx) {
 }
 
 // Digital signal processing pipeline
-void pipeline(float *inout, int updown) {
+void pipeline(float *pframe, int updown) {
 
   // Execute real up-chirp w/ real noise * complex up-chirp
-  mult_ref_chirp(inout, updown);
+  mult_ref_chirp(pframe, updown);
 
   // Windowing
-  arm_cmplx_mult_real_f32(inout, hann_window, inout, PCM_SAMPLES);
+  arm_cmplx_mult_real_f32(pframe, hann_window, pframe, PCM_SAMPLES);
 
   // Execute complex FFT
-  arm_cfft_f32(&arm_cfft_sR_f32_len2048, inout, 0, 1);
+  arm_cfft_f32(&arm_cfft_sR_f32_len2048, pframe, 0, 1);
 
   // Calculate magnitude
-  arm_cmplx_mag_f32(inout, inout, PCM_SAMPLES);
+  arm_cmplx_mag_f32(pframe, pframe, PCM_SAMPLES);
 
 }
 
 // Digital signal processing
-void dsp(float32_t *inout, uint32_t sync_position, struct history *phist,
-    float32_t mag_mean, int updown) {
+void dsp(uint32_t sync_position, struct history *phist, float32_t mag_mean,
+    int updown) {
 
+  float32_t time_frame[PCM_SAMPLES_DOUBLE];
   uint32_t re, im;
-
-  // Copy PCM data to input/output buffer for DSP
-  for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-    re = i * 2;
-    im = re + 1;
-    inout[re] = fifo_queue[sync_position + i];
-    inout[im] = 0.0f;
-  }
 
   float mag_max;
   float mag_max_left;
@@ -170,14 +164,23 @@ void dsp(float32_t *inout, uint32_t sync_position, struct history *phist,
   uint32_t max_idx_left;
   uint32_t max_idx_right;
 
+  // Copy PCM data to input/output buffer for DSP
+  for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
+    re = i * 2;
+    im = re + 1;
+    time_frame[re] = fifo_queue[sync_position + i];
+    time_frame[im] = 0.0f;
+  }
+
   uint32_t start_time = HAL_GetTick();
 
 // Digital signal processing pipeline
-  pipeline(inout, updown);
+  pipeline(time_frame, updown);
 
 // Calculate indexes of max magnitudes
-  arm_max_f32(&inout[idx_left_zero], bandwidth2, &mag_max_left, &max_idx_left);
-  arm_max_f32(&inout[0], bandwidth2, &mag_max_right, &max_idx_right);
+  arm_max_f32(&time_frame[idx_left_zero], bandwidth2, &mag_max_left,
+      &max_idx_left);
+  arm_max_f32(&time_frame[0], bandwidth2, &mag_max_right, &max_idx_right);
   if (mag_max_left > mag_max_right) {
     mag_max = mag_max_left;
     max_idx = idx_left_zero + max_idx_left;
@@ -202,26 +205,76 @@ void dsp(float32_t *inout, uint32_t sync_position, struct history *phist,
 
 }
 
-uint32_t symbol_snr(float32_t *inout, uint32_t sync_position,
-    struct history *phist, int updown) {
-  dsp(inout, sync_position, phist, phist->mag_mean, updown);
+float32_t symbol_snr(uint32_t sync_position, struct history *phist, int updown) {
+  dsp(sync_position, phist, phist->mag_mean, updown);
   return phist->snr;
 }
 
-void print_history(enum state prev_state, enum state state,
-    struct history *hist, int num) {
+void set_ranks(struct history hist[], char r0, char r1) {
+  hist[0].rank = r0;
+  hist[1].rank = r1;
+}
 
-  printf("\nstate: %s => %s\n", STATE[prev_state], STATE[state]);
-  printf(
-      "r,  freq,freq_l,freq_r, t_s, t_f,      max,    max_l,    max_r, mag_mean,   snr\n");
-  for (int i = 0; i < num; i++) {
-    printf("%c,%6ld,%6ld,%6ld,%4lu,%4lu, %4.2e, %4.2e, %4.2e, %4.2e,%6.1f\n",
-        hist[i].rank, hist[i].max_freq, hist[i].max_freq_left,
-        hist[i].max_freq_right, hist[i].start_time % 1000,
-        hist[i].finish_time % 1000, hist[i].mag_max, hist[i].mag_max_left,
-        hist[i].mag_max_right, hist[i].mag_mean, hist[i].snr);
+void resync(float32_t snr, struct history hist[], uint32_t offset,
+    uint32_t *sync_position, int updown) {
+
+  int32_t sync_position_l = *sync_position - offset;
+  int32_t sync_position_r = *sync_position + offset;
+
+  float32_t snr_l = symbol_snr(sync_position_l, &hist[2], updown);
+  float32_t snr_r = symbol_snr(sync_position_r, &hist[3], updown);
+
+  if ((snr > snr_l) && (snr > snr_r)) {
+    set_ranks(&hist[2], '-', '-');
+  } else {  // Adjust sync_position
+
+    if (snr_l >= snr_r) {
+      if (sync_position_l >= 0) {
+        *sync_position = sync_position_l;
+        set_ranks(&hist[2], 'L', '-');  // move sync_position left
+      } else {
+        set_ranks(&hist[2], 'l', '-');  // reached left edge
+      }
+    } else if (snr_l < snr_r) {
+      if (sync_position_r <= PCM_SAMPLES_DOUBLE) {
+        *sync_position = sync_position_r;
+        set_ranks(&hist[2], '-', 'R');  // move sync_position right
+      } else {
+        set_ranks(&hist[2], '-', 'r');  // reached right edge
+      }
+    }
+
   }
+}
 
+void print_history(enum state prev_state, enum state state,
+    struct history hist[], int num, enum ope_mode mode) {
+
+  switch(mode) {
+
+  case NORMAL:
+    break;
+
+  case SIMPLE:
+    printf("%c => %c\n", SIMPLE_STATE[prev_state], SIMPLE_STATE[state]);
+    for (int i = 0; i < num; i++) {
+      printf("%c,%6.1f\n", hist[i].rank, hist[i].snr);
+    }
+    break;
+
+  case DETAIL:
+    printf("\nstate: %s => %s\n", STATE[prev_state], STATE[state]);
+    printf(
+        "r,  freq,freq_l,freq_r, t_s, t_f,      max,    max_l,    max_r, mag_mean,   snr\n");
+    for (int i = 0; i < num; i++) {
+      printf("%c,%6ld,%6ld,%6ld,%4lu,%4lu, %4.2e, %4.2e, %4.2e, %4.2e,%6.1f\n",
+          hist[i].rank, hist[i].max_freq, hist[i].max_freq_left,
+          hist[i].max_freq_right, hist[i].start_time % 1000,
+          hist[i].finish_time % 1000, hist[i].mag_max, hist[i].mag_max_left,
+          hist[i].mag_max_right, hist[i].mag_mean, hist[i].snr);
+    }
+    break;
+  }
 }
 
 /* USER CODE END 0 */
@@ -233,6 +286,8 @@ void print_history(enum state prev_state, enum state state,
  */
 int main(void) {
   /* USER CODE BEGIN 1 */
+  const bool MODE = true;
+
   uint32_t max_idx = 0;
   uint32_t turn = 0;
   uint32_t offset, shift;
@@ -246,8 +301,6 @@ int main(void) {
   float mag_max;
   float mag_mean;
   float mag_max_max;
-
-  float32_t fft_input[PCM_SAMPLES_DOUBLE];
 
   // Time frame synchronization
   uint32_t sync_cnt = 0;
@@ -357,7 +410,7 @@ int main(void) {
         for (uint32_t i = 0; i < 4; i++) {
           sync_position = PCM_SAMPLES_HALF + turn * offset + shift * i;
           int idx = i * 2 + turn;  // Stats index
-          dsp(fft_input, sync_position, &history[idx], mag_mean, UP_CHIRP);
+          dsp(sync_position, &history[idx], mag_mean, UP_CHIRP);
         }
 
         turn = (turn == 0) ? 1 : 0;
@@ -401,20 +454,20 @@ int main(void) {
       case SYNCHRONIZED:
         // TODO: SYNCHRONIZED also requires re-sync.
 
-        snr_up = symbol_snr(fft_input, sync_position, &history[0], UP_CHIRP);
-        snr_down = symbol_snr(fft_input, sync_position, &history[1], DOWN_CHIRP);
+        snr_up = symbol_snr(sync_position, &history[0], UP_CHIRP);
+        snr_down = symbol_snr(sync_position, &history[1], DOWN_CHIRP);
 
         if ((snr_up >= SNR_THRESHOLD) || (snr_down >= SNR_THRESHOLD)) {
+
           if (snr_down > snr_up) {
-            history[0].rank = '-';
-            history[1].rank = 'D';
+            set_ranks(history, '-', 'D');
+            resync(snr_down, history, offset, &sync_position, DOWN_CHIRP);
             state = DATA_RECEIVING;
           } else {
-            history[0].rank = 'U';
-            history[1].rank = '-';
+            set_ranks(history, 'U', '-');
+            resync(snr_up, history, offset, &sync_position, UP_CHIRP);
           }
-          history[2].rank = '-';
-          history[3].rank = '-';
+
         } else {
           state = IDLE;
         }
@@ -422,64 +475,19 @@ int main(void) {
 
       case DATA_RECEIVING:
 
-        snr_up = symbol_snr(fft_input, sync_position, &history[0], UP_CHIRP);
-        snr_down = symbol_snr(fft_input, sync_position, &history[1], DOWN_CHIRP);
+        snr_up = symbol_snr(sync_position, &history[0], UP_CHIRP);
+        snr_down = symbol_snr(sync_position, &history[1], DOWN_CHIRP);
 
         if ((snr_up >= SNR_THRESHOLD) || (snr_down >= SNR_THRESHOLD)) {
 
-          uint32_t sync_position_l = sync_position - offset;
-          uint32_t sync_position_r = sync_position + offset;
-
-          float32_t snr_l, snr_r;
-
           if (snr_down > snr_up) {  // Bit low
-            history[0].rank = '-';
-            history[1].rank = '0';
+            set_ranks(history, '-', '0');
             msg[msg_len++] = '0';
-
-            // re-synchronization
-            snr_l = symbol_snr(fft_input, sync_position_l, &history[2], DOWN_CHIRP);
-            snr_r = symbol_snr(fft_input, sync_position_r, &history[3], DOWN_CHIRP);
-
-            if ( (snr_down > snr_l) && (snr_down > snr_r) ) {
-              history[2].rank = '-';
-              history[3].rank = '-';
-            } else {  // Adjust sync_position
-              if (snr_l > snr_r) {
-                sync_position = sync_position_l;
-                history[2].rank = 'L';
-                history[3].rank = '-';
-              } else {
-                sync_position = sync_position_r;
-                history[2].rank = '-';
-                history[3].rank = 'R';
-              }
-            }
-
+            resync(snr_down, history, offset, &sync_position, DOWN_CHIRP);
           } else {  // Bit high
-            history[0].rank = '1';
-            history[1].rank = '-';
+            set_ranks(history, '1', '-');
             msg[msg_len++] = '1';
-
-            // re-synchronization
-            snr_l = symbol_snr(fft_input, sync_position_l, &history[2], UP_CHIRP);
-            snr_r = symbol_snr(fft_input, sync_position_r, &history[3], UP_CHIRP);
-
-            if ( (snr_up > snr_l) && (snr_up > snr_r) ) {
-              history[2].rank = '-';
-              history[3].rank = '-';
-            } else {  // Adjust sync_position
-              if (snr_l > snr_r) {
-                sync_position = sync_position_l;
-                history[2].rank = 'L';
-                history[3].rank = '-';
-              } else {
-                sync_position = sync_position_r;
-                history[2].rank = '-';
-                history[3].rank = 'R';
-              }
-            }
-
+            resync(snr_up, history, offset, &sync_position, UP_CHIRP);
           }
 
         } else {
@@ -494,42 +502,26 @@ int main(void) {
         break;
       }
 
-      //if (output_result && turn == 1) {  // Output debug info
-
       switch (prev_state) {
       case IDLE:
         if (state == SYNCHRONIZING) {
-          print_history(prev_state, state, history, 8);
+          print_history(prev_state, state, history, 8, MODE);
         }
         break;
       case SYNCHRONIZING:
         if (turn == 1) {  // Output debug info
-          print_history(prev_state, state, history, 8);
+          print_history(prev_state, state, history, 8, MODE);
         }
         break;
       case SYNCHRONIZED:
-        print_history(prev_state, state, history, 2);
+        print_history(prev_state, state, history, 4, MODE);
         break;
       case DATA_RECEIVING:
-        print_history(prev_state, state, history, 4);
+        print_history(prev_state, state, history, 4, MODE);
         break;
       default:
         break;
       }
-
-      if (all_data) {
-        printf("index,Magnitude\n");
-        // FFT
-        for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-          printf("%lu,%e\n", i, fft_input[i]);
-        }
-        printf("EOF\n");
-      }
-
-      // Filtered PCM data (e.g., Hanning Window)
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-      output_result = false;
-      /*}*/
 
       new_pcm_data = false;
     }
