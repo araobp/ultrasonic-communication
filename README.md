@@ -34,11 +34,11 @@ I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very b
 
 ## Work ongoing
 
-### Time frame synchronization
+### Time frame synchronization and orthogonal chirp
 
 ==> [Code](./synchronization)
 
-### Orthogonal chirp
+#### Orthogonal chirp
 
 Since I/Q modulation code did not fit into RAM of STM32, I am trying orthogonal chirp instead.
 
