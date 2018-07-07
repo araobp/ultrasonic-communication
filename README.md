@@ -60,6 +60,71 @@ The receiver could detect the signal and showed a strong peak of magnitude aroun
 
 ==> [Test code](./synchronization)
 
+### Experiment of synchronous addition (July 7, 2018)
+
+[Condition]
+- Volume 18 at my DELL PC (Win10)
+- The receiver is 2 meters away from the transmitter(speaker)
+
+[Results]
+
+DFSDM setting:
+- sinc5 showed better SNR than sinc3 filter 
+
+Synchrouns addition:
+- addition of two frames improved SNR twice, but the ratio between magnitude of upchirp and magnitude of downchirp did not improved.
+- addition of two frames tends to become out of sync faster.
+- addition of three frames was useless.
+
+FFT per one frame
+```
+G => S
+-,   0.8
+-,   0.8
+-,   1.1
+-,   2.4
+-,   3.1
++,   3.4
+-,   2.6
+-,   1.3
+S => S
+U,   3.3
+-,   1.5
+L,   3.4
+-,   2.3
+S => S
+U,   3.2
+-,   1.2
+-,   2.4
+-,   3.1
+```
+
+FFT per addition of two frames
+```
+G => S
++,   3.9
+-,   2.6
+-,   3.5
+-,   1.3
+-,   1.8
+-,   0.5
+-,   1.9
+-,   3.0
+S => S
+U,   4.8
+-,   2.7
+-,   3.7
+-,   4.6
+S => S
+U,   4.2
+-,   2.4
+-,   3.6
+R,   4.3
+```
+
+[Conclusion]
+- Go with FFT per addition of two frames, for the time being.
+
 ### Expressing data in symbol
 
 This implementation use up-chirp and down-chirp to express 0 and 1:
