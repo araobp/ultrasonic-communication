@@ -24,12 +24,6 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
 
-![platform](./doc/MEMSMIC_expansion_board.jpg)
-
-The system architecture is as follows:
-
-![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=2268&h=567)
-
 ==> [Platform](PLATFORM.md)
 
 ==> [Test code](./experiments/basic)
