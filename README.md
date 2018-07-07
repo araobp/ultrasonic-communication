@@ -22,14 +22,6 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 ## Platform: STM32L4 platform and FFT test code on MEMS mic
 
-This project uses STM32L476RG as MCU/DSP and MP34ST01-M as MEMS microphone:
-
-![platform](./doc/MEMSMIC_expansion_board.jpg)
-
-The system architecture is as follows:
-
-![architecture](https://docs.google.com/drawings/d/e/2PACX-1vR1KKp2QeL_SmrnUsTl5zcwddQToPJmnSBHFnxiw78y3_3mjA7EzNl2iNcUA5aOW_jRAQapTNji-eJ7/pub?w=2268&h=567)
-
 ==> [Platform](PLATFORM.md)
 
 ==> [Test code](./experiments/basic)
@@ -42,13 +34,23 @@ I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very b
 
 ## Work ongoing
 
-### Simulation of orthogonal chirp
+### Time frame synchronization and orthogonal chirp
+
+This is a working code for STM32L4:
+
+==> [Code](./synchronization)
+
+#### Simulation of time-frame synchronization
+
+==> [Simulation](./simulation/ChirpSynchronization.ipynb)
+
+#### Simulation of orthogonal chirp
 
 Since I/Q modulation code did not fit into RAM of STM32, I am trying orthogonal chirp instead.
 
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
-### Experiment of orthogonal chirp (June 29, 2018)
+#### Experiment of orthogonal chirp (June 29, 2018)
 
 Very weak orthogonal chirp tone was transmitted to the receiver:
 
@@ -124,21 +126,6 @@ R,   4.3
 
 [Conclusion]
 - Go with FFT per addition of two frames, for the time being.
-
-### Expressing data in symbol
-
-This implementation use up-chirp and down-chirp to express 0 and 1:
-
-- up-chirp means 0.
-- down-chirp means 1.
-
-So one symbol contains 1 bit info.
-
-### Improving SNR (signal-to-noise ratio)
-
-- Bandwidth optimization.
-- Synchronous addition: multiple sets of 2048 PCM samples.
-- Hardware sinc filter optimization on DFSDM.
 
 ### Frame synchronization problems
 
