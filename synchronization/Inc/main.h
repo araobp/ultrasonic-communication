@@ -74,7 +74,8 @@
 
 /* USER CODE BEGIN Private defines */
 #define PCM_SAMPLES 2048UL
-#define SNR_THRESHOLD 3.0f
+#define SNR_THRESHOLD 2.0f
+#define SYNCHRONOUS_ADDITION 1L  // 0 to disable this option
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
