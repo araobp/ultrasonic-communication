@@ -36,13 +36,17 @@ I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very b
 
 ## Work ongoing
 
-### Simulation of orthogonal chirp
+### Time frame synchronization
+
+==> [Code](./synchronization)
+
+### Orthogonal chirp
 
 Since I/Q modulation code did not fit into RAM of STM32, I am trying orthogonal chirp instead.
 
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
-### Experiment of orthogonal chirp (June 29, 2018)
+#### Experiment of orthogonal chirp (June 29, 2018)
 
 Very weak orthogonal chirp tone was transmitted to the receiver:
 
