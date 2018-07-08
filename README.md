@@ -28,7 +28,7 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 ## Mathematical formula expressing ultrasonic wave
 
-I tested frequency-hopping to tranmit data over ultra-sonic, resulting in very bad performance at low SNR in a noisy room. So I decided to employ chirp modulation in this project.
+I tested frequency-hopping to transmit data over ultra-sonic, resulting in very bad performance at low SNR in a noisy room. So I decided to employ chirp modulation in this project.
 
 ==> [Formula](./misc/Formula.ipynb)
 
