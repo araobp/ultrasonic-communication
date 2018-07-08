@@ -1,4 +1,4 @@
-# Ultrasonic communications (Arm Cortex-M4 w/ MEMS mic)
+# Learning DSP with ultrasonic communications
 
 ![](./doc/orthogonal_upchirp.jpg)
 
