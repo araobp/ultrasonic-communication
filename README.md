@@ -127,7 +127,7 @@ R,   4.3
 ```
 
 [Conclusion]
-- Go with FFT per addition of two frames, for the time being.
+- Go with FFT without synchronous addition, for the time being.
 
 ### Developing my original MEMS mic shield
 
