@@ -41,6 +41,19 @@ class Signal:
 
     def chirp_sin(self, updown="up", phase=-pi/2.0):
         return imag(self.chirp(updown, phase))
+    
+    def chirp_orth(self, updown="up", phase=-pi/2.0):
+        t = linspace(0, self.T, int(self.T * self.fs))
+        k = float(self.f1 - self.f0)/float(self.T)
+        if (updown == "up"):
+            f = self.f0 + k * t / 2.0
+        elif (updown == "down"):
+            f = self.f1 - k * t / 2.0
+        arg = (2.0 * pi * f * t) + phase
+        return ( cos(arg) + sin(arg) ) * self.A
+    
+    def silence(self):
+        return zeros(int(self.T * self.fs))
 
     def white_noise(self, A):
         if A == None:
@@ -108,9 +121,9 @@ class Signal:
         g = lfilter(b, a, f)
         return g
 
-    def play(self, wave):
-        write(WAVE_FILE, self.fs, real(wave).astype(int16))
-        display(Audio('./' + WAVE_FILE))
+    def play(self, wave, wave_file=WAVE_FILE):
+        write(wave_file, self.fs, real(wave).astype(int16))
+        display(Audio('./' + wave_file))
 
 def add_delay(chirp, delay_rate=0.0):
     l = len(chirp)

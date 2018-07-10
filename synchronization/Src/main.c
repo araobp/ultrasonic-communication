@@ -99,7 +99,7 @@ enum ope_mode {
   NORMAL, SIMPLE, DETAIL
 };
 
-const enum ope_mode MODE = NORMAL;
+const enum ope_mode MODE = DETAIL;
 
 // Stats
 struct history {
@@ -294,7 +294,6 @@ void print_history(enum state prev_state, enum state state,
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  const bool MODE = true;
 
   uint32_t max_idx = 0;
   uint32_t turn = 0;
@@ -317,8 +316,8 @@ int main(void)
 
   enum state prev_state = IDLE;
 
-  char msg[128];
-  int msg_len = 0;
+  char msg = 0U;
+  int msg_cnt = 0;
 
   /* USER CODE END 1 */
 
@@ -400,7 +399,6 @@ int main(void)
       case IDLE:
 
         sync_cnt = 0;
-        msg_len = 0;
         arm_mean_f32(&mag_stat[4], 8, &mag_mean);
         // intentionally no break here
 
@@ -460,7 +458,6 @@ int main(void)
         break;
 
       case SYNCHRONIZED:
-        // TODO: SYNCHRONIZED also requires re-sync.
 
         snr_up = symbol_snr(sync_position, &history[0], UP_CHIRP);
         snr_down = symbol_snr(sync_position, &history[1], DOWN_CHIRP);
@@ -490,19 +487,24 @@ int main(void)
 
           if (snr_down > snr_up) {  // Bit low
             set_ranks(history, '-', '0');
-            msg[msg_len++] = '0';
+            msg = (msg << 1) + 0;
             resync(snr_down, history, offset, &sync_position, DOWN_CHIRP);
           } else {  // Bit high
             set_ranks(history, '1', '-');
-            msg[msg_len++] = '1';
+            msg = (msg << 1) + 1;
             resync(snr_up, history, offset, &sync_position, UP_CHIRP);
+          }
+          if (++msg_cnt >= 8) {
+            printf("%c", msg);
+            msg = 0U;
+            msg_cnt = 0;
           }
 
         } else {
-          msg[msg_len] = '\0';
-          printf("%s\n", msg);
+          printf("\n");
           state = IDLE;
-          msg_len = 0;
+          msg = 0U;
+          msg_cnt = 0;
         }
         break;
 
@@ -513,19 +515,19 @@ int main(void)
       switch (prev_state) {
       case IDLE:
         if (state == SYNCHRONIZING) {
-          print_history(prev_state, state, history, 8, MODE);
+          //print_history(prev_state, state, history, 8, MODE);
         }
         break;
       case SYNCHRONIZING:
         if (turn == 1) {  // Output debug info
-          print_history(prev_state, state, history, 8, MODE);
+          //print_history(prev_state, state, history, 8, MODE);
         }
         break;
       case SYNCHRONIZED:
-        print_history(prev_state, state, history, 4, MODE);
+        //print_history(prev_state, state, history, 4, MODE);
         break;
       case DATA_RECEIVING:
-        print_history(prev_state, state, history, 4, MODE);
+        //print_history(prev_state, state, history, 4, MODE);
         break;
       default:
         break;
@@ -633,20 +635,12 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
  */
 void HAL_DFSDM_FilterRegConvCpltCallback(
     DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
-  static uint32_t cnt = 0;
   if (!new_pcm_data && (hdfsdm_filter == &hdfsdm1_filter0)) {
-    if (cnt == 0) {
       arm_copy_f32(&fifo_queue[PCM_SAMPLES], fifo_queue, PCM_SAMPLES_DOUBLE);
-      arm_fill_f32(0.0f, &fifo_queue[PCM_SAMPLES_DOUBLE], PCM_SAMPLES);
-    }
     for (uint32_t i = 0; i < PCM_SAMPLES; i++) {
-      uint32_t j = PCM_SAMPLES_DOUBLE + i;
-      fifo_queue[j] = fifo_queue[j] + (float) buf[i];
+      fifo_queue[PCM_SAMPLES_DOUBLE + i] = (float) buf[i];
     }
-    if (++cnt > SYNCHRONOUS_ADDITION) {
-      new_pcm_data = true;
-      cnt = 0;
-    }
+    new_pcm_data = true;
   }
 }
 
