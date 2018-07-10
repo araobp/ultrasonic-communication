@@ -32,27 +32,21 @@ I tested frequency-hopping to transmit data over ultra-sonic, resulting in very 
 
 ==> [Formula](./misc/Formula.ipynb)
 
-## Work ongoing
+## Current work
 
-### Time frame synchronization and orthogonal chirp
-
-This is a working code for STM32L4:
-
-==> [Code](./synchronization)
-
-#### Simulation of time-frame synchronization
+### Simulation of time-frame synchronization
 
 Unsynchronized chirp results in two peaks in frequency domain. Assuming that the clock accuracy of the transmitter and the receiver is bad, sync position adjustment is required even after synchronization.
 
 ==> [Simulation](./simulation/ChirpSynchronization.ipynb)
 
-#### Simulation of orthogonal chirp
+### Simulation of orthogonal chirp
 
 Since I/Q modulation code did not fit into RAM of STM32, I am trying orthogonal chirp instead.
 
 ==> [Simulation](./simulation/OrthogonalChirp.ipynb)
 
-#### Experiment of orthogonal chirp (June 29, 2018)
+### Experiment of orthogonal chirp (June 29, 2018)
 
 Very weak orthogonal chirp tone was transmitted to the receiver:
 
@@ -62,72 +56,13 @@ The receiver could detect the signal and showed a strong peak of magnitude aroun
 
 ![](./doc/Experiment_orthogonal_upchirp_upchirp.jpg)
 
-==> [Test code](./synchronization)
+### Successful implementation of ultrasonic receiver (July 10, 2018)
 
-### Experiment of synchronous addition (July 7, 2018)
+I spent a day to know that 4 times FFT does not fit into 20.5msec time frame (2048 samples/100000Hz) the day before. So I modified the sampling rate to 80MHz /32 divider /32 decimation = 78125Hz, so T of 2048 samples corresponds to 26.2msec.
 
-[Condition]
-- Volume 18 at my DELL PC (Win10)
-- The receiver is 2 meters away from the transmitter(speaker)
+Weak "Hello World!" tone was sent to the receiver, and it could decode the signal and showed the message!
 
-[Results]
-
-DFSDM setting:
-- sinc5 showed better SNR than sinc3 filter 
-
-Synchrouns addition:
-- addition of two frames improved SNR twice, but the ratio between magnitude of upchirp and magnitude of downchirp did not improved.
-- addition of two frames tends to become out of sync faster.
-- addition of three frames was useless.
-
-FFT per one frame
-```
-G => S
--,   0.8
--,   0.8
--,   1.1
--,   2.4
--,   3.1
-+,   3.4
--,   2.6
--,   1.3
-S => S
-U,   3.3
--,   1.5
-L,   3.4
--,   2.3
-S => S
-U,   3.2
--,   1.2
--,   2.4
--,   3.1
-```
-
-FFT per addition of two frames
-```
-G => S
-+,   3.9
--,   2.6
--,   3.5
--,   1.3
--,   1.8
--,   0.5
--,   1.9
--,   3.0
-S => S
-U,   4.8
--,   2.7
--,   3.7
--,   4.6
-S => S
-U,   4.2
--,   2.4
--,   3.6
-R,   4.3
-```
-
-[Conclusion]
-- Go with FFT without synchronous addition, for the time being.
+==> [Code](./synchronization)
 
 ### Developing my original MEMS mic shield
 
@@ -139,10 +74,8 @@ I am going to make my original shield with Knowles MEMS mic:
 
 - Knowles MEMS mic
 - Character LCD
-- Small OEL display
-- LEDs
-- Tactile switches
-- EEPROM
+- Two LEDs (blue and red)
+- Two tactile switches (reset and user)
 
 ## Experiments I made over the past month
 
