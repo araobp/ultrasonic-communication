@@ -70,12 +70,14 @@ I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Kno
 
 ![Knowles](./doc/Knowles.jpg)
 
-I am going to make my original shield with Knowles MEMS mic:
+I am currently developing my original shield with Knowles MEMS mic:
 
 - Knowles MEMS mic
 - Character LCD
 - Two LEDs (blue and red)
-- Two tactile switches (reset and user)
+- One tactile switche (reset)
+
+![](./doc/expansion_board_circuit.jpg)
 
 ## Experiments I made over the past month
 
