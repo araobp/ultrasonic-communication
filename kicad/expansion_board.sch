@@ -38,13 +38,13 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "Ultrasonic receiver expansion board"
-Date "2018-07-10"
-Rev ""
+Date "2018-07-11"
+Rev "0.1"
 Comp "https://github.com/araobp"
 Comment1 ""
-Comment2 ""
+Comment2 "Reset switch and LEDs(blue/red)"
 Comment3 ""
-Comment4 ""
+Comment4 "Knowles MEMS mic and character LCD"
 $EndDescr
 $Comp
 L Conn_01x08 J1
@@ -52,7 +52,7 @@ U 1 1 5B4461AB
 P 2850 3250
 F 0 "J1" H 2850 3650 50  0000 C CNN
 F 1 "Conn_01x08" H 2850 2750 50  0000 C CNN
-F 2 "" H 2850 3250 50  0001 C CNN
+F 2 "expansion_board:Pin Header 8P" H 2850 3250 50  0001 C CNN
 F 3 "" H 2850 3250 50  0001 C CNN
 	1    2850 3250
 	-1   0    0    -1  
@@ -63,7 +63,7 @@ U 1 1 5B4461E6
 P 2850 4900
 F 0 "J2" H 2850 5200 50  0000 C CNN
 F 1 "Conn_01x06" H 2850 4500 50  0000 C CNN
-F 2 "" H 2850 4900 50  0001 C CNN
+F 2 "expansion_board:Pin Header 6P" H 2850 4900 50  0001 C CNN
 F 3 "" H 2850 4900 50  0001 C CNN
 	1    2850 4900
 	-1   0    0    -1  
@@ -74,7 +74,7 @@ U 1 1 5B446201
 P 6900 3350
 F 0 "J8" H 6900 3850 50  0000 C CNN
 F 1 "Conn_01x10" H 6900 2750 50  0000 C CNN
-F 2 "" H 6900 3350 50  0001 C CNN
+F 2 "expansion_board:Pin Header 10P" H 6900 3350 50  0001 C CNN
 F 3 "" H 6900 3350 50  0001 C CNN
 	1    6900 3350
 	1    0    0    1   
@@ -118,7 +118,7 @@ U 1 1 5B4464F0
 P 4350 5900
 F 0 "J3" H 4350 6000 50  0000 C CNN
 F 1 "Conn_01x02" H 4350 5700 50  0000 C CNN
-F 2 "" H 4350 5900 50  0001 C CNN
+F 2 "expansion_board:Pin Header 2P" H 4350 5900 50  0001 C CNN
 F 3 "" H 4350 5900 50  0001 C CNN
 	1    4350 5900
 	0    1    1    0   
@@ -129,7 +129,7 @@ U 1 1 5B4499CF
 P 4650 2900
 F 0 "J4" H 4650 3100 50  0000 C CNN
 F 1 "Conn_01x04_Female" H 4650 2600 50  0000 C CNN
-F 2 "" H 4650 2900 50  0001 C CNN
+F 2 "expansion_board:Pin Header 4P" H 4650 2900 50  0001 C CNN
 F 3 "" H 4650 2900 50  0001 C CNN
 	1    4650 2900
 	1    0    0    -1  
@@ -140,7 +140,7 @@ U 1 1 5B449A02
 P 5400 2900
 F 0 "J6" H 5400 3100 50  0000 C CNN
 F 1 "Conn_01x04_Female" H 5400 2600 50  0000 C CNN
-F 2 "" H 5400 2900 50  0001 C CNN
+F 2 "expansion_board:Pin Header 4P" H 5400 2900 50  0001 C CNN
 F 3 "" H 5400 2900 50  0001 C CNN
 	1    5400 2900
 	-1   0    0    -1  
@@ -166,12 +166,12 @@ CLK
 $Comp
 L LED D1
 U 1 1 5B44A37E
-P 5000 3750
-F 0 "D1" H 5000 3850 50  0000 C CNN
-F 1 "LED red" H 5000 3650 50  0000 C CNN
-F 2 "" H 5000 3750 50  0001 C CNN
-F 3 "" H 5000 3750 50  0001 C CNN
-	1    5000 3750
+P 5000 4400
+F 0 "D1" H 5000 4500 50  0000 C CNN
+F 1 "LED red" H 5000 4300 50  0000 C CNN
+F 2 "expansion_board:LED" H 5000 4400 50  0001 C CNN
+F 3 "" H 5000 4400 50  0001 C CNN
+	1    5000 4400
 	-1   0    0    1   
 $EndComp
 $Comp
@@ -180,7 +180,7 @@ U 1 1 5B44A3FD
 P 5000 4050
 F 0 "D2" H 5000 4150 50  0000 C CNN
 F 1 "LED blue" H 5000 3950 50  0000 C CNN
-F 2 "" H 5000 4050 50  0001 C CNN
+F 2 "expansion_board:LED" H 5000 4050 50  0001 C CNN
 F 3 "" H 5000 4050 50  0001 C CNN
 	1    5000 4050
 	-1   0    0    1   
@@ -188,12 +188,12 @@ $EndComp
 $Comp
 L R R1
 U 1 1 5B44A445
-P 5500 3750
-F 0 "R1" V 5580 3750 50  0000 C CNN
-F 1 "R" V 5500 3750 50  0000 C CNN
-F 2 "" V 5430 3750 50  0001 C CNN
-F 3 "" H 5500 3750 50  0001 C CNN
-	1    5500 3750
+P 5500 4400
+F 0 "R1" V 5580 4400 50  0000 C CNN
+F 1 "470" V 5500 4400 50  0000 C CNN
+F 2 "expansion_board:Register" V 5430 4400 50  0001 C CNN
+F 3 "" H 5500 4400 50  0001 C CNN
+	1    5500 4400
 	0    1    1    0   
 $EndComp
 $Comp
@@ -201,8 +201,8 @@ L R R2
 U 1 1 5B44A4A3
 P 5500 4050
 F 0 "R2" V 5580 4050 50  0000 C CNN
-F 1 "R" V 5500 4050 50  0000 C CNN
-F 2 "" V 5430 4050 50  0001 C CNN
+F 1 "470" V 5500 4050 50  0000 C CNN
+F 2 "expansion_board:Register" V 5430 4050 50  0001 C CNN
 F 3 "" H 5500 4050 50  0001 C CNN
 	1    5500 4050
 	0    1    1    0   
@@ -213,7 +213,7 @@ U 1 1 5B44A653
 P 4950 1700
 F 0 "J5" H 4950 1900 50  0000 C CNN
 F 1 "Conn_01x04_Female" H 4950 1400 50  0000 C CNN
-F 2 "" H 4950 1700 50  0001 C CNN
+F 2 "expansion_board:Pin Header 4P" H 4950 1700 50  0001 C CNN
 F 3 "" H 4950 1700 50  0001 C CNN
 	1    4950 1700
 	0    -1   -1   0   
@@ -224,7 +224,7 @@ U 1 1 5B44A80B
 P 3650 3950
 F 0 "SW1" H 3700 4050 50  0000 L CNN
 F 1 "SW_Push" H 3650 3890 50  0000 C CNN
-F 2 "" H 3650 4150 50  0001 C CNN
+F 2 "expansion_board:Tactile switch 4P" H 3650 4150 50  0001 C CNN
 F 3 "" H 3650 4150 50  0001 C CNN
 	1    3650 3950
 	1    0    0    -1  
@@ -235,7 +235,7 @@ U 1 1 5B44A83A
 P 3650 4250
 F 0 "C1" H 3675 4350 50  0000 L CNN
 F 1 "0.1pF" H 3675 4150 50  0000 L CNN
-F 2 "" H 3688 4100 50  0001 C CNN
+F 2 "expansion_board:Capacitor" H 3688 4100 50  0001 C CNN
 F 3 "" H 3650 4250 50  0001 C CNN
 	1    3650 4250
 	0    1    1    0   
@@ -243,21 +243,37 @@ $EndComp
 Wire Wire Line
 	4150 3550 3050 3550
 Wire Wire Line
-	4150 2650 4150 4900
+	4150 2650 4150 2800
+Wire Wire Line
+	4150 2800 4150 3550
+Wire Wire Line
+	4150 3550 4150 4250
+Wire Wire Line
+	4150 4250 4150 4750
+Wire Wire Line
+	4150 4750 4150 4900
 Wire Wire Line
 	4000 3350 3050 3350
 Wire Wire Line
-	4000 2000 4000 3350
+	4000 2000 4000 2350
 Wire Wire Line
-	3750 2000 3750 3250
+	4000 2350 4000 2450
 Wire Wire Line
-	3050 3250 4550 3250
+	4000 2450 4000 3350
 Wire Wire Line
-	5600 3100 6000 3100
+	3750 2000 3750 2350
 Wire Wire Line
-	6000 3100 6000 5150
+	3750 2350 3750 2550
 Wire Wire Line
-	6000 5150 6700 5150
+	3750 2550 3750 2900
+Wire Wire Line
+	3750 2900 3750 3250
+Wire Wire Line
+	3050 3250 3750 3250
+Wire Wire Line
+	3750 3250 4550 3250
+Wire Wire Line
+	5600 3100 6200 3100
 Connection ~ 4150 3550
 Wire Wire Line
 	4450 3100 4350 3100
@@ -274,7 +290,7 @@ Wire Wire Line
 	5800 2550 3750 2550
 Connection ~ 3750 2550
 Wire Wire Line
-	5150 3750 5350 3750
+	5150 4400 5350 4400
 Wire Wire Line
 	5150 4050 5350 4050
 Wire Wire Line
@@ -284,19 +300,20 @@ Wire Wire Line
 Wire Wire Line
 	5800 5050 6700 5050
 Wire Wire Line
-	5650 3750 5900 3750
+	5650 4400 5950 4400
 Wire Wire Line
-	5900 3750 5900 4950
+	5950 4400 5950 4950
 Wire Wire Line
-	5900 4950 6700 4950
+	5950 4950 6700 4950
 Wire Wire Line
 	4550 3250 4550 4050
 Wire Wire Line
-	4550 3750 4850 3750
+	4550 4050 4550 4400
+Wire Wire Line
+	4550 4400 4850 4400
 Connection ~ 3750 3250
 Wire Wire Line
 	4550 4050 4850 4050
-Connection ~ 4550 3750
 Wire Wire Line
 	4850 1900 4850 2450
 Wire Wire Line
@@ -309,11 +326,11 @@ Wire Wire Line
 Wire Wire Line
 	4950 1900 4950 2450
 Wire Wire Line
-	4950 2450 6300 2450
+	4950 2450 6350 2450
 Wire Wire Line
-	6300 2450 6300 2850
+	6350 2450 6350 2850
 Wire Wire Line
-	6300 2850 6700 2850
+	6350 2850 6700 2850
 Wire Wire Line
 	5050 1900 5050 2350
 Wire Wire Line
@@ -333,7 +350,6 @@ NoConn ~ 6700 3150
 NoConn ~ 6700 3250
 NoConn ~ 6700 3350
 NoConn ~ 6700 3450
-NoConn ~ 6700 3550
 NoConn ~ 3050 2950
 NoConn ~ 3050 3050
 NoConn ~ 3050 3450
@@ -350,7 +366,9 @@ NoConn ~ 3050 4900
 NoConn ~ 3050 4800
 NoConn ~ 3050 4700
 Wire Wire Line
-	3800 4250 4150 4250
+	3800 4250 3950 4250
+Wire Wire Line
+	3950 4250 4150 4250
 Connection ~ 4150 4250
 Wire Wire Line
 	3850 3950 3950 3950
@@ -362,7 +380,9 @@ Wire Wire Line
 Wire Wire Line
 	3050 3150 3200 3150
 Wire Wire Line
-	3200 3150 3200 4250
+	3200 3150 3200 3950
+Wire Wire Line
+	3200 3950 3200 4250
 Wire Wire Line
 	3200 4250 3500 4250
 Connection ~ 3200 3950
@@ -408,15 +428,15 @@ U 1 1 5B44E3D6
 P 6900 5150
 F 0 "J7" H 6900 5550 50  0000 C CNN
 F 1 "Conn_01x08" H 6900 4650 50  0000 C CNN
-F 2 "" H 6900 5150 50  0001 C CNN
+F 2 "expansion_board:Pin Header 8P" H 6900 5150 50  0001 C CNN
 F 3 "" H 6900 5150 50  0001 C CNN
 	1    6900 5150
 	1    0    0    1   
 $EndComp
 NoConn ~ 6700 3650
 NoConn ~ 6700 3750
-Text Label 7000 5200 0    60   ~ 0
-PB3/D4/DFSDM1_DATAIN_7
+Text Label 7000 3600 0    60   ~ 0
+PB6/D10/DFSDM1_DATAIN5
 Text Label 7000 5100 0    60   ~ 0
 PB5/GPIO/D5
 Text Label 7000 5000 0    60   ~ 0
@@ -450,4 +470,12 @@ Wire Wire Line
 	3900 4750 4150 4750
 Connection ~ 4150 4750
 NoConn ~ 4250 5700
+NoConn ~ 6700 5150
+Wire Wire Line
+	6200 3100 6200 3550
+Wire Wire Line
+	6200 3550 6700 3550
+Text Label 3300 6300 0    60   ~ 0
+To_PC2/DFSDM1_CLKOUT(Morpho_connector_CN7_pin#35)
+Connection ~ 4550 4050
 $EndSCHEMATC
