@@ -175,17 +175,6 @@ F 3 "" H 5000 4400 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L LED D2
-U 1 1 5B44A3FD
-P 5000 4050
-F 0 "D2" H 5000 4150 50  0000 C CNN
-F 1 "LED blue" H 5000 3950 50  0000 C CNN
-F 2 "expansion_board:LED" H 5000 4050 50  0001 C CNN
-F 3 "" H 5000 4050 50  0001 C CNN
-	1    5000 4050
-	-1   0    0    1   
-$EndComp
-$Comp
 L R R1
 U 1 1 5B44A445
 P 5500 4400
@@ -194,17 +183,6 @@ F 1 "470" V 5500 4400 50  0000 C CNN
 F 2 "expansion_board:Register" V 5430 4400 50  0001 C CNN
 F 3 "" H 5500 4400 50  0001 C CNN
 	1    5500 4400
-	0    1    1    0   
-$EndComp
-$Comp
-L R R2
-U 1 1 5B44A4A3
-P 5500 4050
-F 0 "R2" V 5580 4050 50  0000 C CNN
-F 1 "470" V 5500 4050 50  0000 C CNN
-F 2 "expansion_board:Register" V 5430 4050 50  0001 C CNN
-F 3 "" H 5500 4050 50  0001 C CNN
-	1    5500 4050
 	0    1    1    0   
 $EndComp
 $Comp
@@ -243,35 +221,15 @@ $EndComp
 Wire Wire Line
 	4150 3550 3050 3550
 Wire Wire Line
-	4150 2650 4150 2800
-Wire Wire Line
-	4150 2800 4150 3550
-Wire Wire Line
-	4150 3550 4150 4250
-Wire Wire Line
-	4150 4250 4150 4750
-Wire Wire Line
-	4150 4750 4150 4900
+	4150 2650 4150 4900
 Wire Wire Line
 	4000 3350 3050 3350
 Wire Wire Line
-	4000 2000 4000 2350
+	4000 2000 4000 3350
 Wire Wire Line
-	4000 2350 4000 2450
+	3750 2000 3750 3250
 Wire Wire Line
-	4000 2450 4000 3350
-Wire Wire Line
-	3750 2000 3750 2350
-Wire Wire Line
-	3750 2350 3750 2550
-Wire Wire Line
-	3750 2550 3750 2900
-Wire Wire Line
-	3750 2900 3750 3250
-Wire Wire Line
-	3050 3250 3750 3250
-Wire Wire Line
-	3750 3250 4550 3250
+	3050 3250 4550 3250
 Wire Wire Line
 	5600 3100 6200 3100
 Connection ~ 4150 3550
@@ -292,28 +250,14 @@ Connection ~ 3750 2550
 Wire Wire Line
 	5150 4400 5350 4400
 Wire Wire Line
-	5150 4050 5350 4050
-Wire Wire Line
-	5650 4050 5800 4050
-Wire Wire Line
-	5800 4050 5800 5050
-Wire Wire Line
-	5800 5050 6700 5050
-Wire Wire Line
 	5650 4400 5950 4400
 Wire Wire Line
 	5950 4400 5950 4950
 Wire Wire Line
-	5950 4950 6700 4950
-Wire Wire Line
-	4550 3250 4550 4050
-Wire Wire Line
-	4550 4050 4550 4400
+	4550 3250 4550 4400
 Wire Wire Line
 	4550 4400 4850 4400
 Connection ~ 3750 3250
-Wire Wire Line
-	4550 4050 4850 4050
 Wire Wire Line
 	4850 1900 4850 2450
 Wire Wire Line
@@ -366,9 +310,7 @@ NoConn ~ 3050 4900
 NoConn ~ 3050 4800
 NoConn ~ 3050 4700
 Wire Wire Line
-	3800 4250 3950 4250
-Wire Wire Line
-	3950 4250 4150 4250
+	3800 4250 4150 4250
 Connection ~ 4150 4250
 Wire Wire Line
 	3850 3950 3950 3950
@@ -380,9 +322,7 @@ Wire Wire Line
 Wire Wire Line
 	3050 3150 3200 3150
 Wire Wire Line
-	3200 3150 3200 3950
-Wire Wire Line
-	3200 3950 3200 4250
+	3200 3150 3200 4250
 Wire Wire Line
 	3200 4250 3500 4250
 Connection ~ 3200 3950
@@ -477,5 +417,7 @@ Wire Wire Line
 	6200 3550 6700 3550
 Text Label 3300 6300 0    60   ~ 0
 To_PC2/DFSDM1_CLKOUT(Morpho_connector_CN7_pin#35)
-Connection ~ 4550 4050
+Wire Wire Line
+	5950 4950 6700 4950
+NoConn ~ 6700 5050
 $EndSCHEMATC
