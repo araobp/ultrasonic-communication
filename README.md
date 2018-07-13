@@ -45,11 +45,11 @@ I developed my original shield with Knowles MEMS mic:
 - LED (red)
 - Tactile switche (reset)
 
-![](./doc/expansion_board_circuit.jpg)
+<img src="./doc/expansion_board_circuit.jpg" alt="drawing" width="500px"/>
 
 #### Pinout of STM32L476RG
 
-![](./doc/Pinout2.jpg)
+<img src="./doc/Pinout2.jpg" alt="drawing" width="400px"/>
 
 #### Working code
 
