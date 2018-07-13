@@ -48,7 +48,7 @@
 /* USER CODE END 0 */
 
 DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
-DFSDM_Channel_HandleTypeDef hdfsdm1_channel2;
+DFSDM_Channel_HandleTypeDef hdfsdm1_channel5;
 DMA_HandleTypeDef hdma_dfsdm1_flt0;
 
 /* DFSDM1 init function */
@@ -67,25 +67,25 @@ void MX_DFSDM1_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  hdfsdm1_channel2.Instance = DFSDM1_Channel2;
-  hdfsdm1_channel2.Init.OutputClock.Activation = ENABLE;
-  hdfsdm1_channel2.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
-  hdfsdm1_channel2.Init.OutputClock.Divider = 32;
-  hdfsdm1_channel2.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
-  hdfsdm1_channel2.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
-  hdfsdm1_channel2.Init.Input.Pins = DFSDM_CHANNEL_SAME_CHANNEL_PINS;
-  hdfsdm1_channel2.Init.SerialInterface.Type = DFSDM_CHANNEL_SPI_RISING;
-  hdfsdm1_channel2.Init.SerialInterface.SpiClock = DFSDM_CHANNEL_SPI_CLOCK_INTERNAL;
-  hdfsdm1_channel2.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
-  hdfsdm1_channel2.Init.Awd.Oversampling = 10;
-  hdfsdm1_channel2.Init.Offset = 0;
-  hdfsdm1_channel2.Init.RightBitShift = 0x2;
-  if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel2) != HAL_OK)
+  hdfsdm1_channel5.Instance = DFSDM1_Channel5;
+  hdfsdm1_channel5.Init.OutputClock.Activation = ENABLE;
+  hdfsdm1_channel5.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
+  hdfsdm1_channel5.Init.OutputClock.Divider = 32;
+  hdfsdm1_channel5.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
+  hdfsdm1_channel5.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
+  hdfsdm1_channel5.Init.Input.Pins = DFSDM_CHANNEL_SAME_CHANNEL_PINS;
+  hdfsdm1_channel5.Init.SerialInterface.Type = DFSDM_CHANNEL_SPI_RISING;
+  hdfsdm1_channel5.Init.SerialInterface.SpiClock = DFSDM_CHANNEL_SPI_CLOCK_INTERNAL;
+  hdfsdm1_channel5.Init.Awd.FilterOrder = DFSDM_CHANNEL_FASTSINC_ORDER;
+  hdfsdm1_channel5.Init.Awd.Oversampling = 10;
+  hdfsdm1_channel5.Init.Offset = 0;
+  hdfsdm1_channel5.Init.RightBitShift = 0x02;
+  if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel5) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  if (HAL_DFSDM_FilterConfigRegChannel(&hdfsdm1_filter0, DFSDM_CHANNEL_2, DFSDM_CONTINUOUS_CONV_ON) != HAL_OK)
+  if (HAL_DFSDM_FilterConfigRegChannel(&hdfsdm1_filter0, DFSDM_CHANNEL_5, DFSDM_CONTINUOUS_CONV_ON) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -113,7 +113,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
   
     /**DFSDM1 GPIO Configuration    
     PC2     ------> DFSDM1_CKOUT
-    PB14     ------> DFSDM1_DATIN2 
+    PB6     ------> DFSDM1_DATIN5 
     */
     GPIO_InitStruct.Pin = GPIO_PIN_2;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -122,7 +122,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
     GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_14;
+    GPIO_InitStruct.Pin = GPIO_PIN_6;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -146,7 +146,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
     hdma_dfsdm1_flt0.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_dfsdm1_flt0.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_dfsdm1_flt0.Init.Mode = DMA_CIRCULAR;
-    hdma_dfsdm1_flt0.Init.Priority = DMA_PRIORITY_MEDIUM;
+    hdma_dfsdm1_flt0.Init.Priority = DMA_PRIORITY_LOW;
     if (HAL_DMA_Init(&hdma_dfsdm1_flt0) != HAL_OK)
     {
       _Error_Handler(__FILE__, __LINE__);
@@ -177,7 +177,7 @@ void HAL_DFSDM_ChannelMspInit(DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle)
   
     /**DFSDM1 GPIO Configuration    
     PC2     ------> DFSDM1_CKOUT
-    PB14     ------> DFSDM1_DATIN2 
+    PB6     ------> DFSDM1_DATIN5 
     */
     GPIO_InitStruct.Pin = GPIO_PIN_2;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -186,7 +186,7 @@ void HAL_DFSDM_ChannelMspInit(DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle)
     GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_14;
+    GPIO_InitStruct.Pin = GPIO_PIN_6;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -214,11 +214,11 @@ void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
   
     /**DFSDM1 GPIO Configuration    
     PC2     ------> DFSDM1_CKOUT
-    PB14     ------> DFSDM1_DATIN2 
+    PB6     ------> DFSDM1_DATIN5 
     */
     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_2);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_14);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6);
 
     /* DFSDM1 DMA DeInit */
     HAL_DMA_DeInit(dfsdm_filterHandle->hdmaInj);
@@ -244,11 +244,11 @@ void HAL_DFSDM_ChannelMspDeInit(DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle
   
     /**DFSDM1 GPIO Configuration    
     PC2     ------> DFSDM1_CKOUT
-    PB14     ------> DFSDM1_DATIN2 
+    PB6     ------> DFSDM1_DATIN5 
     */
     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_2);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_14);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6);
 
   /* USER CODE BEGIN DFSDM1_MspDeInit 1 */
 

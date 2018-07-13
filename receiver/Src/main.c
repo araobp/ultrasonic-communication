@@ -320,6 +320,8 @@ int main(void)
 
   char msg = 0U;
   int msg_cnt = 0;
+  char line[17];
+  int line_cnt = 0;
 
   /* USER CODE END 1 */
 
@@ -343,12 +345,12 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
-  MX_DFSDM1_Init();
   MX_I2C1_Init();
+  MX_DFSDM1_Init();
   /* USER CODE BEGIN 2 */
 
 // FFT sampling rate
-  f_s = SystemCoreClock / hdfsdm1_channel2.Init.OutputClock.Divider
+  f_s = SystemCoreClock / hdfsdm1_channel5.Init.OutputClock.Divider
       / hdfsdm1_filter0.Init.FilterParam.Oversampling
       / hdfsdm1_filter0.Init.FilterParam.IntOversampling;
 
@@ -391,7 +393,11 @@ int main(void)
 
   /* LCD initialization */
   lcd_init(&hi2c1);
-  lcd_test();
+  lcd_string("Receiver start", 15);
+
+  /* LED initialization */
+  int led_state = GPIO_PIN_SET;
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, led_state);
 
   while (1) {
 
@@ -408,6 +414,8 @@ int main(void)
 
         sync_cnt = 0;
         arm_mean_f32(&mag_stat[4], 8, &mag_mean);
+        led_state = GPIO_PIN_SET;
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, led_state);
         // intentionally no break here
 
       case SYNCHRONIZING:
@@ -488,6 +496,9 @@ int main(void)
 
       case DATA_RECEIVING:
 
+        led_state = (led_state == GPIO_PIN_RESET) ? GPIO_PIN_SET: GPIO_PIN_RESET;
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, led_state);
+
         snr_up = symbol_snr(sync_position, &history[0], UP_CHIRP);
         snr_down = symbol_snr(sync_position, &history[1], DOWN_CHIRP);
 
@@ -504,15 +515,21 @@ int main(void)
           }
           if (++msg_cnt >= 8) {
             printf("%c", msg);
+            sprintf(&line[line_cnt++], "%c", msg);
             msg = 0U;
             msg_cnt = 0;
           }
 
         } else {
           printf("\n");
+          line[line_cnt] = '\0';
+          lcd_print_scroll(line);
           state = IDLE;
           msg = 0U;
           msg_cnt = 0;
+          line_cnt = 0;
+          led_state = GPIO_PIN_SET;
+          HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, led_state);
         }
         break;
 
@@ -542,6 +559,7 @@ int main(void)
       }
 
       new_pcm_data = false;
+
     }
   }
 

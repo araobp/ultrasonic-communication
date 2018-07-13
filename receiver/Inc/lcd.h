@@ -20,7 +20,9 @@ void lcd_clear(void);
 void lcd_newline(void);
 void lcd_move_left(void);
 void lcd_move_right(void);
-void lcd_string(uint8_t *pbuf, uint8_t len);
+void lcd_string(char *pbuf, uint8_t len);
+void lcd_print(char *pbuf);
 void lcd_test(void);
+void lcd_print_scroll(char *pbuf);
 
 #endif /* LCD_H_ */

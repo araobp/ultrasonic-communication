@@ -202,7 +202,7 @@ U 1 1 5B44A80B
 P 3650 3950
 F 0 "SW1" H 3700 4050 50  0000 L CNN
 F 1 "SW_Push" H 3650 3890 50  0000 C CNN
-F 2 "expansion_board:Tactile switch 4P" H 3650 4150 50  0001 C CNN
+F 2 "expansion_board:Tactile_switch_4P" H 3650 4150 50  0001 C CNN
 F 3 "" H 3650 4150 50  0001 C CNN
 	1    3650 3950
 	1    0    0    -1  

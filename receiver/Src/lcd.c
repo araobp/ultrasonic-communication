@@ -5,6 +5,7 @@
  */
 
 #include "lcd.h"
+#include "string.h"
 
 const uint16_t lcd_i2c_addr = LCD_I2C_ADDRESS << 1;
 
@@ -64,10 +65,19 @@ void lcd_move_right(void) {
   write_command(0x14);
 }
 
-void lcd_string(uint8_t *pbuf, uint8_t len) {
+void lcd_string(char *pbuf, uint8_t len) {
   uint8_t i;
   for(i=0; i<len; i++) {
     write_data(pbuf[i]);
+  }
+}
+
+void lcd_print(char *pbuf) {
+  uint8_t i;
+  i = 0;
+  while (1) {
+    write_data(pbuf[i++]);
+    if (pbuf[i] == '\0') break;
   }
 }
 
@@ -84,5 +94,17 @@ void lcd_test(void) {
   write_data(0x2d);  // -
   write_data(0x5e);  // ~
   write_data(0x29);  // )
+}
+
+void lcd_print_scroll(char *pbuf) {
+  static char line0[17] = "0123456789012345";
+  static char line1[17] = "0123456789012345";
+
+  strcpy(line1, line0);
+  strcpy(line0, pbuf);
+  lcd_clear();
+  lcd_print(line0);
+  lcd_newline();
+  lcd_print(line1);
 }
 
