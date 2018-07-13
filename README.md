@@ -34,16 +34,14 @@ I tested frequency-hopping to transmit data over ultra-sonic, resulting in very 
 
 ### Developing my original MEMS mic shield
 
-I have bought [this MEMS mic](http://akizukidenshi.com/catalog/g/gM-05577/): Knowles SPM0405HD4H. The spec is similar to the mic on the expansion board from STMicro. Although this one does not support ultrasonic, it should be OK.
-
 ![Knowles](./doc/Knowles.jpg)
 
-I am currently developing my original shield with Knowles MEMS mic:
+I developed my original shield with Knowles MEMS mic:
 
 - Knowles MEMS mic
 - Character LCD
-- Two LEDs (blue and red)
-- One tactile switche (reset)
+- LED (red)
+- Tactile switche (reset)
 
 ![](./doc/expansion_board_circuit.jpg)
 
