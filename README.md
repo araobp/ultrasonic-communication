@@ -1,6 +1,6 @@
 # Learning DSP with ultrasonic communications
 
-<img src="./doc/receiver.jpg" alt="drawing" width="400px"/>
+<img src="./doc/receiver.jpg" alt="drawing" width="350px"/>
 
 ## Background and motivation
 
@@ -30,13 +30,13 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 I tested frequency-hopping to transmit data over ultra-sonic, resulting in very bad performance at low SNR in a noisy room. So I decided to employ chirp modulation in this project.
 
-<img src="./doc/orthogonal_upchirp.jpg" alt="drawing" width="200px"/>
+<img src="./doc/orthogonal_upchirp.jpg" alt="drawing" width="350px"/>
 
 ==> [Formula](./misc/Formula.ipynb)
 
 #### Developing my original MEMS mic shield
 
-<img src="./doc/Knowles.jpg" alt="drawing" width="150px"/>
+<img src="./doc/Knowles.jpg" alt="drawing" width="120px"/>
 
 I developed my original shield with Knowles MEMS mic:
 
