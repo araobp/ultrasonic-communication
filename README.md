@@ -14,17 +14,19 @@ Also thanks to this: https://github.com/y2kblog/NUCLEO-L476RG_DFSDM_PDM-Mic.
 
 I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area networking" by cheap DSP and MEMS mic.
 
-## Project documentation
+## My work so far
+
+#### Project documentation
 
 ==> [Specification](https://docs.google.com/presentation/d/e/2PACX-1vSd3PQnKqmKbjcGNyNh_gygd175jgfzZYH5iwcEPqmmgiy7k3yYzqqHzfs7u-95jm_9hHgc0ugAvv2U/pub?start=false&loop=false&delayms=3000)
 
-## Platform: STM32L4 platform and FFT test code on MEMS mic
+#### Platform: STM32L4 platform and FFT test code on MEMS mic
 
 ==> [Platform](PLATFORM.md)
 
 ==> [Test code](./experiments/basic)
 
-## Mathematical formula expressing ultrasonic wave
+#### Mathematical formula expressing ultrasonic wave
 
 I tested frequency-hopping to transmit data over ultra-sonic, resulting in very bad performance at low SNR in a noisy room. So I decided to employ chirp modulation in this project.
 
@@ -32,7 +34,7 @@ I tested frequency-hopping to transmit data over ultra-sonic, resulting in very 
 
 ==> [Formula](./misc/Formula.ipynb)
 
-### Developing my original MEMS mic shield
+#### Developing my original MEMS mic shield
 
 ![Knowles](./doc/Knowles.jpg)
 
@@ -44,6 +46,12 @@ I developed my original shield with Knowles MEMS mic:
 - Tactile switche (reset)
 
 ![](./doc/expansion_board_circuit.jpg)
+
+#### Working code
+
+Code of the ultrasonic receiver running on STM32L476RG (Arm Cortex-M4L) and the original expansion board:
+
+==> [Code](./receiver)
 
 ## Experiments I made over the past month
 
