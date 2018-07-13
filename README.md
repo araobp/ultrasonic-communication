@@ -22,7 +22,7 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 #### Platform: STM32L4 platform and FFT test code on MEMS mic
 
-==> [Platform](PLATFORM.md)
+==> [Platform](./experiments/PLATFORM.md)
 
 ==> [Test code](./experiments/basic)
 
