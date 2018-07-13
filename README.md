@@ -69,4 +69,4 @@ I have made several experiments over the past month to study how data can be tra
 
 #### Ultrasonic communications experiment (time frame synchronization)
 
-==> [Experiment4](./experiments/EXPERIMENT3.md)
+==> [Experiment4](./experiments/EXPERIMENT4.md)
