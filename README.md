@@ -1,6 +1,6 @@
 # Learning DSP with ultrasonic communications
 
-<img src="./doc/receiver.jpg" alt="drawing" width="350px"/>
+<img src="./doc/receiver.jpg" alt="drawing" width="380px"/>
 
 ## Background and motivation
 
@@ -30,7 +30,7 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 I tested frequency-hopping to transmit data over ultra-sonic, resulting in very bad performance at low SNR in a noisy room. So I decided to employ chirp modulation in this project.
 
-<img src="./doc/orthogonal_upchirp.jpg" alt="drawing" width="350px"/>
+<img src="./doc/orthogonal_upchirp.jpg" alt="drawing" width="450px"/>
 
 ==> [Formula](./misc/Formula.ipynb)
 
@@ -69,7 +69,7 @@ I have made several experiments over the past month to study how data can be tra
 
 #### Ultrasonic communications experiment (Chirp modulation)
 
-![](./doc/Simulation_upchirp_upchirp.jpg)
+<img src="./doc/Simulation_upchirp_upchirp.jpg" alt="drawing" width="400px"/>
 
 ==> [Experiment2](./experiments/EXPERIMENT2.md)
 
