@@ -47,6 +47,10 @@ I developed my original shield with Knowles MEMS mic:
 
 ![](./doc/expansion_board_circuit.jpg)
 
+#### Pinout of STM32L476RG
+
+![](./doc/pinout2.jpg)
+
 #### Working code
 
 Code of the ultrasonic receiver running on STM32L476RG (Arm Cortex-M4L) and the original expansion board:
