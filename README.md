@@ -49,7 +49,7 @@ I developed my original shield with Knowles MEMS mic:
 
 #### Pinout of STM32L476RG
 
-![](./doc/pinout2.jpg)
+![](./doc/Pinout2.jpg)
 
 #### Working code
 
