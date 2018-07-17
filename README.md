@@ -57,6 +57,12 @@ Code of the ultrasonic receiver running on STM32L476RG (Arm Cortex-M4L) and the 
 
 ==> [Code](./receiver)
 
+## Next challenge: I/Q modulation
+
+I already made the code, but it did not fit into the RAM, so I will reduce the number of samples to 1024.
+
+But the resolution of FFT w/ I/Q modulation will be still much better than the current implementation (FFT of 2048 samples w/o I/Q modulation).
+
 ## Experiments I made over the past month
 
 I have made several experiments over the past month to study how data can be transmitted over ultra-sonic wave: FSK, hopping and chirp. The conclusion is to try Chirp modulation to fight with noise.
