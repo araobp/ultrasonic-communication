@@ -4,7 +4,7 @@
 
 Use [X-NUCLEO-CCA02M1](http://www.st.com/en/ecosystems/x-nucleo-cca02m1.html) expansion board to test MEMS microphones with DFSDM.
 
-![expansion](./doc/MEMSMIC_expansion_board.jpg)
+![expansion](../doc/MEMSMIC_expansion_board.jpg)
 
 As per the MEMS mic datasheet, input clock frequency Max value is 3.25MHz.
 
@@ -14,7 +14,7 @@ In this project, to obtain 48kHz sampling rate, the clock divider is set to 52 a
 
 ## Bridge/jumper setting for one microphone (M1) acquisition
 
-![SB](./doc/SB.jpg)
+![SB](../doc/SB.jpg)
 
 Solder bridges to be closed
 
@@ -41,7 +41,7 @@ Note: M1's L/R pin is pulled-down and M2's L/R pin is pulled-up.
 
 This configuration use two lines to aquire sound: one for left mic and the other for right mic.
 
-![Pinout](./doc/Pinout.jpg)
+![Pinout](../doc/Pinout.jpg)
 
 It is also possible to use only one line for both L/R sound acquisition.
 
@@ -67,23 +67,23 @@ It is also possible to use only one line for both L/R sound acquisition.
 I used [this on-line tone generator](http://www.szynalski.com/tone-generator/) to generate sine-wave tone at 18000Hz frequency.
 
 #### PCM data
-![PCM](./doc/PCM_M1.jpg)
+![PCM](./PCM_M1.jpg)
 
 #### Hanning window applied on the PCM data
-![Hanning](./doc/Hanning_M1.jpg)
+![Hanning](./Hanning_M1.jpg)
 
 #### FFT result
-![FFT](./doc/FFT_M1.jpg)
+![FFT](./FFT_M1.jpg)
 
 #### FFT result (dB)
-![FFT DB](./doc/FFT_DB_M1.jpg)
+![FFT DB](./FFT_DB_M1.jpg)
 
 ### Vacuum cleaner
 
 Vaccum cleaner seems to generate tone at around 5000Hz:
 
 #### FFT result
-![FFT_Vaccum_Cleaner](./doc/FFT_Vaccum_Cleaner_M2A.jpg)
+![FFT_Vaccum_Cleaner](./FFT_Vaccum_Cleaner_M2A.jpg)
 
 ## References
 

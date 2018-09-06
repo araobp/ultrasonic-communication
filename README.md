@@ -1,6 +1,6 @@
 # Learning DSP with ultrasonic communications
 
-![](./doc/receiver.jpg)
+<img src="./doc/receiver.jpg" alt="drawing" width="380px"/>
 
 ## Background and motivation
 
@@ -22,7 +22,7 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 #### Platform: STM32L4 platform and FFT test code on MEMS mic
 
-==> [Platform](PLATFORM.md)
+==> [Platform](./experiments/PLATFORM.md)
 
 ==> [Test code](./experiments/basic)
 
@@ -30,13 +30,13 @@ I am a DSP beginner, so I learn DSP by doing: realize "low-power narrow area net
 
 I tested frequency-hopping to transmit data over ultra-sonic, resulting in very bad performance at low SNR in a noisy room. So I decided to employ chirp modulation in this project.
 
-![](./doc/orthogonal_upchirp.jpg)
+<img src="./doc/orthogonal_upchirp.jpg" alt="drawing" width="450px"/>
 
 ==> [Formula](./misc/Formula.ipynb)
 
 #### Developing my original MEMS mic shield
 
-![Knowles](./doc/Knowles.jpg)
+<img src="./doc/Knowles.jpg" alt="drawing" width="120px"/>
 
 I developed my original shield with Knowles MEMS mic:
 
@@ -45,17 +45,23 @@ I developed my original shield with Knowles MEMS mic:
 - LED (red)
 - Tactile switche (reset)
 
-![](./doc/expansion_board_circuit.jpg)
+<img src="./doc/expansion_board_circuit.jpg" alt="drawing" width="600px"/>
 
 #### Pinout of STM32L476RG
 
-![](./doc/Pinout2.jpg)
+<img src="./doc/Pinout2.jpg" alt="drawing" width="360px"/>
 
 #### Working code
 
 Code of the ultrasonic receiver running on STM32L476RG (Arm Cortex-M4L) and the original expansion board:
 
 ==> [Code](./receiver)
+
+## Next challenge: I/Q modulation
+
+I already made the code, but it did not fit into the RAM, so I will reduce the number of samples to 1024.
+
+But the resolution of FFT w/ I/Q modulation will be still much better than the current implementation (FFT of 2048 samples w/o I/Q modulation).
 
 ## Experiments I made over the past month
 
@@ -69,7 +75,7 @@ I have made several experiments over the past month to study how data can be tra
 
 #### Ultrasonic communications experiment (Chirp modulation)
 
-![](./doc/Simulation_upchirp_upchirp.jpg)
+<img src="./doc/Simulation_upchirp_upchirp.jpg" alt="drawing" width="400px"/>
 
 ==> [Experiment2](./experiments/EXPERIMENT2.md)
 
