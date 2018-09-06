@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.rcParams['figure.figsize'] = [10, 4]
 
 Fs = 44100  # Hz
-TIME_FRAME = 1.0 # Time frame in sec
+TIME_FRAME = 0.0262 # Time frame in sec
 AMPLITUDE = 20000 # 16bit PCM max amplitude
 
 # Chirp sweep range in Hz
