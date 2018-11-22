@@ -1,3 +1,7 @@
+Note (Nov 22, 2018): this project needs some rework, since I have studied Arm Cortex-M CMSID DSP a lot in other projects:
+- https://github.com/araobp/acoustic-event-detection
+- https://github.com/araobp/stm32-mcu/tree/master/NUCLEO-L476RG
+
 # Learning DSP with ultrasonic communications
 
 <img src="./doc/receiver.jpg" alt="drawing" width="380px"/>
