@@ -8,6 +8,10 @@ Improvements:
 - Generating pure chirp by DAC on STM32 (to avoid sound effect by Win10 sound device driver).
 - Timer 6 reload for DAC: 25 * 42 - 1 = 1049 
 
+Rework plan:
+- First, test chirp compression with the config above: compression in both time domain (matching filter) and frequency domain (* complex conjugate).
+- Come back to this project.
+
 ---
 # Learning DSP with ultrasonic communications
 
