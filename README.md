@@ -2,6 +2,7 @@
 (Nov 30, 2018) This project was not successful: noises disturbed the communication. I am going to test beam forming to improve SNR.
 
 Improvements:
+- Sampling frequency: 80000000/32/32 = 78.125kHz --> 80000000/25/64 = 50kHz.
 - Complex FFT -> Real FFT
 - Beam forming
 - Generating pure chirp by DAC on STM32 (to avoid sound effect by Win10 sound device driver).
