@@ -1,5 +1,10 @@
 
-This project was not successful: noises disturbed the communication. I am going to test beam forming to improve SNR.
+(Nov 30, 2018) This project was not successful: noises disturbed the communication. I am going to test beam forming to improve SNR.
+
+Improvements:
+- Complex FFT -> Real FFT
+- Beam forming
+- Generating pure chirp by DAC on STM32 (to avoid sound effect by Win10 sound device driver).
 
 ---
 # Learning DSP with ultrasonic communications
