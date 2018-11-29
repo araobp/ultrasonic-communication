@@ -4,7 +4,7 @@
 Improvements:
 - Sampling frequency: 80000000/32/32 = 78.125kHz --> 80000000/25/42 = 76.190kHz.
 - Complex FFT -> Real FFT
-- Beam forming
+- Two mics w/ or w/o beam forming
 - Generating pure chirp by DAC on STM32 (to avoid sound effect by Win10 sound device driver).
 - Timer 6 reload for DAC: 25 * 42 - 1 = 1049 
 
