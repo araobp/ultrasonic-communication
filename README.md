@@ -10,6 +10,7 @@ Improvements:
 
 Rework plan:
 - First, test chirp compression with the config above: compression in both time domain (matching filter) and frequency domain (* complex conjugate).
+- Develop oscilloscope GUI.
 - Come back to this project.
 
 ---
