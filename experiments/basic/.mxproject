@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/shiny/Documents/GitHub/ultrasonic-communication/basic/Inc
+HeaderPath=C:/Users/shiny/Documents/GitHub/ultrasonic-communication/experiments/basic/Inc
 HeaderFiles=stm32l4xx_it.h;stm32l4xx_hal_conf.h;main.h;gpio.h;dfsdm.h;dma.h;usart.h;
-SourcePath=C:/Users/shiny/Documents/GitHub/ultrasonic-communication/basic/Src
+SourcePath=C:/Users/shiny/Documents/GitHub/ultrasonic-communication/experiments/basic/Src
 SourceFiles=stm32l4xx_it.c;stm32l4xx_hal_msp.c;main.c;gpio.c;dfsdm.c;dma.c;usart.c;
 
 [PreviousLibFiles]

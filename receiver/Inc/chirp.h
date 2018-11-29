@@ -9,8 +9,9 @@
 
 #include "stdbool.h"
 
-#define DOWN_CHIRP 0
-#define UP_CHIRP 1
+typedef enum {
+  DOWN_CHIRP, UP_CHIRP
+} chirp;
 
 #define TIME_FRAME 0.0205f
 #define AMPLITUDE 1.0f;
@@ -18,7 +19,7 @@
 #define F1 19000
 
 void init_ref_chirp(float sampling_rate);
-void mult_ref_chirp(float32_t *pInOut, int updown);
-void mult_ref_chirp_sim(float32_t *pInOut, int updown);
+void mult_ref_chirp(float32_t *signal, chirp updown);
+void mult_ref_chirp_sim(float32_t *signal, chirp updown);
 
 #endif /* CHIRP_H_ */

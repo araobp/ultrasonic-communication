@@ -40,9 +40,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "dfsdm.h"
 
-#include "gpio.h"
-#include "dma.h"
-
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -64,9 +61,8 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_filter0.Init.FilterParam.IntOversampling = 1;
   if (HAL_DFSDM_FilterInit(&hdfsdm1_filter0) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
-
   hdfsdm1_channel5.Instance = DFSDM1_Channel5;
   hdfsdm1_channel5.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel5.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;
@@ -82,12 +78,11 @@ void MX_DFSDM1_Init(void)
   hdfsdm1_channel5.Init.RightBitShift = 0x02;
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel5) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
-
   if (HAL_DFSDM_FilterConfigRegChannel(&hdfsdm1_filter0, DFSDM_CHANNEL_5, DFSDM_CONTINUOUS_CONV_ON) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
 }
@@ -99,7 +94,7 @@ static uint32_t DFSDM1_Init = 0;
 void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(DFSDM1_Init == 0)
   {
   /* USER CODE BEGIN DFSDM1_MspInit 0 */
@@ -111,6 +106,8 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
       __HAL_RCC_DFSDM1_CLK_ENABLE();
     }
   
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     /**DFSDM1 GPIO Configuration    
     PC2     ------> DFSDM1_CKOUT
     PB6     ------> DFSDM1_DATIN5 
@@ -149,7 +146,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
     hdma_dfsdm1_flt0.Init.Priority = DMA_PRIORITY_LOW;
     if (HAL_DMA_Init(&hdma_dfsdm1_flt0) != HAL_OK)
     {
-      _Error_Handler(__FILE__, __LINE__);
+      Error_Handler();
     }
 
     /* Several peripheral DMA handle pointers point to the same DMA handle.
@@ -163,7 +160,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle)
 void HAL_DFSDM_ChannelMspInit(DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(DFSDM1_Init == 0)
   {
   /* USER CODE BEGIN DFSDM1_MspInit 0 */
@@ -175,6 +172,8 @@ void HAL_DFSDM_ChannelMspInit(DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle)
       __HAL_RCC_DFSDM1_CLK_ENABLE();
     }
   
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     /**DFSDM1 GPIO Configuration    
     PC2     ------> DFSDM1_CKOUT
     PB6     ------> DFSDM1_DATIN5 
@@ -259,13 +258,5 @@ void HAL_DFSDM_ChannelMspDeInit(DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
