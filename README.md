@@ -1,4 +1,4 @@
-**(Nov 2, 2018) I am going to rework on this project **
+**(Nov 2, 2018) I am going to rework on this project**
 
 ---
 ---
