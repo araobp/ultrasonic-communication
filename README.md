@@ -1,4 +1,4 @@
-**(Nov 2, 2018) This project is superseded by https://github.com/araobp/chirp**
+**(Nov 2, 2018) I am going to rework on this project **
 
 ---
 ---
